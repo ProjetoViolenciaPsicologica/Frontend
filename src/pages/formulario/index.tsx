@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Raleway, Inter } from "next/font/google";
 import Question from "@/components/Question";
 import { questions, categories } from "@/utils/form";
+import { useMutation } from 'react-query';
+import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
-const inter = Inter({
-  weight: "400",
-  style: "normal",
-  subsets: ["latin"],
-});
 
 const raleway = Raleway({
   weight: "700",
@@ -16,8 +14,62 @@ const raleway = Raleway({
   subsets: ["latin"],
 });
 
+
 export default function Index() {
+  const router = useRouter();
   const [page, setPage] = useState(0);
+  const [allOptions, setAllOptions] = useState("");
+  const { mutate } = useMutation(
+    async (data: string) => {
+      const response = await fetch('/api/form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({data}),
+      });
+
+      if (response.ok) {
+        toast.success('Respostas cadastradas com sucesso!', {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        setTimeout(() => {
+          
+        router.push('/dashboard')
+        }, 2000);
+      }
+      else {
+        toast.error('Erro ao enviar as respostas.', {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+
+      return response.json();
+    }
+  );
+
+  useEffect(() => {
+    if(allOptions.length === 30) {
+      const options = allOptions.substring(0, allOptions.length - 1);
+      
+      mutate(options);
+
+    }
+  }, [allOptions, mutate]);
 
   return (
     <Layout>
@@ -54,24 +106,11 @@ export default function Index() {
           </h1>
         </div>
 
-        {page === 0 && <Question question={questions.MEDO} />}
-        {page === 1 && <Question question={questions.DEPENDENCIA} />}
-        {page === 2 && <Question question={questions.CONTROLE} />}
+        {page === 0 && <Question question={questions.MEDO} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
+        {page === 1 && <Question question={questions.DEPENDENCIA} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
+        {page === 2 && <Question question={questions.CONTROLE} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
 
-        <div className="w-full flex justify-center">
-          <button
-            className={`${inter.className} text-xl font-bold text-white w-[202px] h-[59px] bg-green rounded-[32px] mt-7 mb-7`}
-            onClick={() => {
-              page < 2 && setPage(page + 1);
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
-            }}
-          >
-            {page === 2 ? "FINALIZAR" : "AVANÇAR"}
-          </button>
-        </div>
+        
       </div>
     </Layout>
   );
