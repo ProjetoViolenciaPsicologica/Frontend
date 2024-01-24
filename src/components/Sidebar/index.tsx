@@ -32,14 +32,14 @@ export default function Sidebar(){
             href="/dashboard"
             className={`${quicksand.className} t text-white block truncate whitespace-nowrap p-4 `}
           >
-            Sig Sports
+            <Image src="/icon.svg" width={44} height={44} alt={"icon"} />
           </Link>
         </div>
 
         <label
           htmlFor="menu-open"
           id="mobile-menu-button"
-          className="hover:text-white m-2 rounded-md p-2 hover:cursor-pointer focus:outline-none"
+          className="hover:text-white flex items-center rounded-md p-2 hover:cursor-pointer focus:outline-none"
         >
           <svg
             id="menu-open-icon"
@@ -87,7 +87,7 @@ export default function Sidebar(){
             href="/dashboard"
             className="text-white flex items-center justify-center mb-24"
           >
-            <Image src="/icon.svg" width={70} height={70} alt={"icon"} />
+            <Image src="/icon.svg" width={144} height={144} alt={"icon"} />
             
           </Link>
 

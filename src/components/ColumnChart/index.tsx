@@ -47,16 +47,22 @@ const ColumnChart: React.FC<ColumnChartProps> = ({ data }) => {
     },
   ];
 
+  const fullMonthNames = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
+
   return (
     <>
       <select
         value={selectedMonth || ''}
         onChange={(e) => setSelectedMonth(e.target.value || null)}
+        className="w-[90%] sm:w-[269px] h-[46px] mb-4 bg-white rounded-[10px] shadow border border-black border-opacity-10"
       >
         <option value="">Selecione um mês</option>
-        {Object.keys(data).map((month) => (
+        {Object.keys(data).map((month, index) => (
           <option key={month} value={month}>
-            {month}
+            {fullMonthNames[index]}
           </option>
         ))}
       </select>
