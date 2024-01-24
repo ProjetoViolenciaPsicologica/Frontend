@@ -15,7 +15,11 @@ const config: Config = {
       },
       colors:{
         gray:"#DCDCDC",
-        green:"#093520",
+        //green:"#093520",
+        green:{
+          bg:"#093520",
+          ligth:"#377758",
+        }
       }
     },
   },

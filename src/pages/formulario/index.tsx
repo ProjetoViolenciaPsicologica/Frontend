@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { Raleway, Inter } from "next/font/google";
+import { Raleway } from "next/font/google";
 import Question from "@/components/Question";
 import { questions, categories } from "@/utils/form";
 import { useMutation } from 'react-query';
@@ -19,6 +19,7 @@ export default function Index() {
   const router = useRouter();
   const [page, setPage] = useState(0);
   const [allOptions, setAllOptions] = useState("");
+  const [statusRequest, setStatusRequest] = useState(false);
   const { mutate } = useMutation(
     async (data: string) => {
       const response = await fetch('/api/form', {
@@ -40,6 +41,7 @@ export default function Index() {
           progress: undefined,
           theme: "light",
         });
+        setStatusRequest(false);
         setTimeout(() => {
           
         router.push('/dashboard')
@@ -67,7 +69,7 @@ export default function Index() {
       const options = allOptions.substring(0, allOptions.length - 1);
       
       mutate(options);
-
+      setStatusRequest(true);
     }
   }, [allOptions, mutate]);
 
@@ -106,9 +108,9 @@ export default function Index() {
           </h1>
         </div>
 
-        {page === 0 && <Question question={questions.MEDO} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
-        {page === 1 && <Question question={questions.DEPENDENCIA} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
-        {page === 2 && <Question question={questions.CONTROLE} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
+        {page === 0 && <Question question={questions.MEDO} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} status={statusRequest} />}
+        {page === 1 && <Question question={questions.DEPENDENCIA} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} status={statusRequest} />}
+        {page === 2 && <Question question={questions.CONTROLE} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} status={statusRequest} />}
 
         
       </div>
