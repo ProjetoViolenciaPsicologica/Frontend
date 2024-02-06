@@ -3,12 +3,14 @@ import type { AppProps } from "next/app";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AuthProvider } from "@/context/AuthContext";
 
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         <Component {...pageProps} />
         <ToastContainer
           position="top-right"
@@ -23,7 +25,7 @@ export default function App({ Component, pageProps }: AppProps): JSX.Element {
           theme="light"
           limit={1}
         />
-     
+     </AuthProvider>
     </QueryClientProvider>
   );
 }
