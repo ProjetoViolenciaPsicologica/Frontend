@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { GetServerSideProps } from "next";
+import { parseCookies } from 'nookies';
 import { useState, useContext } from "react";
 import { Roboto, Montserrat, Karla } from "next/font/google";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
@@ -36,7 +38,7 @@ const karla = Karla({
 
 export default function Login() {
   const { signIn } = useContext(AuthContext);
-  const [error, setError] = useState(false);
+  const [errorLogin, setError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
@@ -47,7 +49,8 @@ export default function Login() {
   });
   const onSubmit = async (data: FormData) => {
     const response = await signIn(data);
-    if (response !== 200) {
+    console.log(response);
+    if (response) {
       setError(true);
     }
   };
@@ -74,7 +77,7 @@ export default function Login() {
         </h1>
 
         <div className="flex items-center h-full justify-center flex-col w-full">
-          {error && (
+          {errorLogin && (
             <span className="flex items-center p-2 text-lg leading-5 text-red-500">
               Usuário ou senha inválidos
             </span>
@@ -149,4 +152,32 @@ export default function Login() {
       </div>
     </main>
   );
+}
+
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+
+ 
+  const cookies = parseCookies({ req });
+
+  // Acesse o cookie ou qualquer outra informação de autenticação
+  const isAuthenticated = !!cookies['psi-token'];
+
+  // Faça qualquer lógica adicional necessária
+
+ if (isAuthenticated){
+  return {
+    redirect: {
+      destination: '/dashboard',
+      permanent: false,
+    },
+  }
+  
+ }
+
+ return {
+  props: {
+    title:"ok"
+  }
+ }
 }

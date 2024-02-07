@@ -1,13 +1,12 @@
-import React, {useContext} from 'react'
+import React from 'react'
 import { parseCookies } from 'nookies';
 import Layout from "@/components/Layout"
 import { Raleway} from "next/font/google";
 import CardDashboard from "@/components/CardDashboard"
-import { AuthContext } from "@/context/AuthContext";
 import dynamic from 'next/dynamic';
 import { useQuery } from 'react-query';
 import { api } from '@/services'
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps } from "next";
 
 const ColumnChart = dynamic(() => import('@/components/ColumnChart'), { ssr: false });
 
@@ -36,7 +35,6 @@ export interface dadosGraficoType {
 }
 
 export default function Index() {
-  const { isAuthenticated } = useContext(AuthContext);
   const { data:quantidade, isLoading:isLoadingQT } = useQuery('quantidade', async () => {
     const response = await api.get('formulario/quantidade');
     return response.data;
@@ -81,8 +79,7 @@ export default function Index() {
 
 
 
-export async function getServerSideProps(context:any) {
-  const { req } = context;
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
 
   // Acesse o cookie ou qualquer outra informação de autenticação
@@ -98,5 +95,11 @@ export async function getServerSideProps(context:any) {
     },
   }
   
+ }
+
+ return {
+  props: {
+    title:"ok"
+  }
  }
 }
