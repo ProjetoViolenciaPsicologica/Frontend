@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/charts": "^2.0.3",
     "@hookform/resolvers": "^3.3.4",
     "apexcharts": "^3.45.2",
     "axios": "^1.6.5",
