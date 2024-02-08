@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { parseCookies } from 'nookies';
 import Layout from "@/components/Layout"
 import { Raleway} from "next/font/google";
@@ -56,7 +57,9 @@ export default function Index() {
         
         <CardDashboard title='FORMULÁRIOS' qtForm={quantidade?.total_formularios} isQT={isLoadingQT} />
         <CardDashboard title='ARQUIVOS' svg="export" />
+        <Link href="/estatistica">
         <CardDashboard title='ESTATISTICAS' svg="statistic1" />
+        </Link>
         
         </div>
         <div className='w-screen md:w-[90%] h-96 md:h-[80vh] mt-4'>

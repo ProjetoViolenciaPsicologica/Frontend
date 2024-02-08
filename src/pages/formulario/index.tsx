@@ -6,7 +6,8 @@ import { questions, categories } from "@/utils/form";
 import { useMutation } from 'react-query';
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-
+import { GetServerSideProps } from "next";
+import { parseCookies } from 'nookies';
 
 const raleway = Raleway({
   weight: "700",
@@ -116,4 +117,30 @@ export default function Index() {
       </div>
     </Layout>
   );
+}
+
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const cookies = parseCookies({ req });
+
+  // Acesse o cookie ou qualquer outra informação de autenticação
+  const isAuthenticated = !!cookies['psi-token'];
+
+  // Faça qualquer lógica adicional necessária
+
+ if (!isAuthenticated){
+  return {
+    redirect: {
+      destination: '/login',
+      permanent: false,
+    },
+  }
+  
+ }
+
+ return {
+  props: {
+    title:"ok"
+  }
+ }
 }
