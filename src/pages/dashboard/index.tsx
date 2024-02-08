@@ -8,7 +8,7 @@ import { useQuery } from 'react-query';
 import { api } from '@/services'
 import { GetServerSideProps } from "next";
 
-const ColumnChart = dynamic(() => import('@/components/ColumnChart'), { ssr: false });
+const ColumnChart = dynamic(() => import('@/components/Charts/ColumnChart'), { ssr: false });
 
 const raleway = Raleway({
   weight: "400",
