@@ -20,10 +20,10 @@ function index({
 }) {
   return (
     <div
-      className={`bg-gray w-[200px] h-[200px] rounded-[10px] gap-y-4 flex flex-col items-center`}
+      className={`bg-[#4339F2] w-[200px] h-[200px] rounded-[10px] gap-y-4 flex flex-col items-center`}
     >
       <span
-        className={`${raleway.className} mt-5 text-lg font-normal text-black`}
+        className={`${raleway.className} mt-5 text-lg font-normal text-white`}
       >
         {title}
       </span>
@@ -52,7 +52,7 @@ function index({
         </div>
       ) : (
         <span
-          className={`${raleway.className} text-5xl font-normal text-black mt-4`}
+          className={`${raleway.className} text-5xl font-normal text-white mt-4`}
         >
           {qtForm}
         </span>
