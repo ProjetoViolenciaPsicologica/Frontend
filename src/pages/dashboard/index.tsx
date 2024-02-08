@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { parseCookies } from 'nookies';
 import Layout from "@/components/Layout"
 import { Raleway} from "next/font/google";
@@ -52,11 +53,13 @@ export default function Index() {
             <span className={`${raleway.className} w-[256px] mt-4 text-black text-sm font-normal leading-tight`}>Gestão e visualização de informações sobre violência psicológica</span>
        </div>
        <div className='grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-y-14 gap-x-14 mt-4 mx-auto'>
-        <CardDashboard title='USUÁRIOS' svg="user" />
+        <CardDashboard title='USUÁRIOS' svg="user1" />
         
         <CardDashboard title='FORMULÁRIOS' qtForm={quantidade?.total_formularios} isQT={isLoadingQT} />
-        <CardDashboard title='EXPORTAR' svg="export" />
-        <CardDashboard title='ESTATISTICAS' svg="statistic" />
+        <CardDashboard title='ARQUIVOS' svg="export" />
+        <Link href="/estatistica">
+        <CardDashboard title='ESTATISTICAS' svg="statistic1" />
+        </Link>
         
         </div>
         <div className='w-screen md:w-[90%] h-96 md:h-[80vh] mt-4'>

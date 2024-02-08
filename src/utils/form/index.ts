@@ -7,7 +7,7 @@ export const questions = {
         `3- Algum familiar ou relacionamento seu ameaça você com o medo da perda das pessoas e coisas que você mais estima?`,
     ],
     DEPENDENCIA: [
-        `4- Algum familiar ou relacionamento seu muitas vezes humilha você e insiste que você não tem valor, diretamente ou comparando você com outras pessoas? `,
+        `4- Algum familiar ou relacionamento seu  humilha você e insiste que você não tem valor, diretamente ou comparando você com outras pessoas?`,
         `5- Algum familiar ou relacionamento seu insiste que você faça e se esforce mais, mais e mais por ele e absolutamente nada nunca é bom o suficiente, ao passo que ele faz e se esforça menos, menos e menos por você? `,
         `6- Algum familiar ou relacionamento seu castiga você com explosões de fúria? `,
         `7- Algum familiar ou relacionamento seu castiga você com períodos longos de silêncio, dando-lhe "gelo" e passando a agir como se você não existisse? `,

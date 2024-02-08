@@ -81,7 +81,7 @@ export default function Sidebar() {
               <span>USUÁRIOS</span>
             </Link>
             <Link
-              href="/dashboard"
+              href="/estatistica"
               className="flex items-center pl-7 pt-4 md:pt-0 gap-x-2"
             >
               <Image
