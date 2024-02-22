@@ -12,7 +12,7 @@ import * as yup from "yup";
 
 const schema = yup
   .object({
-    username: yup.string().required("Nome de usuário obrigatório"),
+    email: yup.string().required("E-mail obrigatório"),
     password: yup.string().required("Senha obrigatória"),
   })
   .required();
@@ -88,21 +88,21 @@ export default function Login() {
           >
             <div className="flex flex-col w-[82vw] md:w-[447px]">
               <label
-                htmlFor="username"
+                htmlFor="email"
                 className={`${karla.className} font-bold text-2xl`}
               >
                 Usuário
               </label>
               <input
                 type="text"
-                 {...register("username")}
-                name="username"
-                placeholder="Digite seu nome de usuário"
-                className={`py-4 bg-white pl-4 text-[#969696] ${roboto.className} text-lg placeholder:text-[#969696]  placeholder:${roboto.className} placeholder:text-lg rounded-xl shadow border ${errors.username ? "border-red-500" : "border-black border-opacity-10"} `}
+                 {...register("email")}
+                name="email"
+                placeholder="Digite seu e-mail"
+                className={`py-4 bg-white pl-4 text-[#969696] ${roboto.className} text-lg placeholder:text-[#969696]  placeholder:${roboto.className} placeholder:text-lg rounded-xl shadow border ${errors.email ? "border-red-500" : "border-black border-opacity-10"} `}
               />
-               {errors.username && (
+               {errors.email && (
                   <span className="flex items-center p-2 text-lg leading-5 text-red-500">
-                    {errors?.username?.message}
+                    {errors?.email?.message}
                   </span>
                 )}
             </div>
@@ -118,7 +118,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
                   placeholder="Digite sua senha"
-                  className={`py-4 w-full bg-white pl-4 placeholder:text-[#969696] placeholder:${roboto.className} placeholder:text-lg rounded-xl shadow border ${errors.username ? "border-red-500" : "border-black border-opacity-10"}`}
+                  className={`py-4 w-full bg-white pl-4 placeholder:text-[#969696] placeholder:${roboto.className} placeholder:text-lg rounded-xl shadow border ${errors.email ? "border-red-500" : "border-black border-opacity-10"}`}
                 />
                 <button
                   type="button"
