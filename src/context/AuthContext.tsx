@@ -9,7 +9,7 @@ type AuthContextType = {
 };
 
 type SignInCredentials = {
-  username: string;
+  email: string;
   password: string;
 };
 
@@ -18,10 +18,10 @@ export const AuthContext = createContext({} as AuthContextType);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const isAuthenticated = !!token;
-  async function signIn({ username, password }: SignInCredentials) {
+  async function signIn({ email, password }: SignInCredentials) {
     try {
       const response = await api.post("token/", {
-        username,
+        email,
         password,
       });
       setCookie(undefined, "psi-token", response.data.access);
@@ -32,7 +32,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       Router.push("/dashboard");
     } catch (error: any) {
-       
       return error.response.status;
     }
   }
