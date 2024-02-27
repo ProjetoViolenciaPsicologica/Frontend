@@ -76,7 +76,7 @@ export default function Sidebar() {
               <Image src="/form.svg" width={29} height={29} alt={"form"} />
               <span>FORMULÁRIO</span>
             </Link>
-            <Link href="/dashboard" className="flex items-center pl-7  gap-x-2">
+            <Link href="/usuarios" className="flex items-center pl-7  gap-x-2">
               <Image src="/user.svg" width={29} height={29} alt={"user"} />
               <span>USUÁRIOS</span>
             </Link>
