@@ -4,13 +4,11 @@ import { FaSearch } from "react-icons/fa";
 import { TbPencil } from "react-icons/tb";
 import { SlTrash } from "react-icons/sl";
 import { api } from "@/services";
-import { useEffect } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { schema } from "@/utils/users";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "react-query";
-import Loading from "@/components/Loading";
 import { toast } from "react-toastify";
 import {
   Button,
@@ -20,9 +18,10 @@ import {
   Modal,
   Select,
   Table,
+  Spin,
   Pagination,
 } from "antd";
-
+import ModalUserDelete from "@/components/ModalUserDelete";
 const raleway = Raleway({
   weight: "400",
   style: "normal",
@@ -63,10 +62,11 @@ export default function Index() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<number>();
-
+  console.log(selectedUsers);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 6;
   const {
@@ -105,13 +105,8 @@ export default function Index() {
   };
 
   const deleteUser = async (id: number) => {
-    try {
-      await api.delete(`user/${id}`);
-      toast.success("Usuário excluído com sucesso!");
-      refetch();
-    } catch (error) {
-      toast.error("Erro ao excluir usuário.");
-    }
+    setIsModalDeleteOpen(true);
+    setUserId(id);
   };
 
   const editUser = async (id: number) => {
@@ -141,6 +136,7 @@ export default function Index() {
   };
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     try {
       const dataUser = {
         email: data.email,
@@ -160,9 +156,13 @@ export default function Index() {
       setIsModalEditOpen(false);
       setIsEditMode(false);
       setUserId(undefined);
+      setLoading(false);
       refetch();
+      form.resetFields();
     } catch (error) {
       toast.error(`Erro ao ${isEditMode ? "editar" : "criar"} usuário.`);
+    } finally {
+      setLoading(false);
     }
   };
   const mappedData = users?.map((item: any) => ({
@@ -198,42 +198,26 @@ export default function Index() {
   };
 
   const deleteUsers = async () => {
-    const deletionPromises = selectedUsers.map(async (userId) => {
-      try {
-        await api.delete(`user/${userId}`);
-        return { success: true };
-      } catch (error) {
-        return { success: false, error };
-      }
-    });
-
-    const results = await Promise.all(deletionPromises);
-
-    const allDeleted = results.every((result) => result.success);
-
-    if (allDeleted) {
-      // Mostrar notificação de sucesso
-      toast.success("Todos os usuários foram excluídos com sucesso!");
-      refetch();
+    if (selectedUsers.length === 0) {
+      toast.error("Escolha pelo menos 1 usuário para excluir");
     } else {
-      // Mostrar notificação de erro
-      toast.error("Ocorreu um erro ao excluir alguns usuários.");
+      setIsModalDeleteOpen(true);
     }
   };
 
   const columns = [
     {
       title: (
-        <>
+        <div className="flex items-center">
           <Checkbox onChange={toggleSelectAll} checked={selectAll} />
           <Button
             type="link"
             onClick={() => deleteUsers()}
-            className="w-[98px] h-[28.62px] bg-emerald-950 rounded-[32px] text-white text-base font-normal font-['DM Sans'] ml-4"
+            className="w-[98px] h-[28.62px] bg-emerald-950 rounded-[32px] text-white text-base font-normal font-['DM Sans'] ml-4 flex items-center justify-center"
           >
             DELETAR
           </Button>
-        </>
+        </div>
       ),
       key: "checkbox",
       render: (text: any, record: any) => (
@@ -330,17 +314,19 @@ export default function Index() {
           </button>
         </div>
         {isLoading ? (
-          <Loading />
+          <Spin size="large" />
         ) : (
-          <div className="flex flex-col md:w-full mt-2 ">
+          <>
             <Table
               columns={columns}
               dataSource={currentUsers}
               pagination={false} // Desabilitar a paginação dentro do componente Table
               onChange={handleTableChange}
               rowKey="id"
+              className="table-auto divide-y divide-gray-200 even:bg-d9d9d9 odd:bg-aeaeae mt-2 w-full"
+              scroll={{ x: true }}
             />
-          </div>
+          </>
         )}
         <Pagination
           current={currentPage}
@@ -362,7 +348,7 @@ export default function Index() {
             name="nome"
             rules={[{ required: true, message: "Por favor, insira o nome" }]}
           >
-            <Input />
+            <Input placeholder="Digite seu nome" />
           </Form.Item>
           <Form.Item
             label="Sobrenome"
@@ -371,7 +357,7 @@ export default function Index() {
               { required: true, message: "Por favor, insira o sobrenome" },
             ]}
           >
-            <Input />
+            <Input placeholder="Digite sua idade" />
           </Form.Item>
           <Form.Item
             label="Email"
@@ -381,14 +367,21 @@ export default function Index() {
               { type: "email", message: "Email inválido" },
             ]}
           >
-            <Input />
+            <Input placeholder="Digite seu email" />
           </Form.Item>
           <Form.Item
             label="Senha"
             name="senha"
-            rules={[{ required: true, message: "Por favor, insira a senha" }]}
+            rules={[
+              { required: true, message: "Por favor, insira a senha" },
+              {
+                type: "string",
+                min: 6,
+                message: "Senha deve ter no mínimo 6 caracteres",
+              },
+            ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Digite sua senha" />
           </Form.Item>
           <Form.Item
             label="Confirmação de Senha"
@@ -402,7 +395,7 @@ export default function Index() {
               },
             ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Digite sua senha novamente" />
           </Form.Item>
           <Form.Item
             label="Tipo"
@@ -429,7 +422,11 @@ export default function Index() {
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button
+              className="bg-emerald-950 shadow text-white"
+              htmlType="submit"
+              loading={loading}
+            >
               Adicionar
             </Button>
           </Form.Item>
@@ -494,12 +491,23 @@ export default function Index() {
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button
+              htmlType="submit"
+              className="bg-emerald-950 shadow text-white"
+              loading={loading}
+            >
               Editar
             </Button>
           </Form.Item>
         </Form>
       </Modal>
+      <ModalUserDelete
+        isModalDeleteOpen={isModalDeleteOpen}
+        setIsModalDeleteOpen={setIsModalDeleteOpen}
+        userId={userId}
+        selectedUsers={selectedUsers}
+        refetch={refetch}
+      />
     </Layout>
   );
 }
