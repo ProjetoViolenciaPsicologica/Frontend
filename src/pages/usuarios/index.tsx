@@ -314,7 +314,9 @@ export default function Index() {
           </button>
         </div>
         {isLoading ? (
-          <Spin size="large" />
+          <div className="h-full w-full flex items-center justify-center">
+            <Spin size="large" />
+          </div>
         ) : (
           <>
             <Table
