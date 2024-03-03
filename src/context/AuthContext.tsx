@@ -32,7 +32,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       Router.push("/dashboard");
     } catch (error: any) {
-       
       return error.response.status;
     }
   }
