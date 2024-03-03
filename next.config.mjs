@@ -1,6 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-};
+import { join } from 'path';
 
-export default nextConfig;
+// eslint-disable-next-line import/no-anonymous-default-export
+export default {
+  reactStrictMode: true,
+  webpack(config) {
+    config.resolve.fallback = {
+      fs: false,
+      path: false,
+    };
+    return config;
+  },
+};
