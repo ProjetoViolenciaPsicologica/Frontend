@@ -1,3 +1,5 @@
+import * as yup from "yup";
+
 export const categories = ["MEDO", "DEPENDÊNCIA EMOCIONAL", "CONTROLE ABSOLUTO (SUBJUGAÇÃO)"]
 
 export const questions = {
@@ -23,3 +25,12 @@ export const questions = {
         `15- Algum familiar ou relacionamento seu se esforça por controlar como as pessoas enxergam você, passando a imagem para as pessoas de que você é que é uma pessoa desequilibrada e problemática, um peso, um fardo?`
     ]
 }
+
+
+export const schema = yup.object().shape({
+    idade: yup.number().required("Idade é obrigatório"),
+    sexo: yup.string().required("Campo é obrigatório").oneOf(["---"], "Escolha uma das Opções"),
+    grau: yup.string().required("Campo é obrigatória"),
+    local: yup.string().required("Campo é obrigatória"),
+
+  });

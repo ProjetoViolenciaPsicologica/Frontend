@@ -6,7 +6,13 @@ import { questions, categories } from "@/utils/form";
 import { useMutation } from 'react-query';
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-
+import {
+  Button,
+  InputNumber,
+  Form,
+  Input,
+  Select,
+} from "antd";
 
 const raleway = Raleway({
   weight: "700",
@@ -14,11 +20,21 @@ const raleway = Raleway({
   subsets: ["latin"],
 });
 
+export interface dataForm {
+  idade: number
+  escolha_sexo: string
+  grau_de_instrucao: string
+  definicaoLocalForm: string
+}
+
 
 export default function Index() {
+  const [form] = Form.useForm(); // Extrai a referência do form
+
   const router = useRouter();
   const [page, setPage] = useState(0);
   const [allOptions, setAllOptions] = useState("");
+  const [formData, setFormData] = useState<dataForm>()
   const { mutate } = useMutation(
     async (data: string) => {
       const response = await fetch('/api/form', {
@@ -61,12 +77,25 @@ export default function Index() {
       return response.json();
     }
   );
-
+  const onSubmit = async (data: any) => {
+    setFormData(data);
+    // setPage(page + 1);
+    console.log(data)
+  }
   useEffect(() => {
     if(allOptions.length === 30) {
       const options = allOptions.substring(0, allOptions.length - 1);
-      
-      mutate(options);
+      const data = {
+        campo_questoes: options,
+        idade: formData?.idade,
+        escolha_sexo: formData?.escolha_sexo,
+        grau_de_instrucao: formData?.grau_de_instrucao,
+        localAplicacao: {
+          definicaoLocalForm: formData?.definicaoLocalForm
+        }
+        
+      }
+     // mutate(options);
 
     }
   }, [allOptions, mutate]);
@@ -102,13 +131,72 @@ export default function Index() {
           <h1
             className={`${raleway.className} mt-9 text-2xl md:text-4xl font-bold text-black`}
           >
-            CATEGORIA: {categories[page]}
+           {page === 0 ? "Dados de Entrevistado" : `CATEGORIA: ${categories[page]}`}
           </h1>
         </div>
-
-        {page === 0 && <Question question={questions.MEDO} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
-        {page === 1 && <Question question={questions.DEPENDENCIA} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
-        {page === 2 && <Question question={questions.CONTROLE} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
+        {page === 0 && (
+         <div className="h-screen w-full mt-10 md:mt-[88px]">
+            <Form form={form} onFinish={onSubmit} layout="vertical">
+          <Form.Item
+            label="Idade"
+            name="idade"
+            rules={[{ required: true, message: "Por favor, insira sua idade" }]}
+          >
+            <Input type="number" min={2} placeholder="Digite sua idade" className="w-80"/>
+          </Form.Item>
+         
+          <Form.Item
+          className="w-80"
+            label="Sexo"
+            name="escolha_sexo"
+            rules={[{ required: true, message: "Campo é Obrigatório" }]}
+          >
+            <Select >
+              <Select.Option value="masculino">
+                Masculino
+              </Select.Option>
+              <Select.Option value="feminino">Feminino</Select.Option>
+              <Select.Option value="outro">Outro</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item 
+          className="w-80"
+            label="Grau de instrução"
+            name="grau_de_instrucao"
+            rules={[{ required: true, message: "Campo é Obrigatório" }]}
+          >
+            <Select >
+              <Select.Option value="fundamental">Ensino fundamental completo</Select.Option>
+              <Select.Option value="medio">Ensino médio completo</Select.Option>
+              <Select.Option value="superior">Ensino superior completo</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+          className="w-80"
+            label="Local da aplicação"
+            name="definicaoLocalForm"
+            rules={[{ required: true, message: "Campo é Obrigatório" }]}
+          >
+            <Select>
+              <Select.Option value="hospital">Hospital</Select.Option>
+              <Select.Option value="escola">Escola</Select.Option>
+              <Select.Option value="delegacia">Delegacia</Select.Option>
+            </Select>
+          </Form.Item>
+          <div className="flex w-80 md:w-[470px] justify-center mt-10 md:justify-end md:mt-44 items-center">
+            <button
+              type="submit"
+              className="w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+            >
+              Avançar
+            </button>
+          </div>
+        </Form>
+         </div>
+        )}
+        {page === 1 && <Question question={questions.MEDO} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
+        {page === 2 && <Question question={questions.DEPENDENCIA} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
+        {page === 3 && <Question question={questions.CONTROLE} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} />}
 
         
       </div>

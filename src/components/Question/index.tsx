@@ -76,7 +76,7 @@ export default function Index({
       let newOptions = prevOptions + optionsString + ",";
       setAllOptions(newOptions);
       // Mudar de página
-      if (page < 2) {
+      if (page < 3) {
         setPage(page + 1);
       } else {
         // Se for a última página, você pode enviar a string para a API aqui
@@ -191,7 +191,7 @@ export default function Index({
           className={`${inter.className} text-xl font-bold text-white w-[202px] h-[59px] bg-green rounded-[32px] mt-7 mb-7`}
           onClick={handleSubmit}
         >
-          {page === 2 ? "FINALIZAR" : "AVANÇAR"}
+          {page === 3 ? "FINALIZAR" : "AVANÇAR"}
         </button>
       </div>
     </>
