@@ -36,13 +36,9 @@ export default function Index() {
     const token = nookies.get()["psi-token"];
     const response = await api.post("/formulario/novo", data, {
       headers: {
-        Authorization: `Bearer ${token}`,
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+        Authorization: `Bearer ${token}`
       },
     });
-    console.log(response);
     if (response.status === 201) {
       toast.success("Respostas cadastradas com sucesso!", {
         position: "top-center",
