@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { Raleway } from "next/font/google";
+import { Raleway, Inter } from "next/font/google";
 import Question from "@/components/Question";
 import { questions, categories } from "@/utils/form";
-import { useMutation } from 'react-query';
+import { useMutation } from "react-query";
 import { toast } from "react-toastify";
+import { api } from "@/services";
+import nookies from "nookies";
+
 import { useRouter } from "next/router";
-import { GetServerSideProps } from "next";
-import { parseCookies } from 'nookies';
+import { Button, InputNumber, Form, Input, Select } from "antd";
 
 const raleway = Raleway({
   weight: "700",
@@ -15,69 +17,91 @@ const raleway = Raleway({
   subsets: ["latin"],
 });
 
+export interface dataForm {
+  idade: number;
+  escolha_sexo: string;
+  grau_de_instrucao: string;
+  definicaoLocalForm: string;
+}
 
 export default function Index() {
+  const [form] = Form.useForm(); // Extrai a referência do form
+
   const router = useRouter();
   const [page, setPage] = useState(0);
   const [allOptions, setAllOptions] = useState("");
-  const [statusRequest, setStatusRequest] = useState(false);
-  const { mutate } = useMutation(
-    async (data: string) => {
-      const response = await fetch('/api/form', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({data}),
+  const [formData, setFormData] = useState<dataForm>();
+
+  const { mutate } = useMutation(async (data: any) => {
+    const token = nookies.get()["psi-token"];
+    const response = await api.post("/formulario/novo", data, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    if (response.status === 201) {
+      toast.success("Respostas cadastradas com sucesso!", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
       });
-
-      if (response.ok) {
-        toast.success('Respostas cadastradas com sucesso!', {
-          position: "top-center",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        setStatusRequest(false);
-        setTimeout(() => {
-          
-        router.push('/dashboard')
-        }, 2000);
-      }
-      else {
-        toast.error('Erro ao enviar as respostas.', {
-          position: "top-center",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      }
-
-      return response.json();
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 2000);
+    } else {
+      toast.error("Erro ao enviar as respostas.", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
-  );
+
+    return response;
+  });
+
+  const onSubmit = async (data: any) => {
+    setFormData(data);
+    setPage(page + 1);
+  };
 
   useEffect(() => {
-    if(allOptions.length === 30) {
+    if (allOptions.length === 30) {
       const options = allOptions.substring(0, allOptions.length - 1);
-      
-      mutate(options);
-      setStatusRequest(true);
+
+      const data: any = {
+        campo_questoes: options,
+        idade: formData?.idade,
+        escolha_sexo: formData?.escolha_sexo,
+        grau_de_instrucao: formData?.grau_de_instrucao,
+        localAplicacao: {
+          definicaoLocalForm: formData?.definicaoLocalForm,
+        },
+      };
+      mutate(data);
     }
-  }, [allOptions, mutate]);
+  }, [
+    allOptions,
+    formData?.definicaoLocalForm,
+    formData?.escolha_sexo,
+    formData?.grau_de_instrucao,
+    formData?.idade,
+    mutate,
+  ]);
 
   return (
     <Layout>
       <div className="flex bg-[#F6FBF9] h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
-        <div className="mt-4 flex flex-col w-full  md:mt-10">
+        <div className="mt-4 flex flex-col w-full md:mt-10">
           <svg
             width="155"
             height="16"
@@ -105,42 +129,109 @@ export default function Index() {
           <h1
             className={`${raleway.className} mt-9 text-2xl md:text-4xl font-bold text-black`}
           >
-            CATEGORIA: {categories[page]}
+            {page === 0
+              ? "Dados de Entrevistado"
+              : `CATEGORIA: ${categories[page]}`}
           </h1>
         </div>
-
-        {page === 0 && <Question question={questions.MEDO} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} status={statusRequest} />}
-        {page === 1 && <Question question={questions.DEPENDENCIA} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} status={statusRequest} />}
-        {page === 2 && <Question question={questions.CONTROLE} page={page} setPage={setPage} allOptions={allOptions} setAllOptions={setAllOptions} status={statusRequest} />}
-
-        
+        {page === 0 && (
+          <div className="h-screen w-full md:mt-16 ">
+            <Form form={form} onFinish={onSubmit} layout="vertical">
+              <Form.Item
+                label="Idade"
+                name="idade"
+                rules={[
+                  { required: true, message: "Por favor, insira sua idade" },
+                ]}
+              >
+                <Input
+                  type="number"
+                  min={2}
+                  placeholder="Digite sua idade"
+                  className="w-80"
+                />
+              </Form.Item>
+              <Form.Item
+                className="w-80"
+                label="Sexo"
+                name="escolha_sexo"
+                rules={[{ required: true, message: "Campo é Obrigatório" }]}
+              >
+                <Select>
+                  <Select.Option value="masculino">Masculino</Select.Option>
+                  <Select.Option value="feminino">Feminino</Select.Option>
+                  <Select.Option value="outro">Outro</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                className="w-80"
+                label="Grau de instrução"
+                name="grau_de_instrucao"
+                rules={[{ required: true, message: "Campo é Obrigatório" }]}
+              >
+                <Select>
+                  <Select.Option value="fundamental">
+                    Ensino fundamental completo
+                  </Select.Option>
+                  <Select.Option value="medio">
+                    Ensino médio completo
+                  </Select.Option>
+                  <Select.Option value="superior">
+                    Ensino superior completo
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                className="w-80"
+                label="Local da aplicação"
+                name="definicaoLocalForm"
+                rules={[{ required: true, message: "Campo é Obrigatório" }]}
+              >
+                <Select>
+                  <Select.Option value="hospital">Hospital</Select.Option>
+                  <Select.Option value="escola">Escola</Select.Option>
+                  <Select.Option value="delegacia">Delegacia</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item className="flex w-80 md:w-[470px] justify-center mt-10 md:justify-end  items-center">
+                <button
+                  type="submit"
+                  className="w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+                >
+                  Avançar
+                </button>
+              </Form.Item>
+            </Form>
+          </div>
+        )}
+        {page === 1 && (
+          <Question
+            question={questions.MEDO}
+            page={page}
+            setPage={setPage}
+            allOptions={allOptions}
+            setAllOptions={setAllOptions}
+          />
+        )}
+        {page === 2 && (
+          <Question
+            question={questions.DEPENDENCIA}
+            page={page}
+            setPage={setPage}
+            allOptions={allOptions}
+            setAllOptions={setAllOptions}
+          />
+        )}
+        {page === 3 && (
+          <Question
+            question={questions.CONTROLE}
+            page={page}
+            setPage={setPage}
+            allOptions={allOptions}
+            setAllOptions={setAllOptions}
+          />
+        )}
       </div>
     </Layout>
   );
-}
-
-
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const cookies = parseCookies({ req });
-
-  // Acesse o cookie ou qualquer outra informação de autenticação
-  const isAuthenticated = !!cookies['psi-token'];
-
-  // Faça qualquer lógica adicional necessária
-
- if (!isAuthenticated){
-  return {
-    redirect: {
-      destination: '/login',
-      permanent: false,
-    },
-  }
-  
- }
-
- return {
-  props: {
-    title:"ok"
-  }
- }
 }

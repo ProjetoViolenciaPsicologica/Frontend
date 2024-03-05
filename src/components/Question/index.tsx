@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Montserrat, Jost, Inter } from "next/font/google";
+import React, { useState, useEffect } from "react";
+import { Raleway, Montserrat, Jost, Inter } from "next/font/google";
 import { toast } from "react-toastify";
 
 const inter = Inter({
@@ -19,6 +19,11 @@ const montserrat = Montserrat({
   subsets: ["latin"],
 });
 
+const raleway = Raleway({
+  weight: "700",
+  style: "normal",
+  subsets: ["latin"],
+});
 
 export default function Index({
   question,
@@ -26,18 +31,15 @@ export default function Index({
   setPage,
   allOptions,
   setAllOptions,
-  status,
 }: {
   question: string[];
   page: number;
   setPage: (page: number) => void;
   allOptions: string;
   setAllOptions: (allOptions: string) => void;
-  status: boolean;
 }) {
   const [selectedOptions, setSelectedOptions] = useState<any>({});
   const [, setErrors] = useState({});
-
   const handleRadioChange = (questionIndex: number, value: string) => {
     setSelectedOptions((prevOptions: any) => ({
       ...prevOptions,
@@ -48,8 +50,8 @@ export default function Index({
       [questionIndex.toString()]: false,
     }));
   };
-
   const handleSubmit = () => {
+    // Validar se alguma questão não foi respondida
     const newErrors: Record<string, boolean> = {};
     question.forEach((_, index) => {
       if (!selectedOptions[index.toString()]) {
@@ -60,28 +62,32 @@ export default function Index({
     });
     setErrors(newErrors);
 
+    // Verificar se todas as questões foram respondidas
     const allQuestionsAnswered = Object.values(newErrors).every(
       (error) => !error
     );
 
     if (allQuestionsAnswered) {
+      // Realizar ações necessárias com as opções selecionadas
 
       const optionsString = Object.values(selectedOptions).join(",");
 
-      let prevOptions = allOptions;
+      let prevOptions = allOptions; // assuming allOptions is the previous state
       let newOptions = prevOptions + optionsString + ",";
       setAllOptions(newOptions);
       // Mudar de página
-      if (page < 2) {
+      if (page < 3) {
         setPage(page + 1);
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
+      } else {
+        // Se for a última página, você pode enviar a string para a API aqui
+        console.log("Enviar para a API:", allOptions);
       }
 
       // Scroll para o topo
-      
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     } else {
       // Se alguma questão não foi respondida, você pode exibir uma mensagem de erro ou tomar outra ação apropriada.
       toast.error("Por favor, responda a todas as perguntas.", {
@@ -109,7 +115,7 @@ export default function Index({
                 {question}
               </h1>
               <div className="mt-7 mb-11 w-full h-[182px] p-2 bg-white bg-opacity-70 rounded-2xl shadow border border-white border-opacity-70 flex-col gap-y-2 justify-center items-start inline-flex">
-               
+                {/* faça 4 inputs radios */}
 
                 <div className="flex items-center">
                   <input
@@ -181,20 +187,13 @@ export default function Index({
         })}
       </div>
       <div className="w-full flex justify-center">
-  <button
-    className={`${inter.className} ${status ? "bg-green-ligth cursor-wait" : "bg-green-bg cursor-pointer"} text-xl font-bold text-white w-[202px] h-[59px]  rounded-[32px] mt-7 mb-7 relative`}
-    onClick={handleSubmit}
-  >
-    {page === 2 && !status && "FINALIZAR"}
-    {page < 2 && "AVANÇAR"}
-    {status && (
-      <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <div className="animate-spin w-6 h-6 border-t-2 border-white rounded-full"></div>
-      </span>
-    )}
-  </button>
-</div>
-
+        <button
+          className={`${inter.className} text-xl font-bold text-white w-[202px] h-[59px] bg-emerald-950 rounded-[32px] mt-7 mb-7`}
+          onClick={handleSubmit}
+        >
+          {page === 3 ? "FINALIZAR" : "AVANÇAR"}
+        </button>
+      </div>
     </>
   );
 }
