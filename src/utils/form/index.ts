@@ -1,8 +1,8 @@
 export const categories = [
   "",
-  "MEDO",
-  "DEPENDÊNCIA EMOCIONAL",
-  "CONTROLE ABSOLUTO (SUBJUGAÇÃO)",
+  "1",
+  "2",
+  "3",
 ];
 
 export const questions = {

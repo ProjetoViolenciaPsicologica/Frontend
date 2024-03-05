@@ -73,7 +73,7 @@ export default function Login() {
         <h1
           className={`text-4xl font-bold ${montserrat.className} text-[#2D3A3A]`}
         >
-          Nome do sistema
+          KM-QUEST
         </h1>
 
         <div className="flex items-center h-full justify-center flex-col w-full">

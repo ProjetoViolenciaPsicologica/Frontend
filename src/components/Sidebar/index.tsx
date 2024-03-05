@@ -46,7 +46,7 @@ export default function Sidebar() {
 
       <aside
         id="sidebar"
-        className={`absolute inset-y-0 left-0 z-50 w-3/4 min-w-[13%] transform space-y-6 overflow-y-auto bg-gray px-0 pt-6 text-gray-100 transition duration-200 ease-in-out md:relative md:flex md:w-64 md:translate-x-0 md:flex-col md:justify-between ${
+        className={`absolute inset-y-0 left-0 z-50 w-3/4 min-w-[13%] transform space-y-6  bg-gray px-0 pt-6 text-gray-100 transition duration-200 ease-in-out md:relative md:flex md:w-64 md:translate-x-0 md:flex-col md:justify-between ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -54,13 +54,15 @@ export default function Sidebar() {
           className="flex flex-col space-y-6"
           data-dev-hint="optional div for having an extra footer navigation"
         >
+         
           <Link
             href="/dashboard"
-            className="text-white flex items-center justify-center mb-24"
+            className="text-white flex flex-col items-center justify-center mb-24"
           >
             <Image src="/icon.svg" width={144} height={144} alt={"icon"} />
+            <h1 className="text-neutral-700 text-4xl font-bold font-['Montserrat'] leading-[46.80px]">KM-QUEST</h1>
           </Link>
-
+          
           <nav
             data-dev-hint="main navigation"
             className={`${raleway.className} flex flex-col justify-center md:gap-y-4 text-bgGray  font-normal`}

@@ -7,9 +7,9 @@ import { useMutation } from "react-query";
 import { toast } from "react-toastify";
 import { api } from "@/services";
 import nookies from "nookies";
-
+import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
-import { Button, InputNumber, Form, Input, Select } from "antd";
+import { Steps, Form, Input, Select } from "antd";
 
 const raleway = Raleway({
   weight: "700",
@@ -26,19 +26,34 @@ export interface dataForm {
 
 export default function Index() {
   const [form] = Form.useForm(); // Extrai a referência do form
-
   const router = useRouter();
   const [page, setPage] = useState(0);
   const [allOptions, setAllOptions] = useState("");
   const [formData, setFormData] = useState<dataForm>();
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [sumQuestion, setSumQuestion] = useState<number>(16);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 768);
+    };
+
+    handleResize(); // Define o tamanho inicial da tela
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Executa este efeito apenas uma vez no momento da montage
 
   const { mutate } = useMutation(async (data: any) => {
     const token = nookies.get()["psi-token"];
+    // erro de cors como corrigir
     const response = await api.post("/formulario/novo", data, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     });
+    console.log(response);
     if (response.status === 201) {
       toast.success("Respostas cadastradas com sucesso!", {
         position: "top-center",
@@ -76,18 +91,22 @@ export default function Index() {
 
   useEffect(() => {
     if (allOptions.length === 30) {
+      console.log(allOptions);
       const options = allOptions.substring(0, allOptions.length - 1);
-
-      const data: any = {
-        campo_questoes: options,
-        idade: formData?.idade,
-        escolha_sexo: formData?.escolha_sexo,
-        grau_de_instrucao: formData?.grau_de_instrucao,
-        localAplicacao: {
-          definicaoLocalForm: formData?.definicaoLocalForm,
-        },
-      };
-      mutate(data);
+      const questions = options.split(",");
+      const sum = questions.map(Number).reduce((acc, curr) => acc + curr, 0);
+      setSumQuestion(sum);
+      setIsModalOpen(true);
+      // const data: any = {
+      //   campo_questoes: options,
+      //   idade: formData?.idade,
+      //   escolha_sexo: formData?.escolha_sexo,
+      //   grau_de_instrucao: formData?.grau_de_instrucao,
+      //   localAplicacao: {
+      //     definicaoLocalForm: formData?.definicaoLocalForm,
+      //   },
+      // };
+      // mutate(data);
     }
   }, [
     allOptions,
@@ -102,36 +121,84 @@ export default function Index() {
     <Layout>
       <div className="flex bg-[#F6FBF9] h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
         <div className="mt-4 flex flex-col w-full md:mt-10">
-          <svg
-            width="155"
-            height="16"
-            viewBox="0 0 155 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="6" cy="8" r="6" fill="#093520" />
-            <line x1="20" y1="7.5" x2="60" y2="7.5" stroke="#093520" />
-            <circle
-              cx="74"
-              cy="8"
-              r="6"
-              fill={page === 0 ? "#B9B9C4" : "#093520"}
+          {isSmallScreen ? (
+            <div className="absolute left-0 rigt-0">
+              <svg
+                width="395"
+                height="16"
+                viewBox="0 0 375 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="6" cy="8" r="6" fill="#093520" />
+                <line x1="20" y1="8" x2="80" y2="8" stroke="#093520" />
+                <circle
+                  cx="94"
+                  cy="8"
+                  r="6"
+                  fill={page === 0 ? "#B9B9C4" : "#093520"}
+                />
+                <line
+                  x1="108"
+                  y1="8"
+                  x2="168"
+                  y2="8"
+                  stroke={page < 3 ? "#B9B9C4" : "#093520"}
+                />
+                <circle
+                  cx="182"
+                  cy="8"
+                  r="6"
+                  fill={page < 3 ? "#B9B9C4" : "#093520"}
+                />
+                <line
+                  x1="196"
+                  y1="8"
+                  x2="256"
+                  y2="8"
+                  stroke={page === 3 ? "#093520" : "#B9B9C4"}
+                />
+                <circle
+                  cx="270"
+                  cy="8"
+                  r="6"
+                  fill={page < 3 ? "#B9B9C4" : "#093520"}
+                />
+              </svg>
+            </div>
+          ) : (
+            <Steps
+              direction="horizontal"
+              className="w-[155px]"
+              progressDot
+              current={page}
+              items={[
+                {
+                  title: "Formulário",
+                  description: "",
+                },
+                {
+                  title: "Categoria 1",
+                  description: "",
+                },
+                {
+                  title: "Categoria 2",
+                  description: "",
+                },
+                {
+                  title: "Categoria 3",
+                  description: "",
+                },
+              ]}
             />
-            <line x1="88" y1="7.5" x2="128" y2="7.5" stroke="#B9B9C4" />
-            <circle
-              cx="142"
-              cy="8"
-              r="6"
-              fill={page < 2 ? "#B9B9C4" : "#093520"}
-            />
-          </svg>
+          )}
 
           <h1
             className={`${raleway.className} mt-9 text-2xl md:text-4xl font-bold text-black`}
           >
             {page === 0
               ? "Dados de Entrevistado"
-              : `CATEGORIA: ${categories[page]}`}
+              : `CATEGORIA ${categories[page]}`}
           </h1>
         </div>
         {page === 0 && (
@@ -157,7 +224,10 @@ export default function Index() {
                 name="escolha_sexo"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
-                <Select>
+                <Select
+                  placeholder="---------"
+                  className="text-black font-bold text-lg"
+                >
                   <Select.Option value="masculino">Masculino</Select.Option>
                   <Select.Option value="feminino">Feminino</Select.Option>
                   <Select.Option value="outro">Outro</Select.Option>
@@ -169,7 +239,10 @@ export default function Index() {
                 name="grau_de_instrucao"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
-                <Select>
+                <Select
+                  placeholder="---------"
+                  className="text-black font-bold text-lg"
+                >
                   <Select.Option value="fundamental">
                     Ensino fundamental completo
                   </Select.Option>
@@ -187,7 +260,10 @@ export default function Index() {
                 name="definicaoLocalForm"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
-                <Select>
+                <Select
+                  placeholder="---------"
+                  className="text-black font-bold text-lg"
+                >
                   <Select.Option value="hospital">Hospital</Select.Option>
                   <Select.Option value="escola">Escola</Select.Option>
                   <Select.Option value="delegacia">Delegacia</Select.Option>
@@ -232,6 +308,11 @@ export default function Index() {
           />
         )}
       </div>
+      <Modal
+        sum={sumQuestion}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+      />
     </Layout>
   );
 }

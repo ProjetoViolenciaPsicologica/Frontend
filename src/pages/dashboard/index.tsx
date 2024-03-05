@@ -57,7 +57,9 @@ export default function Index() {
         <CardDashboard title='USUÁRIOS' svg="user1" />
         </Link>
         <CardDashboard title='FORMULÁRIOS' qtForm={quantidade?.total_formularios} isQT={isLoadingQT} />
+        <Link href="/arquivo">
         <CardDashboard title='ARQUIVOS' svg="export" />
+        </Link>
         <Link href="/estatistica">
         <CardDashboard title='ESTATÍSTICA' svg="statistic1" />
         </Link>
