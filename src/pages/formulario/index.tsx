@@ -9,7 +9,7 @@ import { api } from "@/services";
 import nookies from "nookies";
 import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
-import { Steps, Form, Input, Select } from "antd";
+import { Steps, Form,InputNumber, Select } from "antd";
 
 const raleway = Raleway({
   weight: "700",
@@ -27,12 +27,14 @@ export interface dataForm {
 export default function Index() {
   const [form] = Form.useForm(); // Extrai a referência do form
   const router = useRouter();
+  const[okQuestion, setOkQuestion] = useState(false)
   const [page, setPage] = useState(0);
   const [allOptions, setAllOptions] = useState("");
   const [formData, setFormData] = useState<dataForm>();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [sumQuestion, setSumQuestion] = useState<number>(16);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
+  const [sumQuestion, setSumQuestion] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedOptions, setSelectedOptions] = useState<any>({});
 
   useEffect(() => {
     const handleResize = () => {
@@ -88,9 +90,9 @@ export default function Index() {
     setFormData(data);
     setPage(page + 1);
   };
-
+  
   useEffect(() => {
-    if (allOptions.length === 30) {
+    if (okQuestion) {
       console.log(allOptions);
       const options = allOptions.substring(0, allOptions.length - 1);
       const questions = options.split(",");
@@ -115,6 +117,7 @@ export default function Index() {
     formData?.grau_de_instrucao,
     formData?.idade,
     mutate,
+    okQuestion
   ]);
 
   return (
@@ -211,7 +214,7 @@ export default function Index() {
                   { required: true, message: "Por favor, insira sua idade" },
                 ]}
               >
-                <Input
+                <InputNumber
                   type="number"
                   min={2}
                   placeholder="Digite sua idade"
@@ -286,7 +289,10 @@ export default function Index() {
             page={page}
             setPage={setPage}
             allOptions={allOptions}
+            setOkQuestion={setOkQuestion}
             setAllOptions={setAllOptions}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
           />
         )}
         {page === 2 && (
@@ -295,7 +301,10 @@ export default function Index() {
             page={page}
             setPage={setPage}
             allOptions={allOptions}
+            setOkQuestion={setOkQuestion}
             setAllOptions={setAllOptions}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
           />
         )}
         {page === 3 && (
@@ -303,12 +312,16 @@ export default function Index() {
             question={questions.CONTROLE}
             page={page}
             setPage={setPage}
+            setOkQuestion={setOkQuestion}
             allOptions={allOptions}
             setAllOptions={setAllOptions}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
           />
         )}
       </div>
       <Modal
+      setOkQuestion={setOkQuestion}
         sum={sumQuestion}
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
