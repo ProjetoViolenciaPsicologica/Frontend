@@ -57,7 +57,7 @@ export default function Login() {
 
   return (
     <main className="flex w-screen h-screen justify-between bg-[#f6fbf9]">
-      <div className="h-full hidden md:flex md:w-[50vw]">
+      <div className="h-full hidden lg:flex md:w-[50vw]">
         <Image
           src="/garota.png"
           alt="logo"
@@ -66,7 +66,7 @@ export default function Login() {
           className="h-full "
         />
       </div>
-      <div className="h-full w-full md:w-[50vw] flex flex-col items-center justify-between">
+      <div className="h-full w-full lg:w-[50vw] flex flex-col items-center justify-between">
         <Link href="/">
           <Image src="/icon.svg" alt="logo" width={150} height={150} />
         </Link>

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Raleway, Inter } from "next/font/google";
 import Question from "@/components/Question";
-import { questions, categories } from "@/utils/form";
-
+import { questions } from "@/utils/form";
+import { GetServerSideProps } from "next";
+import { parseCookies } from 'nookies';
 import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
 import { Steps, Form, InputNumber, Select } from "antd";
@@ -290,3 +291,29 @@ export default function Index() {
     </Layout>
   );
 }
+
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const cookies = parseCookies({ req });
+
+  // Acesse o cookie ou qualquer outra informação de autenticação
+  const isAuthenticated = !!cookies["psi-token"];
+
+  // Faça qualquer lógica adicional necessária
+
+  if (!isAuthenticated) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+ 
+  return {
+    props: {
+      users:"users",
+    },
+  };
+};

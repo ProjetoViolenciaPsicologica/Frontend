@@ -46,7 +46,7 @@ export default function Sidebar() {
 
       <aside
         id="sidebar"
-        className={`absolute inset-y-0 left-0 z-50 w-3/4 min-w-[13%] transform space-y-6  bg-gray px-0 pt-6 text-gray-100 transition duration-200 ease-in-out md:relative md:flex md:w-64 md:translate-x-0 md:flex-col md:justify-between ${
+        className={`absolute inset-y-0 left-0 z-50 w-3/4 min-w-56 transform space-y-6  bg-gray px-0 pt-6 text-gray-100 transition duration-200 ease-in-out md:relative md:flex md:w-64 md:translate-x-0 md:flex-col md:justify-between ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -70,6 +70,10 @@ export default function Sidebar() {
             <Link href="/dashboard" className="flex items-center pl-7  gap-x-2">
               <Image src="/home.svg" width={29} height={29} alt={"icon"} />
               <span className="">INÍCIO</span>
+            </Link>
+            <Link href="/arquivo" className="flex items-center pl-7  gap-x-2">
+              <Image src="/arquivo.svg" width={29} height={29} alt={"icon"} />
+              <span className="">ARQUIVOS</span>
             </Link>
             <Link
               href="/formulario"

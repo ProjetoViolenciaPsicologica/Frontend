@@ -10,6 +10,8 @@ import { schema } from "@/utils/users";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "react-query";
 import { toast } from "react-toastify";
+import { GetServerSideProps } from "next";
+import { parseCookies } from 'nookies';
 import {
   Button,
   Checkbox,
@@ -519,3 +521,28 @@ export default function Index() {
     </Layout>
   );
 }
+
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const cookies = parseCookies({ req });
+
+  // Acesse o cookie ou qualquer outra informação de autenticação
+  const isAuthenticated = !!cookies["psi-token"];
+
+  // Faça qualquer lógica adicional necessária
+
+  if (!isAuthenticated) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      users:"users",
+    },
+  };
+};

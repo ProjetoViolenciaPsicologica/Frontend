@@ -3,13 +3,16 @@ import Layout from "@/components/Layout";
 import { Raleway, Karla } from "next/font/google";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { registerLocale } from "react-datepicker";
-import { ptBR } from "date-fns/locale/pt-BR"; // Importe o locale em pt-BR
-import { Form, Input, Space, Switch } from "antd";
+import { Form, Input, Space, Switch, Select, InputNumber } from "antd";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { api } from "@/services";
+import { GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
 
-// Registre o locale para uso com o DatePicker
-registerLocale("pt-BR", ptBR);
+type Users = {
+  id:number,
+  name:string
+}
 
 const raleway = Raleway({
   style: "normal",
@@ -21,10 +24,10 @@ const karla = Karla({
   subsets: ["latin"],
 });
 
-function Index() {
+function Index({users}:{users:Users[]}) {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [disabledDate, setDisabledDate] = useState(true);
+  const [disabledDate, setDisabledDate] = useState(false);
   const handleStartDateChange = (date: any) => {
     setStartDate(date);
   };
@@ -35,10 +38,13 @@ function Index() {
   const handleChange = (checked: boolean) => {
     setDisabledDate(checked); // Atualizando o estado quando o Switch é alterado
   };
-  console.log(startDate, endDate);
+
+  function onSubmit(data: any) {
+    console.log(data);
+  }
   return (
     <Layout>
-      <div className="flex h-screen w-screen flex-col items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
+      <div className="flex w-full  flex-col items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
         <div className="mt-4 flex flex-col w-full md:mt-4">
           <h1 className={`${raleway.className} text-3xl font-normal `}>
             ARQUIVOS
@@ -50,9 +56,9 @@ function Index() {
           </span>
         </div>
 
-        <Form className="bg-[#F6FBF9]">
-          <div className="flex flex-col  md:flex-row gap-x-44 w-full mt-10 md:mt-20">
-            <div className="flex flex-col gap-y-4 md:gap-y-12 ">
+        <Form className="h-full " onFinish={onSubmit}>
+          <div className="flex flex-col  md:flex-row gap-x-44 w-full mt-10">
+            <div className="flex flex-col ">
               <div className="flex flex-col">
                 <label
                   htmlFor="grau"
@@ -60,17 +66,26 @@ function Index() {
                 >
                   Grau de instrução
                 </label>
-                <select
-                  name="grau"
-                  id="grau"
-                  className="w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6"
+                <Form.Item
+                  className="w-96 md:w-full h-full"
+                  name="grau_de_instrucao"
+                  
                 >
-                  <option value="fundamental">
-                    Ensino fundamental completo
-                  </option>
-                  <option value="medio">Ensino médio completo</option>
-                  <option value="superior">Ensino superior completo</option>
-                </select>
+                  <Select
+                    placeholder="Selecione"
+                    className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  >
+                    <Select.Option value="fundamental">
+                      Ensino fundamental completo
+                    </Select.Option>
+                    <Select.Option value="medio">
+                      Ensino médio completo
+                    </Select.Option>
+                    <Select.Option value="superior">
+                      Ensino superior completo
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
               </div>
               <div className="flex flex-col">
                 <label
@@ -79,17 +94,22 @@ function Index() {
                 >
                   Sexo
                 </label>
-                <select
+                <Form.Item
+                  className="w-96 md:w-full h-full"
                   name="sexo"
-                  id="sexo"
-                  className="w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6"
+                 
                 >
-                  <option value="masculino">Masculino</option>
-                  <option value="feminino">Feminino</option>
-                  <option value="outro">Outro</option>
-                </select>
+                  <Select
+                    placeholder="Selecione"
+                    className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  >
+                    <Select.Option value="masculino">Masculino</Select.Option>
+                    <Select.Option value="feminino">Feminino</Select.Option>
+                    <Select.Option value="outro">Outro</Select.Option>
+                  </Select>
+                </Form.Item>
               </div>
-              <div className="flex flex-col mt-6">
+              <div className="flex flex-col">
                 <div className="flex items-center">
                   <span className="text-red-500 mr-1">*</span>
                   <label
@@ -102,37 +122,62 @@ function Index() {
                 <Form.Item
                   name="idade"
                   className="block"
-                  rules={[
-                    { required: true, message: "Por favor, insira sua idade" },
-                  ]}
+                 
                 >
-                  <Input
+                  <InputNumber
                     type="number"
                     min={2}
                     placeholder="Digite sua idade"
-                    className="w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6"
+                    className="w-96 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   />
                 </Form.Item>
               </div>
-            </div>
-            <div className="flex flex-col gap-y-4 md:gap-y-12">
               <div className="flex flex-col">
                 <label
-                  htmlFor="grau"
+                  htmlFor="usuarios"
+                  className={`${karla.className} text-xl font-bold`}
+                >
+                  Usuário
+                </label>
+                <Form.Item
+                  className="w-96 md:w-full h-full"
+                  
+                  name="usuarios"
+                 
+                >
+                  <Select  placeholder="Selecione" className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10">
+                   
+                   {users.map(user => (
+                      <Select.Option value={user.name} key={user.id}>
+                     {user.name }
+                    </Select.Option>
+                   ))}
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
+            <div className="flex flex-col w-full">
+              <div className="flex flex-col pr-4">
+                <label
+                  htmlFor="definicaoLocalForm"
                   className={`${karla.className} text-xl font-bold`}
                 >
                   Local da aplicação
                 </label>
-                <select
-                  name="local"
-                  id="local"
-                  className="w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6"
+                <Form.Item
+                  className="w-96 md:w-full h-full"
+                  name="definicaoLocalForm"
+                  
                 >
-                  <option value="">Selecione</option>
-                  <option value="hospital">Hospital</option>
-                  <option value="escola">Escola</option>
-                  <option value="delegacia">Delegacia</option>
-                </select>
+                  <Select
+                    placeholder="Selecione"
+                    className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  >
+                    <Select.Option value="hospital">Hospital</Select.Option>
+                    <Select.Option value="escola">Escola</Select.Option>
+                    <Select.Option value="delegacia">Delegacia</Select.Option>
+                  </Select>
+                </Form.Item>
               </div>
               <div className="flex flex-col">
                 <label
@@ -145,7 +190,7 @@ function Index() {
                   name="startDate"
                   rules={[
                     {
-                      required: true,
+                      required: !disabledDate,
                       message: "Por favor, selecione a data de início",
                     },
                   ]}
@@ -160,13 +205,13 @@ function Index() {
                     timeFormat="HH:mm"
                     dateFormat="dd/MM/yyyy HH:mm"
                     locale="pt-BR"
-                    className={`w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
+                    className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
                       disabledDate ? "cursor-not-allowed" : "cursor-pointer"
                     }`}
                   />
                 </Form.Item>
               </div>
-              <div className="flex flex-col mt-0 mb-0">
+              <div className="flex flex-col">
                 <label
                   htmlFor="endDate"
                   className={`${karla.className} text-xl font-bold`}
@@ -177,13 +222,13 @@ function Index() {
                   name="endDate"
                   rules={[
                     {
-                      required: true,
-                      message: "Por favor, selecione a data de fim",
+                      required: !disabledDate,
+                      message: "Por favor, selecione a data de início",
                     },
                   ]}
                 >
                   <DatePicker
-                    name="endDate"
+                    name="startDate"
                     selected={endDate}
                     disabled={disabledDate}
                     onChange={handleEndDateChange}
@@ -192,7 +237,7 @@ function Index() {
                     timeFormat="HH:mm"
                     dateFormat="dd/MM/yyyy HH:mm"
                     locale="pt-BR"
-                    className={`w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
+                    className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
                       disabledDate ? "cursor-not-allowed" : "cursor-pointer"
                     }`}
                   />
@@ -201,7 +246,7 @@ function Index() {
             </div>
           </div>
 
-          <Space direction="vertical" className="mt-10 gap-y-10 bg-[#F6FBF9]">
+          <Space direction="vertical" className="mt-10 gap-y-10">
             <Space direction="horizontal">
               <Switch
                 checkedChildren={<CheckOutlined />}
@@ -260,3 +305,29 @@ function Index() {
 }
 
 export default Index;
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const cookies = parseCookies({ req });
+
+  // Acesse o cookie ou qualquer outra informação de autenticação
+  const isAuthenticated = !!cookies["psi-token"];
+
+  // Faça qualquer lógica adicional necessária
+
+  if (!isAuthenticated) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  const response = await api.get("user")
+  const users = response.data
+  return {
+    props: {
+      users:users,
+    },
+  };
+};
