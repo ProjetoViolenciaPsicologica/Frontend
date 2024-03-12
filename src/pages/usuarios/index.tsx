@@ -145,7 +145,7 @@ export default function Index() {
         tipo: { definicaoTipo: data.tipo },
         area: { definicaoArea: data.area },
       };
-      if (isEditMode && userId) {
+      if (userId) {
         await api.put(`user/${userId}`, dataUser);
         toast.success("Usuário editado com sucesso!");
       } else {
@@ -210,13 +210,13 @@ export default function Index() {
       title: (
         <div className="flex items-center">
           <Checkbox onChange={toggleSelectAll} checked={selectAll} />
-          <Button
-            type="link"
+          <button
+            type="button"
             onClick={() => deleteUsers()}
             className="w-[98px] h-[28.62px] bg-emerald-950 rounded-[32px] text-white text-base font-normal font-['DM Sans'] ml-4 flex items-center justify-center"
           >
             DELETAR
-          </Button>
+          </button>
         </div>
       ),
       key: "checkbox",
@@ -278,7 +278,7 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="flex h-screen w-full flex-col items-center pl-4 lg:items-start lg:pl-12 bg-[F6FBF9]">
+      <div className="flex bg-[#F6FBF9] h-screen w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
         <div className="mt-4 flex flex-col w-full  md:mt-4">
           <h1 className={`${raleway.className} text-3xl font-normal `}>
             USUÁRIOS
@@ -473,7 +473,10 @@ export default function Index() {
             name="tipo"
             rules={[{ required: true, message: "Por favor, selecione o tipo" }]}
           >
-            <Select>
+           <Select
+                  placeholder="---------"
+                  className="text-black font-bold text-lg"
+                >
               <Select.Option value="Agente de Saude">
                 Agente de Saúde
               </Select.Option>
@@ -486,7 +489,10 @@ export default function Index() {
             name="area"
             rules={[{ required: true, message: "Por favor, selecione a área" }]}
           >
-            <Select>
+           <Select
+                  placeholder="---------"
+                  className="text-black font-bold text-lg"
+                >
               <Select.Option value="Saúde">Saúde</Select.Option>
               <Select.Option value="Educação">Educação</Select.Option>
               <Select.Option value="Segurança">Segurança</Select.Option>

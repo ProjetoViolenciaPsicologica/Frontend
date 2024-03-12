@@ -3,13 +3,10 @@ import Layout from "@/components/Layout";
 import { Raleway, Inter } from "next/font/google";
 import Question from "@/components/Question";
 import { questions, categories } from "@/utils/form";
-import { useMutation } from "react-query";
-import { toast } from "react-toastify";
-import { api } from "@/services";
-import nookies from "nookies";
+
 import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
-import { Steps, Form,InputNumber, Select } from "antd";
+import { Steps, Form, InputNumber, Select } from "antd";
 
 const raleway = Raleway({
   weight: "700",
@@ -27,7 +24,7 @@ export interface dataForm {
 export default function Index() {
   const [form] = Form.useForm(); // Extrai a referência do form
   const router = useRouter();
-  const[okQuestion, setOkQuestion] = useState(false)
+  const [okQuestion, setOkQuestion] = useState(false);
   const [page, setPage] = useState(0);
   const [allOptions, setAllOptions] = useState("");
   const [formData, setFormData] = useState<dataForm>();
@@ -35,7 +32,7 @@ export default function Index() {
   const [sumQuestion, setSumQuestion] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedOptions, setSelectedOptions] = useState<any>({});
-
+  const [data, setData] = useState({});
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth <= 768);
@@ -47,68 +44,34 @@ export default function Index() {
     return () => window.removeEventListener("resize", handleResize);
   }, []); // Executa este efeito apenas uma vez no momento da montage
 
-  const { mutate } = useMutation(async (data: any) => {
-    const token = nookies.get()["psi-token"];
-    // erro de cors como corrigir
-    const response = await api.post("/formulario/novo", data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(response);
-    if (response.status === 201) {
-      toast.success("Respostas cadastradas com sucesso!", {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 2000);
-    } else {
-      toast.error("Erro ao enviar as respostas.", {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    }
-
-    return response;
-  });
-
   const onSubmit = async (data: any) => {
     setFormData(data);
     setPage(page + 1);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
-  
+
   useEffect(() => {
     if (okQuestion) {
       console.log(allOptions);
-      const options = allOptions.substring(0, allOptions.length - 1);
-      const questions = options.split(",");
+      const questions =allOptions.split(",");
       const sum = questions.map(Number).reduce((acc, curr) => acc + curr, 0);
+      console.log(questions)
       setSumQuestion(sum);
+
+      const data1: any = {
+        campo_questoes: allOptions,
+        idade: formData?.idade,
+        escolha_sexo: formData?.escolha_sexo,
+        grau_de_instrucao: formData?.grau_de_instrucao,
+        localAplicacao: {
+          definicaoLocalForm: formData?.definicaoLocalForm,
+        },
+      };
       setIsModalOpen(true);
-      // const data: any = {
-      //   campo_questoes: options,
-      //   idade: formData?.idade,
-      //   escolha_sexo: formData?.escolha_sexo,
-      //   grau_de_instrucao: formData?.grau_de_instrucao,
-      //   localAplicacao: {
-      //     definicaoLocalForm: formData?.definicaoLocalForm,
-      //   },
-      // };
-      // mutate(data);
+      setData(data1);
     }
   }, [
     allOptions,
@@ -116,8 +79,7 @@ export default function Index() {
     formData?.escolha_sexo,
     formData?.grau_de_instrucao,
     formData?.idade,
-    mutate,
-    okQuestion
+    okQuestion,
   ]);
 
   return (
@@ -197,11 +159,9 @@ export default function Index() {
           )}
 
           <h1
-            className={`${raleway.className} mt-9 text-2xl md:text-4xl font-bold text-black`}
+            className={`${raleway.className} flex items-center mt-9 text-2xl md:text-4xl font-bold text-black`}
           >
-            {page === 0
-              ? "Dados de Entrevistado"
-              : `CATEGORIA ${categories[page]}`}
+            {page === 0 ? "Dados de Entrevistado" : `CATEGORIA ${page}`}
           </h1>
         </div>
         {page === 0 && (
@@ -321,7 +281,8 @@ export default function Index() {
         )}
       </div>
       <Modal
-      setOkQuestion={setOkQuestion}
+        data={data}
+        setOkQuestion={setOkQuestion}
         sum={sumQuestion}
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
