@@ -8,7 +8,6 @@ import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { api } from "@/services";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
-
 type Users = {
   id:number,
   name:string
@@ -28,6 +27,7 @@ function Index({users}:{users:Users[]}) {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [disabledDate, setDisabledDate] = useState(false);
+  const [disabledUser, setDisabledUser] = useState(true)
   const handleStartDateChange = (date: any) => {
     setStartDate(date);
   };
@@ -39,8 +39,10 @@ function Index({users}:{users:Users[]}) {
     setDisabledDate(checked); // Atualizando o estado quando o Switch é alterado
   };
 
-  function onSubmit(data: any) {
-    console.log(data);
+  async function onSubmit(data: any) {
+    console.log(data)
+    const response = await api.get("formulario/filtro/", { data })
+    console.log(response.data)
   }
   return (
     <Layout>
@@ -103,9 +105,9 @@ function Index({users}:{users:Users[]}) {
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
-                    <Select.Option value="masculino">Masculino</Select.Option>
-                    <Select.Option value="feminino">Feminino</Select.Option>
-                    <Select.Option value="outro">Outro</Select.Option>
+                    <Select.Option value="masculino">fasculino</Select.Option>
+                    <Select.Option value="feminino">feminino</Select.Option>
+                    <Select.Option value="outro">outro</Select.Option>
                   </Select>
                 </Form.Item>
               </div>
@@ -145,7 +147,7 @@ function Index({users}:{users:Users[]}) {
                   name="usuarios"
                  
                 >
-                  <Select  placeholder="Selecione" className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10">
+                  <Select disabled={disabledUser}  placeholder="Selecione" className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10">
                    
                    {users.map(user => (
                       <Select.Option value={user.name} key={user.id}>
@@ -170,6 +172,7 @@ function Index({users}:{users:Users[]}) {
                   
                 >
                   <Select
+                  disabled={!disabledUser}
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
@@ -206,7 +209,7 @@ function Index({users}:{users:Users[]}) {
                     dateFormat="dd/MM/yyyy HH:mm"
                     locale="pt-BR"
                     className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
-                      disabledDate ? "cursor-not-allowed" : "cursor-pointer"
+                      disabledDate ? "cursor-not-allowed bg-[#F5F5F5]" : "cursor-pointer"
                     }`}
                   />
                 </Form.Item>
@@ -238,7 +241,7 @@ function Index({users}:{users:Users[]}) {
                     dateFormat="dd/MM/yyyy HH:mm"
                     locale="pt-BR"
                     className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
-                      disabledDate ? "cursor-not-allowed" : "cursor-pointer"
+                      disabledDate ? "cursor-not-allowed bg-[#F5F5F5]" : "cursor-pointer"
                     }`}
                   />
                 </Form.Item>
@@ -275,6 +278,8 @@ function Index({users}:{users:Users[]}) {
             </Space>
             <Space direction="horizontal">
               <Switch
+              checked={disabledUser}
+              onChange={()=> setDisabledUser(!disabledUser)}
                 checkedChildren={<CheckOutlined />}
                 unCheckedChildren={<CloseOutlined />}
                 className="bg-[#9EACAE] hover:bg-blue-600 "
