@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import Layout from "@/components/Layout";
 import { Raleway, Karla } from "next/font/google";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { DatePicker } from "antd";
 import { Form, Input, Space, Switch, Select, InputNumber } from "antd";
+import { ptBR } from "date-fns/locale";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { api } from "@/services";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
+
+const { RangePicker } = DatePicker;
 type Users = {
-  id:number,
-  name:string
-}
+  id: number;
+  name: string;
+};
 
 const raleway = Raleway({
   style: "normal",
@@ -23,26 +25,60 @@ const karla = Karla({
   subsets: ["latin"],
 });
 
-function Index({users}:{users:Users[]}) {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+function Index({ users }: { users: Users[] }) {
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
   const [disabledDate, setDisabledDate] = useState(false);
-  const [disabledUser, setDisabledUser] = useState(true)
-  const handleStartDateChange = (date: any) => {
-    setStartDate(date);
+  const [disabledUser, setDisabledUser] = useState(false);
+
+  const handleStartDateChange = (dates: any) => {
+    const formattedDates = dates?.map(formatDate);
+    const [startDate, endDate] = formattedDates;
+    setStartDate(startDate);
+    setEndDate(endDate);
   };
 
-  const handleEndDateChange = (date: any) => {
-    setEndDate(date);
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const formattedDate = `${date.getFullYear()}-${(
+      "0" +
+      (date.getMonth() + 1)
+    ).slice(-2)}-${("0" + date.getDate()).slice(-2)} ${(
+      "0" + date.getHours()
+    ).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}`;
+    return formattedDate;
   };
+
   const handleChange = (checked: boolean) => {
-    setDisabledDate(checked); // Atualizando o estado quando o Switch é alterado
+    setDisabledDate(checked);
+    setStartDate(null);
+    setEndDate(null);
   };
 
   async function onSubmit(data: any) {
-    console.log(data)
-    const response = await api.get("formulario/filtro/", { data })
-    console.log(response.data)
+    const params: any = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined) {
+        params[key] = value;
+      }
+    }
+    if (startDate && endDate) {
+      params.data_inicio = startDate;
+      params.data_fim = endDate;
+    } else {
+      delete params.data_inicio;
+    }
+    // if(params.localAplicacao){
+    //   params.localAplicacao = {localAplicacao:{definicaoLocalForm: params.localAplicacao}}
+    // }
+
+    // if(params.area ){
+    //   params.area = {definicaoArea: params.area}
+    // }
+    console.log(params);
+
+    const response = await api.get("formulario/filtro/", { params });
+    console.log(response.data);
   }
   return (
     <Layout>
@@ -71,12 +107,12 @@ function Index({users}:{users:Users[]}) {
                 <Form.Item
                   className="w-96 md:w-full h-full"
                   name="grau_de_instrucao"
-                  
                 >
                   <Select
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
+                    <Select.Option value="">Selecione</Select.Option>
                     <Select.Option value="fundamental">
                       Ensino fundamental completo
                     </Select.Option>
@@ -96,18 +132,15 @@ function Index({users}:{users:Users[]}) {
                 >
                   Sexo
                 </label>
-                <Form.Item
-                  className="w-96 md:w-full h-full"
-                  name="sexo"
-                 
-                >
+                <Form.Item className="w-96 md:w-full h-full" name="sexo">
                   <Select
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
-                    <Select.Option value="masculino">fasculino</Select.Option>
-                    <Select.Option value="feminino">feminino</Select.Option>
-                    <Select.Option value="outro">outro</Select.Option>
+                    <Select.Option value="">Selecione</Select.Option>
+                    <Select.Option value="masculino">Masculino</Select.Option>
+                    <Select.Option value="feminino">Feminino</Select.Option>
+                    <Select.Option value="outro">Outro</Select.Option>
                   </Select>
                 </Form.Item>
               </div>
@@ -121,11 +154,7 @@ function Index({users}:{users:Users[]}) {
                     Idade
                   </label>
                 </div>
-                <Form.Item
-                  name="idade"
-                  className="block"
-                 
-                >
+                <Form.Item name="idade" className="block">
                   <InputNumber
                     type="number"
                     min={2}
@@ -141,19 +170,18 @@ function Index({users}:{users:Users[]}) {
                 >
                   Usuário
                 </label>
-                <Form.Item
-                  className="w-96 md:w-full h-full"
-                  
-                  name="usuarios"
-                 
-                >
-                  <Select disabled={disabledUser}  placeholder="Selecione" className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10">
-                   
-                   {users.map(user => (
+                <Form.Item className="w-96 md:w-full h-full" name="usuarios">
+                  <Select.Option value="">Selecione</Select.Option>
+                  <Select
+                    disabled={!disabledUser}
+                    placeholder="Selecione"
+                    className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  >
+                    {users.map((user) => (
                       <Select.Option value={user.name} key={user.id}>
-                     {user.name }
-                    </Select.Option>
-                   ))}
+                        {user.name}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </div>
@@ -161,21 +189,17 @@ function Index({users}:{users:Users[]}) {
             <div className="flex flex-col w-full">
               <div className="flex flex-col pr-4">
                 <label
-                  htmlFor="definicaoLocalForm"
+                  htmlFor="local_aplicacao"
                   className={`${karla.className} text-xl font-bold`}
                 >
                   Local da aplicação
                 </label>
                 <Form.Item
                   className="w-96 md:w-full h-full"
-                  name="definicaoLocalForm"
-                  
+                  name="local_aplicacao"
                 >
-                  <Select
-                  disabled={!disabledUser}
-                    placeholder="Selecione"
-                    className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
-                  >
+                  <Select className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10">
+                    <Select.Option value="">Selecione</Select.Option>
                     <Select.Option value="hospital">Hospital</Select.Option>
                     <Select.Option value="escola">Escola</Select.Option>
                     <Select.Option value="delegacia">Delegacia</Select.Option>
@@ -184,13 +208,13 @@ function Index({users}:{users:Users[]}) {
               </div>
               <div className="flex flex-col">
                 <label
-                  htmlFor="startDate"
+                  htmlFor="dataInicio"
                   className={`${karla.className} text-xl font-bold`}
                 >
                   Data de início
                 </label>
                 <Form.Item
-                  name="startDate"
+                  name="data_inicio"
                   rules={[
                     {
                       required: !disabledDate,
@@ -198,52 +222,66 @@ function Index({users}:{users:Users[]}) {
                     },
                   ]}
                 >
-                  <DatePicker
-                    name="startDate"
-                    selected={startDate}
+                  <RangePicker
+                    showTime={{ format: "HH:mm" }}
                     disabled={disabledDate}
+                    format="DD-MM-YYYY HH:mm"
                     onChange={handleStartDateChange}
-                    showTimeSelect
-                    placeholderText="DD/MM/AA, HH:MM"
-                    timeFormat="HH:mm"
-                    dateFormat="dd/MM/yyyy HH:mm"
-                    locale="pt-BR"
+                    lang="pt-br" // Adicione o locale correto aqui
+                    locale={ptBR}
                     className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
-                      disabledDate ? "cursor-not-allowed bg-[#F5F5F5]" : "cursor-pointer"
+                      disabledDate
+                        ? "cursor-not-allowed bg-[#F5F5F5]"
+                        : "cursor-pointer"
                     }`}
                   />
                 </Form.Item>
               </div>
               <div className="flex flex-col">
                 <label
-                  htmlFor="endDate"
+                  htmlFor="area"
                   className={`${karla.className} text-xl font-bold`}
                 >
-                  Data de Fim
+                  Área
+                </label>
+                <Form.Item className="w-96 md:w-full h-full" name="area">
+                  <Select
+                    disabled={disabledUser}
+                    className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  >
+                    <Select.Option value="">Selecione</Select.Option>
+                    <Select.Option value="Saúde">Saúde</Select.Option>
+                    <Select.Option value="Educacao">Educacao</Select.Option>
+                    <Select.Option value="Segurança">Segurança</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="tipo"
+                  className={`${karla.className} text-xl font-bold`}
+                >
+                  Tipo de usuário
                 </label>
                 <Form.Item
-                  name="endDate"
-                  rules={[
-                    {
-                      required: !disabledDate,
-                      message: "Por favor, selecione a data de início",
-                    },
-                  ]}
+                  className="w-96 md:w-full h-full"
+                  name="definicaoLocalForm"
                 >
-                  <DatePicker
-                    name="startDate"
-                    selected={endDate}
-                    disabled={disabledDate}
-                    onChange={handleEndDateChange}
-                    showTimeSelect
-                    placeholderText="DD/MM/AA, HH:MM"
-                    timeFormat="HH:mm"
-                    dateFormat="dd/MM/yyyy HH:mm"
-                    locale="pt-BR"
-                    className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
-                      disabledDate ? "cursor-not-allowed bg-[#F5F5F5]" : "cursor-pointer"
-                    }`}
-                  />
+                  <Select
+                    disabled={disabledUser}
+                    placeholder="Selecione"
+                    className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  >
+                    <Select.Option value="Agente de Saúde">
+                      Agente de Saúde
+                    </Select.Option>
+                    <Select.Option value="Agente de Educacao">
+                      Agente de Educacao
+                    </Select.Option>
+                    <Select.Option value="Agente de Segurança">
+                      Agente de Segurança
+                    </Select.Option>
+                  </Select>
                 </Form.Item>
               </div>
             </div>
@@ -278,8 +316,8 @@ function Index({users}:{users:Users[]}) {
             </Space>
             <Space direction="horizontal">
               <Switch
-              checked={disabledUser}
-              onChange={()=> setDisabledUser(!disabledUser)}
+                checked={disabledUser}
+                onChange={() => setDisabledUser(!disabledUser)}
                 checkedChildren={<CheckOutlined />}
                 unCheckedChildren={<CloseOutlined />}
                 className="bg-[#9EACAE] hover:bg-blue-600 "
@@ -328,11 +366,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
-  const response = await api.get("user")
-  const users = response.data
+  const response = await api.get("user");
+  const users = response.data;
   return {
     props: {
-      users:users,
+      users: users,
     },
   };
 };
