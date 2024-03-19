@@ -3,7 +3,10 @@ import Layout from "@/components/Layout";
 import { Raleway, Karla } from "next/font/google";
 import { DatePicker } from "antd";
 import { Form, Input, Space, Switch, Select, InputNumber } from "antd";
-import { ptBR } from "date-fns/locale";
+import ptBR from "antd/lib/date-picker/locale/pt_BR";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
+import "moment/locale/pt-br";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { api } from "@/services";
 import { GetServerSideProps } from "next";
@@ -28,14 +31,15 @@ const karla = Karla({
 function Index({ users }: { users: Users[] }) {
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
-  const [disabledDate, setDisabledDate] = useState(false);
+  const [disabledDate, setDisabledDate] = useState(true);
   const [disabledUser, setDisabledUser] = useState(false);
-
   const handleStartDateChange = (dates: any) => {
     const formattedDates = dates?.map(formatDate);
-    const [startDate, endDate] = formattedDates;
-    setStartDate(startDate);
-    setEndDate(endDate);
+    if (formattedDates) {
+      const [startDate, endDate] = formattedDates;
+      setStartDate(startDate);
+      setEndDate(endDate);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -68,18 +72,82 @@ function Index({ users }: { users: Users[] }) {
     } else {
       delete params.data_inicio;
     }
-    // if(params.localAplicacao){
-    //   params.localAplicacao = {localAplicacao:{definicaoLocalForm: params.localAplicacao}}
-    // }
-
-    // if(params.area ){
-    //   params.area = {definicaoArea: params.area}
-    // }
     console.log(params);
 
     const response = await api.get("formulario/filtro/", { params });
     console.log(response.data);
+
+    handleExportExcel(response.data);
   }
+
+  const handleExportExcel = (filteredData: any) => {
+    // Converte os dados para o formato apropriado para o Excel
+    const dataFilter = filteredData.map(
+      (data: {
+        campo_questoes: any;
+        idade: any;
+        escolha_sexo: any;
+        localAplicacao: { definicaoLocalForm: any };
+      }) => {
+        return {
+          questões: data?.campo_questoes,
+          idade: data?.idade,
+          sexo: data?.escolha_sexo,
+          "local da aplicação": data?.localAplicacao?.definicaoLocalForm,
+        };
+      }
+    );
+    const excelData = convertToExcelData(dataFilter);
+
+    // Cria uma nova pasta de trabalho do Excel
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+
+    // Cria um livro de trabalho e adiciona a planilha a ele
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Dados Filtrados");
+
+    // Converte o livro de trabalho em um blob
+    const excelBlob = workbook2blob(workbook);
+
+    // Cria um objeto URL a partir do blob
+    const url = window.URL.createObjectURL(excelBlob);
+
+    // Cria um link temporário e o clica para iniciar o download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "filtered_data.xlsx";
+    link.click();
+
+    // Libera o objeto URL quando o link é removido
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Função para converter os dados para o formato apropriado para o Excel
+  const convertToExcelData = (data: any[]) => {
+    const headerRow = Object.keys(data[0]);
+    const rows = data.map((row) => Object.values(row));
+    return [headerRow, ...rows];
+  };
+
+  // Função para converter o livro de trabalho em um blob
+  const workbook2blob = (workbook: XLSX.WorkBook) => {
+    const wopts: XLSX.WritingOptions = {
+      bookType: "xlsx",
+      bookSST: false,
+      type: "binary",
+    };
+    const wbout = XLSX.write(workbook, wopts);
+
+    function s2ab(s: string): ArrayBuffer {
+      const buf = new ArrayBuffer(s.length);
+      const view = new Uint8Array(buf);
+      for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
+      return buf;
+    }
+
+    return new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+  };
+
   return (
     <Layout>
       <div className="flex w-full  flex-col items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
@@ -112,7 +180,7 @@ function Index({ users }: { users: Users[] }) {
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
-                    <Select.Option value="">Selecione</Select.Option>
+                    <Select.Option value="">------</Select.Option>
                     <Select.Option value="fundamental">
                       Ensino fundamental completo
                     </Select.Option>
@@ -137,7 +205,7 @@ function Index({ users }: { users: Users[] }) {
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
-                    <Select.Option value="">Selecione</Select.Option>
+                    <Select.Option value="">------</Select.Option>
                     <Select.Option value="masculino">Masculino</Select.Option>
                     <Select.Option value="feminino">Feminino</Select.Option>
                     <Select.Option value="outro">Outro</Select.Option>
@@ -171,12 +239,12 @@ function Index({ users }: { users: Users[] }) {
                   Usuário
                 </label>
                 <Form.Item className="w-96 md:w-full h-full" name="usuarios">
-                  <Select.Option value="">Selecione</Select.Option>
                   <Select
                     disabled={!disabledUser}
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
+                    <Select.Option value="">------</Select.Option>
                     {users.map((user) => (
                       <Select.Option value={user.name} key={user.id}>
                         {user.name}
@@ -198,8 +266,11 @@ function Index({ users }: { users: Users[] }) {
                   className="w-96 md:w-full h-full"
                   name="local_aplicacao"
                 >
-                  <Select className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10">
-                    <Select.Option value="">Selecione</Select.Option>
+                  <Select
+                    placeholder="Selecione"
+                    className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  >
+                    <Select.Option value="">--------</Select.Option>
                     <Select.Option value="hospital">Hospital</Select.Option>
                     <Select.Option value="escola">Escola</Select.Option>
                     <Select.Option value="delegacia">Delegacia</Select.Option>
@@ -211,7 +282,7 @@ function Index({ users }: { users: Users[] }) {
                   htmlFor="dataInicio"
                   className={`${karla.className} text-xl font-bold`}
                 >
-                  Data de início
+                  Data de início e fim
                 </label>
                 <Form.Item
                   name="data_inicio"
@@ -225,10 +296,11 @@ function Index({ users }: { users: Users[] }) {
                   <RangePicker
                     showTime={{ format: "HH:mm" }}
                     disabled={disabledDate}
-                    format="DD-MM-YYYY HH:mm"
+                    placeholder={["Data e hora inicial", "Data e hora final"]}
+                    format="DD/MM/YYYY HH:mm"
                     onChange={handleStartDateChange}
-                    lang="pt-br" // Adicione o locale correto aqui
                     locale={ptBR}
+                    lang="pt-br" // Adicione o locale correto aqui
                     className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
                       disabledDate
                         ? "cursor-not-allowed bg-[#F5F5F5]"
@@ -246,12 +318,13 @@ function Index({ users }: { users: Users[] }) {
                 </label>
                 <Form.Item className="w-96 md:w-full h-full" name="area">
                   <Select
+                    placeholder="Selecione"
                     disabled={disabledUser}
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
-                    <Select.Option value="">Selecione</Select.Option>
+                    <Select.Option value="">------</Select.Option>
                     <Select.Option value="Saúde">Saúde</Select.Option>
-                    <Select.Option value="Educacao">Educacao</Select.Option>
+                    <Select.Option value="Educação">Educação</Select.Option>
                     <Select.Option value="Segurança">Segurança</Select.Option>
                   </Select>
                 </Form.Item>
@@ -272,6 +345,7 @@ function Index({ users }: { users: Users[] }) {
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
+                    <Select.Option value="">------</Select.Option>
                     <Select.Option value="Agente de Saúde">
                       Agente de Saúde
                     </Select.Option>
@@ -288,18 +362,6 @@ function Index({ users }: { users: Users[] }) {
           </div>
 
           <Space direction="vertical" className="mt-10 gap-y-10">
-            <Space direction="horizontal">
-              <Switch
-                checkedChildren={<CheckOutlined />}
-                unCheckedChildren={<CloseOutlined />}
-                className="bg-[#9EACAE] hover:bg-blue-600 "
-              />
-              <span
-                className={`${karla.className} text-black text-xl font-bold`}
-              >
-                Exportar Base de dados
-              </span>
-            </Space>
             <Space direction="horizontal">
               <Switch
                 checkedChildren={<CheckOutlined />}
