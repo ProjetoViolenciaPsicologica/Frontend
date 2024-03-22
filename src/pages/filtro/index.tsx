@@ -1,0 +1,174 @@
+import Layout from "@/components/Layout";
+import { Raleway, DM_Sans } from "next/font/google";
+import dynamic from "next/dynamic";
+import {api} from "@/services/";
+import { GetServerSideProps } from "next";
+import { parseCookies } from 'nookies';
+import { useRouter } from "next/router";
+
+
+const Pie = dynamic(() => import("@/components/Charts/Pie"), { ssr: false });
+
+const Bar = dynamic(() => import("@/components/Charts/BarHorizontal"), { ssr: false });
+
+const raleway = Raleway({
+  weight: "400",
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const dm = DM_Sans({
+    weight: "500",
+    style: "normal",
+    subsets: ["latin"],
+  });
+  
+  export interface Root {
+    grau_de_instrucao: string
+    sexo: string
+    idade: number
+    local_aplicacao: string
+    data_inicio: string
+    area: string
+    definicaoLocalForm: string
+    data_fim: string
+    tipo_usuario:string
+    usuario:string
+  }
+  
+
+export default function Index({dataPie, dataBar, data, qtForm}: {dataPie:any, dataBar:any, data:Root, qtForm:number}) {
+    const router = useRouter()
+    let startDate:string | Array<string> = data?.data_inicio?.split(" ")[0].split("-")
+    let endDate:string | Array<string> = data?.data_fim?.split(" ")[0].split("-")
+    if(startDate && endDate){
+        startDate = `${startDate[2]}/${startDate[1]}/${startDate[0]}`
+    endDate = `${endDate[2]}/${endDate[1]}/${endDate[0]}`
+    }
+
+  return (
+    <Layout>
+        
+      <div className="flex w-full  flex-col items-center pl-4 lg:items-start lg:pl-12">
+        <div className="flex flex-col md:flex-row justify-between items-center w-full mt-4 md:mt-16 ">
+          <div className=" flex h-full flex-col w-full">
+          <button onClick={()=> {
+              router.back()
+          }} className="mr-6 hover:cursor-pointer my-2">
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 30 30"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="30" height="30" rx="5" fill="#4239F2" />
+              <g clipPath="url(#clip0_1450_3668)">
+                <path
+                  d="M13.9023 15.0004L18.543 10.3598L17.2173 9.03418L11.2511 15.0004L17.2173 20.9667L18.543 19.6411L13.9023 15.0004Z"
+                  fill="white"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_1450_3668">
+                  <rect
+                    width="22.5"
+                    height="22.5"
+                    fill="white"
+                    transform="matrix(-1 0 0 1 26.25 3.75)"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
+          </button>
+            <h1 className={`${raleway.className} text-3xl font-normal `}>
+              ESTATÍSTICA
+            </h1>
+            <span
+              className={`${raleway.className} w-[309px] mt-4 text-black text-sm font-normal leading-tight`}
+            >
+              Disponibilização e visualização via filtro dos dados reunidos com
+              base no registro de formulários
+            </span>
+            <span className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}>Local da Aplicação: {data.local_aplicacao ? data.local_aplicacao : "---------"}</span>
+            <span className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}>Idade: {data.idade ? data.idade : "---------"}</span>
+            <span className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}>Sexo: {data.sexo ? data.sexo : "---------"}</span>
+            <span className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}>Grau de Instrução: {data.grau_de_instrucao ? data.grau_de_instrucao : "---------"}</span>
+            <span className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}>Área: {data.area ? data.area : "---------"}</span>
+            <span className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}>Tipo de usuário: {data.definicaoLocalForm ? data.definicaoLocalForm : "---------"}</span>
+          </div>
+          <div className="flex flex-col h-full mr-16 md:mt-0 w-80">
+            <h1 className={`${raleway.className} text-black text-2xl font-normal mb-1.5`}>{data.usuario ? data.usuario :"---------"}</h1>
+            <span className={`${raleway.className} w-full text-black text-sm font-normal mb-5`}>{startDate && endDate ? `De ${startDate} até ${endDate}` : "---------"}</span>
+
+            <div
+              className={`bg-[#4339F2] w-[200px] h-[200px] rounded-[10px] gap-y-4 flex flex-col items-center`}
+            >
+              <span
+                className={`${raleway.className} mt-5 text-lg font-normal text-white`}
+              >
+                FORMULÁRIOS
+              </span>
+
+              <span
+                className={`${raleway.className} text-5xl font-normal text-white mt-4`}
+              >
+                {qtForm}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-6  gap-y-5 md:gap-y-0 md:gap-x-10 w-full flex flex-col flex-wrap md:flex-row md:items-center">
+          <div className="w-[80vw] md:w-[30%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9]">
+            <h1
+              className={`${dm.className} text-[22px] font-medium text-black`}
+            >
+              Resultado por sinalização
+            </h1>
+            <Pie chartData={dataPie}/>
+          </div>
+          <div className="w-[80vw] md:w-[60%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9]">
+            <h1
+              className={`${dm.className} text-[22px] font-medium text-black`}
+            >
+              Respostas por opção
+            </h1>
+            <Bar data={dataBar} />
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+    const cookies = parseCookies({ req });
+    const isAuthenticated = !!cookies['psi-token'];
+    const data = JSON.parse(cookies["dataFilter"])
+    let params = data
+    const response2 = await api.get("formulario/filtro/", { params });
+    params = response2.data
+    const qtForm = response2.data.length
+    if (!isAuthenticated){
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    }
+   }
+  
+   const response = await api.get("formulario/sinalizacao", {params})
+   const response1 = await api.get("formulario/quantidadeRespostas", {params})
+   const dataPie = response.data
+    const dataBar = response1.data
+   return {
+    props: {
+        dataPie,
+        dataBar,
+        data,
+        qtForm
+    }
+   }
+  }

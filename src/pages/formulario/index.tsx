@@ -158,7 +158,35 @@ export default function Index() {
               ]}
             />
           )}
-
+          <button onClick={()=> {
+              router.back()
+          }} className="mr-6 hover:cursor-pointer my-6">
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 30 30"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="30" height="30" rx="5" fill="#4239F2" />
+              <g clipPath="url(#clip0_1450_3668)">
+                <path
+                  d="M13.9023 15.0004L18.543 10.3598L17.2173 9.03418L11.2511 15.0004L17.2173 20.9667L18.543 19.6411L13.9023 15.0004Z"
+                  fill="white"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_1450_3668">
+                  <rect
+                    width="22.5"
+                    height="22.5"
+                    fill="white"
+                    transform="matrix(-1 0 0 1 26.25 3.75)"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
+          </button>
           <h1
             className={`${raleway.className} flex items-center mt-9 text-2xl md:text-4xl font-bold text-black`}
           >
