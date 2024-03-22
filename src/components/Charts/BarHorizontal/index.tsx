@@ -16,8 +16,8 @@ const HorizontalBarChart: React.FC<{ data: ChartData }> = ({ data }) => {
       color: colors[index],
       value: values[index],
     })),
-    xField: 'resposta',
-    yField: 'value',
+    xField: 'value',
+    yField: 'resposta',
     seriesField: 'resposta',
     legend: {
       position: 'top',

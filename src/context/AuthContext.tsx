@@ -2,6 +2,7 @@ import { setCookie } from "nookies";
 import { createContext, useState } from "react";
 import Router from "next/router";
 import { api } from "@/services";
+import { jwtDecode } from "jwt-decode";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -12,6 +13,10 @@ type SignInCredentials = {
   email: string;
   password: string;
 };
+
+type dataType = {
+  is_superuser:boolean
+}
 
 export const AuthContext = createContext({} as AuthContextType);
 
@@ -30,7 +35,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.data.access) {
         setToken(response.data.access);
       }
-      Router.push("/dashboard");
+      const data:dataType = jwtDecode(response.data.access);
+      if(data?.is_superuser){
+        Router.push("/dashboard");
+      }
+      else {
+        Router.push("/inicio");
+      }
     } catch (error: any) {
       return error.response.status;
     }

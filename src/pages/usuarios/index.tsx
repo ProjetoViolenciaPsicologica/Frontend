@@ -9,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { schema } from "@/utils/users";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "react-query";
-import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { GetServerSideProps } from "next";
 import { parseCookies } from 'nookies';
@@ -59,7 +58,7 @@ export default function Index() {
     return response.data;
   });
   const [form] = Form.useForm(); // Extrai a referência do form
-  const router = useRouter()
+
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -283,35 +282,6 @@ export default function Index() {
     <Layout>
       <div className="flex bg-[#F6FBF9] h-screen w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
         <div className="mt-4 flex flex-col w-full  md:mt-4">
-        <button onClick={()=> {
-              router.back()
-          }} className="mr-6 hover:cursor-pointer my-6">
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 30 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect width="30" height="30" rx="5" fill="#4239F2" />
-              <g clipPath="url(#clip0_1450_3668)">
-                <path
-                  d="M13.9023 15.0004L18.543 10.3598L17.2173 9.03418L11.2511 15.0004L17.2173 20.9667L18.543 19.6411L13.9023 15.0004Z"
-                  fill="white"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_1450_3668">
-                  <rect
-                    width="22.5"
-                    height="22.5"
-                    fill="white"
-                    transform="matrix(-1 0 0 1 26.25 3.75)"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
-          </button>
           <h1 className={`${raleway.className} text-3xl font-normal `}>
             USUÁRIOS
           </h1>

@@ -8,8 +8,8 @@ import * as XLSX from "xlsx";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { api } from "@/services";
 import { GetServerSideProps } from "next";
-import { parseCookies, setCookie } from "nookies";
-import { useRouter } from "next/router";
+import { parseCookies } from "nookies";
+
 const { RangePicker } = DatePicker;
 type Users = {
   id: number;
@@ -27,8 +27,6 @@ const karla = Karla({
 });
 
 function Index({ users }: { users: Users[] }) {
-  const [form] = Form.useForm(); // Use a instância do Form
-  const router = useRouter()
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [disabledDate, setDisabledDate] = useState(true);
@@ -41,25 +39,6 @@ function Index({ users }: { users: Users[] }) {
       setEndDate(endDate);
     }
   };
-
-  async function handleViewFilter(){
-   const data = await form.validateFields()
-   const params: any = {};
-   for (const [key, value] of Object.entries(data)) {
-     if (value !== undefined) {
-       params[key] = value;
-     }
-   }
-   if (startDate && endDate) {
-     params.data_inicio = startDate;
-     params.data_fim = endDate;
-   } else {
-     delete params.data_inicio;
-   }
-   
-   setCookie(undefined, "dataFilter", JSON.stringify(params));
-   router.push("/filtro")
-  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -96,7 +75,7 @@ function Index({ users }: { users: Users[] }) {
     const response = await api.get("formulario/filtro/", { params });
     console.log(response.data);
 
-    //handleExportExcel(response.data);
+    handleExportExcel(response.data);
   }
 
   const handleExportExcel = (filteredData: any) => {
@@ -171,35 +150,6 @@ function Index({ users }: { users: Users[] }) {
     <Layout>
       <div className="flex w-full  flex-col items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
         <div className="mt-4 flex flex-col w-full md:mt-4">
-        <button onClick={()=> {
-              router.back()
-          }} className="mr-6 hover:cursor-pointer my-6">
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 30 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect width="30" height="30" rx="5" fill="#4239F2" />
-              <g clipPath="url(#clip0_1450_3668)">
-                <path
-                  d="M13.9023 15.0004L18.543 10.3598L17.2173 9.03418L11.2511 15.0004L17.2173 20.9667L18.543 19.6411L13.9023 15.0004Z"
-                  fill="white"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_1450_3668">
-                  <rect
-                    width="22.5"
-                    height="22.5"
-                    fill="white"
-                    transform="matrix(-1 0 0 1 26.25 3.75)"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
-          </button>
           <h1 className={`${raleway.className} text-3xl font-normal `}>
             ARQUIVOS
           </h1>
@@ -210,7 +160,7 @@ function Index({ users }: { users: Users[] }) {
           </span>
         </div>
 
-        <Form className="h-full" form={form} onFinish={onSubmit}>
+        <Form className="h-full " onFinish={onSubmit}>
           <div className="flex flex-col  md:flex-row gap-x-44 w-full mt-10">
             <div className="flex flex-col ">
               <div className="flex flex-col">
@@ -281,12 +231,12 @@ function Index({ users }: { users: Users[] }) {
               </div>
               <div className="flex flex-col">
                 <label
-                  htmlFor="usuario"
+                  htmlFor="usuarios"
                   className={`${karla.className} text-xl font-bold`}
                 >
                   Usuário
                 </label>
-                <Form.Item className="w-96 md:w-full h-full" name="usuario">
+                <Form.Item className="w-96 md:w-full h-full" name="usuarios">
                   <Select
                     disabled={!disabledUser}
                     placeholder="Selecione"
@@ -441,7 +391,7 @@ function Index({ users }: { users: Users[] }) {
           </Space>
 
           <div className="w-full  flex flex-col md:flex-row justify-center items-center mt-10 gap-y-4 md:gap-y-0 md:gap-x-3.5 bg-[#F6FBF9]">
-            <button type="button" onClick={handleViewFilter} className="w-[202px] h-[59px] bg-[#00FF85]  rounded-[32px] text-white font-bold font-['Inter']">
+            <button className="w-[202px] h-[59px] bg-[#00FF85]  rounded-[32px] text-white font-bold font-['Inter']">
               VISUALIZAR
             </button>
             <button
@@ -462,8 +412,10 @@ export default Index;
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
 
+  // Acesse o cookie ou qualquer outra informação de autenticação
   const isAuthenticated = !!cookies["psi-token"];
 
+  // Faça qualquer lógica adicional necessária
 
   if (!isAuthenticated) {
     return {

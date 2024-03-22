@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Layout from "@/components/Layout";
+import Layout from "@/components/LayoutUser";
 import { Raleway, Inter } from "next/font/google";
 import Question from "@/components/Question";
 import { questions } from "@/utils/form";
@@ -66,7 +66,7 @@ export default function Index() {
         campo_questoes: allOptions,
         idade: formData?.idade,
         escolha_sexo: formData?.escolha_sexo,
-        grau_de_instrucao: formData?.grau_de_instrucao,
+        grauInstrucao: {definicaoGrau:formData?.grau_de_instrucao},
         localAplicacao: {
           definicaoLocalForm: formData?.definicaoLocalForm,
         },
@@ -179,18 +179,18 @@ export default function Index() {
                   type="number"
                   min={2}
                   placeholder="Digite sua idade"
-                  className="w-80"
+                  className="w-96 flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 />
               </Form.Item>
               <Form.Item
-                className="w-80"
+                className="w-96"
                 label="Sexo"
                 name="escolha_sexo"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg"
+                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="masculino">Masculino</Select.Option>
                   <Select.Option value="feminino">Feminino</Select.Option>
@@ -198,14 +198,14 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-80"
+                className="w-96"
                 label="Grau de instrução"
                 name="grau_de_instrucao"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg"
+                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="fundamental">
                     Ensino fundamental completo
@@ -219,14 +219,14 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-80"
+                className="w-96"
                 label="Local da aplicação"
                 name="definicaoLocalForm"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg"
+                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="hospital">Hospital</Select.Option>
                   <Select.Option value="escola">Escola</Select.Option>

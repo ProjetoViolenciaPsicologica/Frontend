@@ -8,6 +8,8 @@ import dynamic from 'next/dynamic';
 import { useQuery } from 'react-query';
 import { api } from '@/services'
 import { GetServerSideProps } from "next";
+import { jwtDecode } from "jwt-decode";
+
 
 const ColumnChart = dynamic(() => import('@/components/Charts/ColumnChart'), { ssr: false });
 
@@ -87,9 +89,21 @@ export default function Index() {
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
+  const token = cookies['psi-token'];
+  const decoded: {is_superuser:boolean} = jwtDecode(token);
 
+  if(!decoded?.is_superuser){
+
+  return {
+    redirect: {
+      destination: '/inicio',
+      permanent: false,
+    },
+  }
+  
+ }
   // Acesse o cookie ou qualquer outra informação de autenticação
-  const isAuthenticated = !!cookies['psi-token'];
+  const isAuthenticated = !!token
 
   // Faça qualquer lógica adicional necessária
 
