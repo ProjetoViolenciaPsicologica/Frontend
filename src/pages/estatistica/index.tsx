@@ -2,13 +2,16 @@ import React from "react";
 import Layout from "@/components/Layout";
 import { Raleway, DM_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
-import {api} from "@/services/";
+import { api } from "@/services/";
 import { GetServerSideProps } from "next";
-import { parseCookies } from 'nookies';
+import { parseCookies } from "nookies";
 
 const Pie = dynamic(() => import("@/components/Charts/Pie"), { ssr: false });
 
-const Bar = dynamic(() => import("@/components/Charts/BarHorizontal"), { ssr: false });
+const Bar = dynamic(() => import("@/components/Charts/BarHorizontal"), {
+  ssr: false,
+});
+const Box = dynamic(() => import("@/components/Charts/Box"), { ssr: false });
 
 const raleway = Raleway({
   weight: "400",
@@ -22,8 +25,7 @@ const dm = DM_Sans({
   subsets: ["latin"],
 });
 
-export default function index({dataPie, dataBar}: any) {
-    
+export default function index({ dataPie, dataBar, data }: any) {
   return (
     <Layout>
       <div className="flex h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
@@ -39,22 +41,27 @@ export default function index({dataPie, dataBar}: any) {
           </span>
         </div>
 
-        <div className="mt-10 md:mt-24 gap-y-5 md:gap-y-0 md:gap-x-5 w-full flex flex-col flex-wrap md:flex-row items-center">
-          <div className="w-[80vw] md:w-80 h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9]">
-            <h1
-              className={`${dm.className} text-[22px] font-medium text-black`}
-            >
-              Resultado por sinalização
-            </h1>
-            <Pie chartData={dataPie}/>
+        <div className="mt-10 md:mt-16 gap-y-5 md:gap-x-5 w-full flex flex-col flex-wrap md:flex-row items-center">
+          <div className="flex w-[80vw] justify-around">
+            <div className="w-[80vw] md:w-80 h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9]">
+              <h1
+                className={`${dm.className} text-[22px] font-medium text-black`}
+              >
+                Resultado por sinalização
+              </h1>
+              <Pie chartData={dataPie} />
+            </div>
+            <div className="w-[80vw] md:w-[701px] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9]">
+              <h1
+                className={`${dm.className} text-[22px] font-medium text-black`}
+              >
+                Respostas por opção
+              </h1>
+              <Bar data={dataBar} />
+            </div>
           </div>
-          <div className="w-[80vw] md:w-[701px] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9]">
-            <h1
-              className={`${dm.className} text-[22px] font-medium text-black`}
-            >
-              Respostas por opção
-            </h1>
-            <Bar data={dataBar} />
+          <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9]">
+            <Box data={data} />
           </div>
         </div>
       </div>
@@ -63,25 +70,47 @@ export default function index({dataPie, dataBar}: any) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-    const cookies = parseCookies({ req });
-    const isAuthenticated = !!cookies['psi-token'];
-    if (!isAuthenticated){
+  const cookies = parseCookies({ req });
+  const isAuthenticated = !!cookies["psi-token"];
+  if (!isAuthenticated) {
     return {
       redirect: {
-        destination: '/login',
+        destination: "/login",
         permanent: false,
       },
-    }
-   }
-  
-   const response = await api.get("formulario/sinalizacao")
-   const response1 = await api.get("formulario/quantidadeRespostas")
-   const dataPie = response.data
-    const dataBar = response1.data
-   return {
-    props: {
-        dataPie,
-        dataBar
-    }
-   }
+    };
   }
+  const response4 = await api.get("desvio");
+  const quantidade = response4.data;
+  const verde = quantidade.filter((item: any) => item.sinalizacao === "Verde");
+  const amarelo = quantidade.filter(
+    (item: any) => item.sinalizacao === "Amarelo"
+  );
+  const vermelho = quantidade.filter(
+    (item: any) => item.sinalizacao === "Vermelho"
+  );
+  const calcularSomatorioCampoQuestoes = (dados: any[]) => {
+    let somatorio = 0;
+    dados.forEach((item) => {
+      const valores = item.campo_questoes.split(",").map(Number);
+      somatorio += valores.reduce((acc: any, valor: any) => acc + valor, 0);
+    });
+    return somatorio;
+  };
+
+  const d1 = calcularSomatorioCampoQuestoes(verde);
+  const d2 = calcularSomatorioCampoQuestoes(amarelo);
+  const d3 = calcularSomatorioCampoQuestoes(vermelho);
+  const data = [d1, d2, d3];
+  const response = await api.get("formulario/sinalizacao");
+  const response1 = await api.get("formulario/quantidadeRespostas");
+  const dataPie = response.data;
+  const dataBar = response1.data;
+  return {
+    props: {
+      dataPie,
+      dataBar,
+      data,
+    },
+  };
+};

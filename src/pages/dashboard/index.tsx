@@ -8,6 +8,8 @@ import dynamic from 'next/dynamic';
 import { useQuery } from 'react-query';
 import { api } from '@/services'
 import { GetServerSideProps } from "next";
+import { jwtDecode } from "jwt-decode";
+
 
 const ColumnChart = dynamic(() => import('@/components/Charts/ColumnChart'), { ssr: false });
 
@@ -52,11 +54,14 @@ export default function Index() {
             <h1 className={`${raleway.className} text-3xl font-normal `}>DASHBOARD</h1>
             <span className={`${raleway.className} w-[256px] mt-4 text-black text-sm font-normal leading-tight`}>Gestão e visualização de informações sobre violência psicológica</span>
        </div>
-       <div className='grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-y-14 gap-x-14 mt-4 mx-auto'>
+       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-14 gap-x-14 mt-4 mx-auto'>
+       <Link href="/usuarios">
         <CardDashboard title='USUÁRIOS' svg="user1" />
-        
+        </Link>
         <CardDashboard title='FORMULÁRIOS' qtForm={quantidade?.total_formularios} isQT={isLoadingQT} />
+        <Link href="/arquivo">
         <CardDashboard title='ARQUIVOS' svg="export" />
+        </Link>
         <Link href="/estatistica">
         <CardDashboard title='ESTATÍSTICA' svg="statistic1" />
         </Link>
@@ -84,9 +89,21 @@ export default function Index() {
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
+  const token = cookies['psi-token'];
+  const decoded: {is_superuser:boolean} = jwtDecode(token);
 
+  if(!decoded?.is_superuser){
+
+  return {
+    redirect: {
+      destination: '/inicio',
+      permanent: false,
+    },
+  }
+  
+ }
   // Acesse o cookie ou qualquer outra informação de autenticação
-  const isAuthenticated = !!cookies['psi-token'];
+  const isAuthenticated = !!token
 
   // Faça qualquer lógica adicional necessária
 

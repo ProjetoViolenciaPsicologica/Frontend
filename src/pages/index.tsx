@@ -18,12 +18,12 @@ const montserrat = Montserrat({
 export default function Home() {
   return (
    <main className="flex w-screen h-screen justify-between bg-[#f6fbf9]">
-    <div className="h-full hidden md:flex md:w-[50vw]">
+    <div className="h-full hidden lg:flex lg:w-[50vw]">
          <Image src="/garota.png" alt="logo" width={1000} height={200} className="h-full " />
     </div>
-    <div className="h-full w-full md:w-[50vw] flex flex-col items-center justify-between">
+    <div className="h-full w-full lg:w-[50vw] flex flex-col items-center justify-between">
           <Image src="/icon.svg" alt="logo" width={150} height={150} />
-      <h1 className={`text-4xl font-bold ${montserrat.className} text-[#2D3A3A]`}>Nome do sistema</h1>
+      <h1 className={`text-4xl font-bold ${montserrat.className} text-[#2D3A3A]`}>KM-QUEST</h1>
       <div className="flex items-center h-full justify-center flex-col w-full">
       <p className={`text-4xl text-justify px-12 mb-8  text-[#2D3A3A] ${aclonica.className}`}>Rompendo o silêncio para construir a força: Sua voz importa</p>
 

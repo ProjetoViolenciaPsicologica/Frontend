@@ -34,7 +34,7 @@ export default function Sidebar() {
       >
         <div className="flex w-full ">
           <Link
-            href="/dashboard"
+            href="/inicio"
             className={`${quicksand.className}  text-white block truncate whitespace-nowrap p-4 `}
           >
             <Image src="/icon.svg" width={44} height={44} alt={"icon"} />
@@ -67,37 +67,19 @@ export default function Sidebar() {
             data-dev-hint="main navigation"
             className={`${raleway.className} flex flex-col justify-center md:gap-y-4 text-bgGray  font-normal`}
           >
-            <Link href="/dashboard" className="flex items-center pl-7  gap-x-2">
+            <Link href="/inicio" className="flex items-center pl-7  gap-x-2">
               <Image src="/home.svg" width={29} height={29} alt={"icon"} />
               <span className="">INÍCIO</span>
             </Link>
-            <Link href="/arquivo" className="flex items-center pl-7  gap-x-2">
-              <Image src="/arquivo.svg" width={29} height={29} alt={"icon"} />
-              <span className="">ARQUIVOS</span>
-            </Link>
+            
             <Link
-              href="/formulario"
+              href="/formularioUser"
               className="flex items-center pl-7 py-4 md:py-0 gap-x-2"
             >
               <Image src="/form.svg" width={29} height={29} alt={"form"} />
               <span>FORMULÁRIO</span>
             </Link>
-            <Link href="/usuarios" className="flex items-center pl-7  gap-x-2">
-              <Image src="/user.svg" width={29} height={29} alt={"user"} />
-              <span>USUÁRIOS</span>
-            </Link>
-            <Link
-              href="/estatistica"
-              className="flex items-center pl-7 pt-4 md:pt-0 gap-x-2"
-            >
-              <Image
-                src="/statistic.svg"
-                width={29}
-                height={29}
-                alt={"statistic"}
-              />
-              <span>ESTATÍSTICA</span>
-            </Link>
+            
             <button
               type="button"
               onClick={() => {

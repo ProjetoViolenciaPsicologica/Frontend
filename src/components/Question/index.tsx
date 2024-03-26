@@ -14,34 +14,32 @@ const Question = ({
 }: {
   question: string[];
   page: number;
-  setOkQuestion: (ok: boolean) => void;
   setPage: (page: number) => void;
   allOptions: string;
   setAllOptions: (allOptions: string) => void;
-  selectedOptions: { [key: string]: any };
+  setOkQuestion: (ok: boolean) => void;
+  selectedOptions: { [key: string]: string[] };
   setSelectedOptions: (selectedOptions: { [key: string]: any }) => void;
 }) => {
   const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
-    // Restore selected options when page changes
+    // Initialize selected options for the current page
     if (!selectedOptions[page.toString()]) {
-      setSelectedOptions((prevOptions:any) => ({
+      setSelectedOptions((prevOptions: any) => ({
         ...prevOptions,
-        [page.toString()]: {},
+        [page.toString()]: Array(question.length).fill(""),
       }));
     }
-  }, [page, selectedOptions, setSelectedOptions]);
+  }, [page, question.length, selectedOptions, setSelectedOptions]);
 
   const handleRadioChange = (questionIndex: number, value: string) => {
-    const updatedOptions = {
-      ...selectedOptions,
-      [page.toString()]: {
-        ...selectedOptions[page.toString()],
-        [questionIndex.toString()]: value,
-      },
-    };
-    setSelectedOptions(updatedOptions);
+    setSelectedOptions((prevOptions:any) => ({
+      ...prevOptions,
+      [page.toString()]: prevOptions[page.toString()].map((prevValue:any, index:number | undefined) =>
+        index === questionIndex ? value : prevValue
+      ),
+    }));
     setErrors({});
   };
 
@@ -49,7 +47,7 @@ const Question = ({
     // Validate if any question is not answered
     const newErrors: { [key: string]: boolean } = {};
     question.forEach((_, index) => {
-      if (!selectedOptions[page.toString()]?.[index.toString()]) {
+      if (!selectedOptions[page.toString()][index]) {
         newErrors[index.toString()] = true;
       } else {
         newErrors[index.toString()] = false;
@@ -61,32 +59,27 @@ const Question = ({
     const allQuestionsAnswered = !Object.values(newErrors).some((error) => error);
 
     if (allQuestionsAnswered) {
-      // Perform necessary actions with selected options
-
-      let optionsString = "";
-      for (let i = 0; i < question.length; i++) {
-        const value = selectedOptions[page.toString()]?.[i.toString()] || "";
-        optionsString += value ? value + "," : ",";
-      }
-
-      const prevOptions = allOptions || ""; // assuming allOptions is the previous state
-      const newOptions = prevOptions + optionsString;
-      setAllOptions(newOptions);
-
-      // Move to the next page
+      // Move to the next page if not the last page
       if (page < 3) {
         setPage(page + 1);
-      } else {
-        // If it's the last page, you can send the string to the API here
-        console.log("Send to API:", allOptions);
-        setOkQuestion(true);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        return;
       }
 
+      // Combine options from all pages
+      const combinedOptions = Object.values(selectedOptions).flatMap((options) => options).join(",");
+
+      // Perform necessary actions with combined options
+      // For example, send the string to the API
+      console.log("Send to API:", combinedOptions);
+      setAllOptions(combinedOptions);
+      setOkQuestion(true);
+
       // Scroll to top
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+     
     } else {
       // If any question is not answered, display error message
       toast.error("Por favor, responda a todas as perguntas.", {
@@ -112,7 +105,9 @@ const Question = ({
               <Radio
                 value="1"
                 checked={
-                  selectedOptions[page.toString()]?.[index.toString()] === "1"
+                  selectedOptions[page.toString()] &&
+                  selectedOptions[page.toString()].length > index &&
+                  selectedOptions[page.toString()][index] === "1"
                 }
                 onChange={() => handleRadioChange(index, "1")}
                 className="mr-2 text-black text-lg font-normal leading-[27px]"
@@ -122,25 +117,29 @@ const Question = ({
             </div>
             <div className="flex items-center">
               <Radio
-                value="2"
-                checked={
-                  selectedOptions[page.toString()]?.[index.toString()] === "2"
-                }
-                onChange={() => handleRadioChange(index, "2")}
-                className="mr-2 text-black text-lg font-normal leading-[27px]"
-              >
+              value="2"
+              checked={
+                selectedOptions[page.toString()] &&
+                selectedOptions[page.toString()].length > index &&
+                selectedOptions[page.toString()][index] === "2"
+              }
+              onChange={() => handleRadioChange(index, "2")}
+              className="mr-2 text-black text-lg font-normal leading-[27px]"
+            >
                 2 - Às Vezes
               </Radio>
             </div>
             <div className="flex items-center">
               <Radio
-                value="3"
-                checked={
-                  selectedOptions[page.toString()]?.[index.toString()] === "3"
-                }
-                onChange={() => handleRadioChange(index, "3")}
-                className="mr-2 text-black text-lg font-normal leading-[27px]"
-              >
+               value="3"
+               checked={
+                 selectedOptions[page.toString()] &&
+                 selectedOptions[page.toString()].length > index &&
+                 selectedOptions[page.toString()][index] === "3"
+               }
+               onChange={() => handleRadioChange(index, "3")}
+               className="mr-2 text-black text-lg font-normal leading-[27px]"
+             >
                 3 - Frequentemente
               </Radio>
             </div>
@@ -148,7 +147,9 @@ const Question = ({
               <Radio
                 value="4"
                 checked={
-                  selectedOptions[page.toString()]?.[index.toString()] === "4"
+                  selectedOptions[page.toString()] &&
+                  selectedOptions[page.toString()].length > index &&
+                  selectedOptions[page.toString()][index] === "4"
                 }
                 onChange={() => handleRadioChange(index, "4")}
                 className="mr-2 text-black text-lg font-normal leading-[27px]"

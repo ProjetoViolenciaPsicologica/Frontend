@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import Chart from 'react-apexcharts';
-import axios from 'axios';
+import React from "react";
+import Chart from "react-apexcharts";
 
 type ChartData = {
   Vermelho: number;
@@ -8,44 +7,51 @@ type ChartData = {
   Verde: number;
 };
 
-export default function PieChart({chartData}:{chartData:ChartData}) {
-  
+const PieChart: React.FC<{ chartData: ChartData }> = ({ chartData }) => {
+  // Verifica se há algum valor maior que 0
+  const hasData = Object.values(chartData).some((value) => value > 0);
 
+  // Retorna null se não houver dados
+  if (!hasData) return null;
 
-const options = {
-    labels: ['Vermelho', 'Amarelo', 'Verde'],
-    colors: ['#FF3A29', '#FFF500', '#00FF66'],
+  const options = {
+    labels: ["Vermelho", "Amarelo", "Verde"],
+    colors: ["#FF3A29", "#FFF500", "#00FF66"],
     dataLabels: {
-      enabled: false, // Desabilita a exibição de números percentuais
+      enabled: false,
     },
     legend: {
       show: true,
-      position: 'bottom',
+      position: "top",
       onItemClick: {
         toggleDataSeries: true,
       },
     },
     tooltip: {
-      enabled: true, // Habilita a exibição dos dados ao passar o mouse
+      enabled: true,
+      style: {
+        fontSize: "14px",
+        fontFamily: "Helvetica, Arial, sans-serif",
+        fontWeight: "bold",
+        colors: ["#0000"],
+      }, // Habilita a exibição dos dados ao passar o mouse
     },
   };
-  
 
   return (
     <Chart
-    options={{
+      options={{
         ...options,
         legend: {
-            ...options.legend,  
-            position: 'bottom',
+          ...options.legend,
+          position: "bottom",
         },
-    }}
-      series={[chartData.Vermelho, chartData.Amarelo, chartData.Verde]}
+      }}
+      series={[chartData?.Vermelho, chartData?.Amarelo, chartData?.Verde]}
       type="pie"
       width="350px"
     />
   );
 };
 
-
-
+export default PieChart;
