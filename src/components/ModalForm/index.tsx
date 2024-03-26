@@ -54,9 +54,9 @@ export default function Index({
           progress: undefined,
           theme: "light",
         });
-        // destroyCookie(null, "psi-token");
-        // destroyCookie(null, "psi-refreshToken");
-        // Router.push("/login");
+        destroyCookie(null, "psi-token");
+        destroyCookie(null, "psi-refreshToken");
+        Router.push("/login");
       },
       onSuccess: (response) => {
         if (response.status === 201) {
@@ -73,7 +73,7 @@ export default function Index({
           });
           
           setTimeout(() => {
-            Router.reload();
+            Router.push("/inicio")
           }, 2000);
         } else {
           toast.error("Erro ao enviar as respostas.", {
