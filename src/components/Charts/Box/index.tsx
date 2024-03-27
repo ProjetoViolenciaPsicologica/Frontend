@@ -32,7 +32,7 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
       curve: "smooth",
     },
     title: {
-      text: "Visualização da Média e Desvio Padrão",
+      text: "Média e Desvio Padrão",
       align: "center",
       style: {
         fontSize: "16px",

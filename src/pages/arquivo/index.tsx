@@ -212,7 +212,7 @@ function Index({ users }: { users: Users[] }) {
         </div>
 
         <Form className="h-full" form={form} onFinish={onSubmit}>
-          <div className="flex flex-col  md:flex-row gap-x-44 w-full mt-10">
+          <div className="flex flex-col-reverse  md:flex-row gap-x-44 w-full mt-10">
             <div className="flex flex-col ">
               <div className="flex flex-col">
                 <label

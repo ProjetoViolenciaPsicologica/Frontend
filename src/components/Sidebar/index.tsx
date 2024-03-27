@@ -35,9 +35,10 @@ export default function Sidebar() {
         <div className="flex w-full ">
           <Link
             href="/dashboard"
-            className={`${quicksand.className}  text-white block truncate whitespace-nowrap p-4 `}
+            className={`${quicksand.className} flex items-center gap-x-2 text-white block truncate whitespace-nowrap p-4 `}
           >
             <Image src="/icon.svg" width={44} height={44} alt={"icon"} />
+            <h1 className="text-neutral-700 text-2xl font-bold font-['Montserrat'] leading-[46.80px]">KM-QUEST</h1>
           </Link>
         </div>
 
@@ -67,11 +68,11 @@ export default function Sidebar() {
             data-dev-hint="main navigation"
             className={`${raleway.className} flex flex-col justify-center md:gap-y-4 text-bgGray  font-normal`}
           >
-            <Link href="/dashboard" className="flex items-center pl-7  gap-x-2">
+            <Link href="/dashboard" className="flex items-center pl-7 gap-x-2">
               <Image src="/home.svg" width={29} height={29} alt={"icon"} />
               <span className="">INÍCIO</span>
             </Link>
-            <Link href="/arquivo" className="flex items-center pl-7  gap-x-2">
+            <Link href="/arquivo" className="flex items-center pl-7 mt-4 md:mt-0 gap-x-2">
               <Image src="/arquivo.svg" width={29} height={29} alt={"icon"} />
               <span className="">ARQUIVOS</span>
             </Link>
