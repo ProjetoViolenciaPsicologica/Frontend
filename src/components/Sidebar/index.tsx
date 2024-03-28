@@ -2,10 +2,10 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Raleway, Quicksand } from "next/font/google";
-import { Squash as Hamburger } from 'hamburger-react';
+import { Squash as Hamburger } from "hamburger-react";
 import Router from "next/router";
 import { destroyCookie } from "nookies";
-
+import { Modal, Divider } from "antd";
 const raleway = Raleway({
   weight: "400",
   style: "normal",
@@ -20,6 +20,11 @@ const quicksand = Quicksand({
 
 export default function Sidebar() {
   const [isOpen, setOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  function handleCancel() {
+    setIsModalOpen(false);
+  }
   function handleLogout() {
     destroyCookie(null, "psi-token");
     destroyCookie(null, "psi-refreshToken");
@@ -29,19 +34,25 @@ export default function Sidebar() {
     <>
       <input type="checkbox" id="menu-open" className="hidden" />
 
-      <header
-        className="flex w-screen items-center justify-between bg-gray text-gray-100 md:hidden pr-4"
-      >
+      <header className="flex w-screen items-center justify-between bg-gray text-gray-100 md:hidden pr-4">
         <div className="flex w-full ">
           <Link
             href="/dashboard"
-            className={`${quicksand.className}  text-white block truncate whitespace-nowrap p-4 `}
+            className={`${quicksand.className} flex items-center gap-x-2 text-white block truncate whitespace-nowrap p-4 `}
           >
             <Image src="/icon.svg" width={44} height={44} alt={"icon"} />
+            <h1 className="text-neutral-700 text-2xl font-bold font-['Montserrat'] leading-[46.80px]">
+              KM-QUEST
+            </h1>
           </Link>
         </div>
 
-        <Hamburger toggled={isOpen} toggle={setOpen} color="black" distance="lg" />
+        <Hamburger
+          toggled={isOpen}
+          toggle={setOpen}
+          color="black"
+          distance="lg"
+        />
       </header>
 
       <aside
@@ -54,24 +65,28 @@ export default function Sidebar() {
           className="flex flex-col space-y-6"
           data-dev-hint="optional div for having an extra footer navigation"
         >
-         
           <Link
             href="/dashboard"
             className="text-white flex flex-col items-center justify-center mb-24"
           >
             <Image src="/icon.svg" width={144} height={144} alt={"icon"} />
-            <h1 className="text-neutral-700 text-4xl font-bold font-['Montserrat'] leading-[46.80px]">KM-QUEST</h1>
+            <h1 className="text-neutral-700 text-4xl font-bold font-['Montserrat'] leading-[46.80px]">
+              KM-QUEST
+            </h1>
           </Link>
-          
+
           <nav
             data-dev-hint="main navigation"
             className={`${raleway.className} flex flex-col justify-center md:gap-y-4 text-bgGray  font-normal`}
           >
-            <Link href="/dashboard" className="flex items-center pl-7  gap-x-2">
+            <Link href="/dashboard" className="flex items-center pl-7 gap-x-2">
               <Image src="/home.svg" width={29} height={29} alt={"icon"} />
               <span className="">INÍCIO</span>
             </Link>
-            <Link href="/arquivo" className="flex items-center pl-7  gap-x-2">
+            <Link
+              href="/arquivo"
+              className="flex items-center pl-7 mt-4 md:mt-0 gap-x-2"
+            >
               <Image src="/arquivo.svg" width={29} height={29} alt={"icon"} />
               <span className="">ARQUIVOS</span>
             </Link>
@@ -101,7 +116,7 @@ export default function Sidebar() {
             <button
               type="button"
               onClick={() => {
-                handleLogout();
+                setIsModalOpen(true);
               }}
               className={`group flex w-full items-center space-x-2 px-3 py-2 ${raleway.className} transition duration-200 ml-4 text-bgGray  font-normal`}
             >
@@ -148,6 +163,36 @@ export default function Sidebar() {
           </nav>
         </div>
       </aside>
+
+      <Modal
+        title="TEM CERTEZA QUE DESEJA SAIR?"
+        open={isModalOpen}
+        onCancel={handleCancel}
+        className=" h-[478px]"
+        footer={null}
+      >
+        <Divider />
+        <span className="mt-8 text-center text-black text-2xl font-semibold font-['Montserrat']">
+          Ao deixar a página, todas as informações preenchidas e selecionadas
+          para formulário serão perdidas.{" "}
+        </span>
+        <Divider />
+
+        <div className="flex justify-center mt-4 gap-x-5">
+          <button
+            onClick={handleCancel}
+            className="w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+          >
+            CANCELAR
+          </button>
+          <button
+            onClick={handleLogout}
+            className="w-[172px] h-[59px] hover:bg-esmerald-900 bg-black rounded-[32px] text-white text-xl font-bold font-['Inter']"
+          >
+            SAIR
+          </button>
+        </div>
+      </Modal>
     </>
   );
 }

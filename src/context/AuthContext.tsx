@@ -15,8 +15,8 @@ type SignInCredentials = {
 };
 
 type dataType = {
-  is_superuser:boolean
-}
+  is_superuser: boolean;
+};
 
 export const AuthContext = createContext({} as AuthContextType);
 
@@ -35,15 +35,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.data.access) {
         setToken(response.data.access);
       }
-      const data:dataType = jwtDecode(response.data.access);
-      if(data?.is_superuser){
+      const data: dataType = jwtDecode(response.data.access);
+      if (data?.is_superuser) {
         Router.push("/dashboard");
-      }
-      else {
+      } else {
         Router.push("/inicio");
       }
     } catch (error: any) {
-      return error.response.status;
+      return true;
     }
   }
 
