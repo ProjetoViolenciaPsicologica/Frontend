@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { Karla, Quicksand, Montserrat } from "next/font/google";
-import { Form, Input, Space, Switch, Select, InputNumber } from "antd";
-
+import { Form, Input, Button } from "antd";
+import { api } from "@/services";
+import { toast } from "react-toastify";
 const montserrat = Montserrat({
   weight: "700",
   style: "normal",
@@ -21,14 +22,27 @@ const quicksand = Quicksand({
   subsets: ["latin"],
 });
 
+type form = {
+  email: string;
+};
+
 export default function Index() {
-  function onSubmit(data: any) {
-    console.log(data);
+  const [loading, setLoading] = useState(false);
+  async function onSubmit(data: form) {
+    setLoading(true);
+    try {
+      const response = await api.post("password_reset/", data);
+      toast.success("Um email foi enviado para mudança de senha");
+    } catch (error) {
+      toast.error("Email não pertence a sua conta cadastrada");
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <div className="h-screen w-full bg-[#F6FBF9] flex flex-col items-center">
       <div
-        className={`${quicksand.className} flex flex-col items-center gap-x-2 text-white block truncate whitespace-nowrap p-4 `}
+        className={`${quicksand.className} flex flex-col items-center gap-x-2 text-white truncate whitespace-nowrap p-4 `}
       >
         <Image src="/icon.svg" width={150} height={150} alt={"icon"} />
         <h1
@@ -38,12 +52,14 @@ export default function Index() {
         </h1>
       </div>
 
-      <div className="mt-20 md:mt-44 px-4">
-        <h1 className={`${karla.className} text-black text-2xl font-bold`}>
+      <div className="mt-10 md:mt-24 w-full flex flex-col items-center px-4">
+        <h1
+          className={`${karla.className} ml-4 md:ml-0 text-black text-2xl font-bold`}
+        >
           Esqueceu a sua senha?
         </h1>
         <span
-          className={`${karla.className} text-zinc-600 text-xl font-bold ml-4`}
+          className={`${karla.className}w-full text-zinc-600 md:px-0 text-xl font-bold ml-4 md:text-start text-center px-4`}
         >
           Insira o e-mail cadastrado de sua conta para poder resetar e recuperar
           sua senha.
@@ -64,7 +80,6 @@ export default function Index() {
                 { type: "email", message: "Email inválido" },
               ]}
             >
-             
               <Input
                 placeholder="Digite seu E-mail aqui"
                 name={"email"}
@@ -72,13 +87,14 @@ export default function Index() {
               />
             </Form.Item>
           </div>
-          <div className="mt-8 md:mt-20 flex justify-center w-full">
-            <button
-              type="submit"
+          <div className="mt-4 md:mt-20  flex justify-center w-full">
+            <Button
+              htmlType="submit"
+              loading={loading}
               className="w-[175px] h-[51px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
             >
               ENVIAR
-            </button>
+            </Button>
           </div>
         </Form>
       </div>

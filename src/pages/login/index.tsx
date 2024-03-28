@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { GetServerSideProps } from "next";
-import { parseCookies } from 'nookies';
+import { parseCookies } from "nookies";
 import { useState, useContext } from "react";
 import { Roboto, Montserrat, Karla } from "next/font/google";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { AuthContext } from "@/context/AuthContext";
 import { useForm } from "react-hook-form";
+import { Button } from "antd";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
@@ -37,7 +38,9 @@ const karla = Karla({
 });
 
 export default function Login() {
+  const [loading, setLoading] = useState<boolean>(false);
   const { signIn } = useContext(AuthContext);
+
   const [errorLogin, setError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const {
@@ -48,11 +51,13 @@ export default function Login() {
     resolver: yupResolver(schema),
   });
   const onSubmit = async (data: FormData) => {
+    setLoading(true);
     const response = await signIn(data);
     console.log(response);
     if (response) {
       setError(true);
     }
+    setLoading(false);
   };
 
   return (
@@ -95,16 +100,24 @@ export default function Login() {
               </label>
               <input
                 type="text"
-                 {...register("email")}
+                {...register("email")}
                 name="email"
                 placeholder="Digite seu e-mail"
-                className={`py-4 bg-white pl-4 text-[#969696] ${roboto.className} text-lg placeholder:text-[#969696]  placeholder:${roboto.className} placeholder:text-lg rounded-xl shadow border ${errors.email ? "border-red-500" : "border-black border-opacity-10"} `}
+                className={`py-4 bg-white pl-4 text-[#969696] ${
+                  roboto.className
+                } text-lg placeholder:text-[#969696]  placeholder:${
+                  roboto.className
+                } placeholder:text-lg rounded-xl shadow border ${
+                  errors.email
+                    ? "border-red-500"
+                    : "border-black border-opacity-10"
+                } `}
               />
-               {errors.email && (
-                  <span className="flex items-center p-2 text-lg leading-5 text-red-500">
-                    {errors?.email?.message}
-                  </span>
-                )}
+              {errors.email && (
+                <span className="flex items-center p-2 text-lg leading-5 text-red-500">
+                  {errors?.email?.message}
+                </span>
+              )}
             </div>
             <div className="flex flex-col w-[82vw] md:w-[447px]">
               <label
@@ -118,7 +131,13 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
                   placeholder="Digite sua senha"
-                  className={`py-4 w-full bg-white pl-4 placeholder:text-[#969696] placeholder:${roboto.className} placeholder:text-lg rounded-xl shadow border ${errors.email ? "border-red-500" : "border-black border-opacity-10"}`}
+                  className={`py-4 w-full bg-white pl-4 placeholder:text-[#969696] placeholder:${
+                    roboto.className
+                  } placeholder:text-lg rounded-xl shadow border ${
+                    errors.email
+                      ? "border-red-500"
+                      : "border-black border-opacity-10"
+                  }`}
                 />
                 <button
                   type="button"
@@ -128,25 +147,28 @@ export default function Login() {
                   {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
                 </button>
               </div>
-              
+
               {errors.password && (
-                  <span className="flex items-center p-2 text-lg leading-5 text-red-500">
-                    {errors?.password?.message}
-                  </span>
-                )}
+                <span className="flex items-center p-2 text-lg leading-5 text-red-500">
+                  {errors?.password?.message}
+                </span>
+              )}
             </div>
 
-            <button
-              type="submit"
-              className="px-8 py-3 rounded-[32px] bg-[#093520] text-white"
+            <Button
+              htmlType="submit"
+              loading={loading}
+              className="px-10 py-6 rounded-[32px] bg-[#093520] hover:bg-[#093520] text-white flex items-center"
             >
               ENTRAR
-            </button>
-            <span
-              className={`text-center text-[#32403B] text-sm font-normal ${karla.className} leading-[18.20px] cursor-pointer`}
-            >
-              Esqueceu sua senha?
-            </span>
+            </Button>
+            <Link href={"/recuperar-senha"}>
+              <span
+                className={`text-center text-[#32403B] text-sm font-normal ${karla.className} leading-[18.20px] cursor-pointer`}
+              >
+                Esqueceu sua senha?
+              </span>
+            </Link>
           </form>
         </div>
       </div>
@@ -154,30 +176,26 @@ export default function Login() {
   );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-
- 
   const cookies = parseCookies({ req });
 
   // Acesse o cookie ou qualquer outra informação de autenticação
-  const isAuthenticated = !!cookies['psi-token'];
+  const isAuthenticated = !!cookies["psi-token"];
 
   // Faça qualquer lógica adicional necessária
 
- if (isAuthenticated){
-  return {
-    redirect: {
-      destination: '/dashboard',
-      permanent: false,
-    },
+  if (isAuthenticated) {
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
   }
-  
- }
 
- return {
-  props: {
-    title:"ok"
-  }
- }
-}
+  return {
+    props: {
+      title: "ok",
+    },
+  };
+};

@@ -29,7 +29,7 @@ export default function Index({
   data,
 }: ValuePropsType) {
   const [loading, setLoading] = useState(false);
-  const { mutate,  } = useMutation(
+  const { mutate } = useMutation(
     async (data: any) => {
       const token = nookies.get()["psi-token"];
       const response = await api.post("/formulario/novo", data, {
@@ -71,9 +71,9 @@ export default function Index({
             progress: undefined,
             theme: "light",
           });
-          
+
           setTimeout(() => {
-            Router.push("/inicio")
+            Router.push("/inicio");
           }, 2000);
         } else {
           toast.error("Erro ao enviar as respostas.", {
@@ -91,13 +91,12 @@ export default function Index({
       onMutate: () => {
         setLoading(true); // Ativa o estado de loading quando a mutação é iniciada
       },
-     
     }
   );
 
   function handleOk() {
     setLoading(true); // Set loading to true when the button is clicked
-    mutate(data)
+    mutate(data);
     setIsModalOpen(false);
   }
 
