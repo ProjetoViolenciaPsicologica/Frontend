@@ -54,7 +54,7 @@ export default function Index() {
             <h1 className={`${raleway.className} text-3xl font-normal `}>DASHBOARD</h1>
             <span className={`${raleway.className} w-[256px] mt-4 text-black text-sm font-normal leading-tight`}>Gestão e visualização de informações sobre violência psicológica</span>
        </div>
-       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-14 gap-x-14 mt-4 mx-auto'>
+       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-14 gap-x-14 mt-4 mx-auto'>
        <Link href="/usuarios">
         <CardDashboard title='USUÁRIOS' svg="user1" />
         </Link>

@@ -134,7 +134,7 @@ export default function Index({ cookies }: { cookies: any }) {
         ref={contentRef}
         className="flex w-full  flex-col items-center pl-4 lg:items-start lg:pl-12 "
       >
-        <div className="flex flex-col md:flex-row justify-between items-center w-full mt-4 md:mt-16 ">
+        <div className="flex flex-col lg:flex-row justify-between items-center w-full mt-4 md:mt-16 ">
           <div className=" flex h-full flex-col w-full">
             <button
               onClick={() => {
@@ -214,7 +214,7 @@ export default function Index({ cookies }: { cookies: any }) {
               {data?.definicaoLocalForm ? data.definicaoLocalForm : "---------"}
             </span>
           </div>
-          <div className="flex flex-col h-full mr-16 md:mt-0 w-80">
+          <div className="flex flex-col h-full ml-14 md:mt-0 w-80">
             <h1
               className={`${raleway.className} text-black text-2xl font-normal mb-1.5`}
             >

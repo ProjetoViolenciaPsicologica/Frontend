@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { Raleway, Inter } from "next/font/google";
+import { Raleway, Karla } from "next/font/google";
 import Question from "@/components/Question";
 import { questions } from "@/utils/form";
 import { GetServerSideProps } from "next";
@@ -21,6 +21,11 @@ export interface dataForm {
   grau_de_instrucao: string;
   definicaoLocalForm: string;
 }
+
+const karla = Karla({
+  style: "normal",
+  subsets: ["latin"],
+});
 
 export default function Index() {
   const [form] = Form.useForm(); // Extrai a referência do form
@@ -85,8 +90,8 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="flex bg-[#F6FBF9] h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
-        <div className="mt-4 flex flex-col w-full md:mt-10">
+     <div className="flex flex-col items-center lg:items-start lg:pl-12">
+        <div className="mt-4 flex flex-col md:mt-10 pl-4 lg:pl-0">
           {isSmallScreen ? (
             <div className="absolute left-0 rigt-0">
               <svg
@@ -166,31 +171,36 @@ export default function Index() {
           </h1>
         </div>
         {page === 0 && (
-          <div className="h-screen w-full md:mt-16 ">
+          <div className="w-full mt-8 md:mt-16 flex justify-center lg:justify-start">
             <Form form={form} onFinish={onSubmit} layout="vertical">
+            <div className="flex flex-col">
+                <div className="flex items-center">
+                  <span className="text-red-500 mr-1">*</span>
+                  <label
+                    htmlFor="idade"
+                    className={`${karla.className} text-xl text-[#000000e0] flex items-center`}
+                  >
+                    Idade
+                  </label>
+                </div>
+                <Form.Item name="idade" className="block">
+                  <InputNumber
+                    type="number"
+                    min={2}
+                    placeholder="Digite sua idade"
+                    className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  />
+                </Form.Item>
+              </div>
               <Form.Item
-                label="Idade"
-                name="idade"
-                rules={[
-                  { required: true, message: "Por favor, insira sua idade" },
-                ]}
-              >
-                <InputNumber
-                  type="number"
-                  min={2}
-                  placeholder="Digite sua idade"
-                  className="w-80"
-                />
-              </Form.Item>
-              <Form.Item
-                className="w-80"
+                className="w-72 md:w-full"
                 label="Sexo"
                 name="escolha_sexo"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg"
+                  className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="masculino">Masculino</Select.Option>
                   <Select.Option value="feminino">Feminino</Select.Option>
@@ -198,14 +208,14 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-80"
+                className="w-72 md:w-full"
                 label="Grau de instrução"
                 name="grau_de_instrucao"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg"
+                  className="text-black font-bold text-lg w-full lg:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="fundamental">
                     Ensino fundamental completo
@@ -219,21 +229,21 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-80"
+                className="w-72 md:w-full"
                 label="Local da aplicação"
                 name="definicaoLocalForm"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg"
+                  className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="hospital">Hospital</Select.Option>
                   <Select.Option value="escola">Escola</Select.Option>
                   <Select.Option value="delegacia">Delegacia</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item className="flex w-80 md:w-[470px] justify-center mt-10 md:justify-end  items-center">
+              <Form.Item className="flex w-72 md:w-[470px] justify-center mt-10 lg:justify-end  items-center">
                 <button
                   type="submit"
                   className="w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
@@ -317,3 +327,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     },
   };
 };
+
+
+
+

@@ -212,7 +212,7 @@ function Index({ users }: { users: Users[] }) {
         </div>
 
         <Form className="h-full" form={form} onFinish={onSubmit}>
-          <div className="flex flex-col-reverse  md:flex-row gap-x-44 w-full mt-10">
+          <div className="flex flex-col-reverse lg:flex-row gap-x-44 w-full mt-10">
             <div className="flex flex-col ">
               <div className="flex flex-col">
                 <label
@@ -222,7 +222,7 @@ function Index({ users }: { users: Users[] }) {
                   Grau de instrução
                 </label>
                 <Form.Item
-                  className="w-96 md:w-full h-full"
+                  className="w-72 md:w-full h-full"
                   name="grau_de_instrucao"
                 >
                   <Select
@@ -249,7 +249,7 @@ function Index({ users }: { users: Users[] }) {
                 >
                   Sexo
                 </label>
-                <Form.Item className="w-96 md:w-full h-full" name="sexo">
+                <Form.Item className="w-72 md:w-full h-full" name="sexo">
                   <Select
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
@@ -276,7 +276,7 @@ function Index({ users }: { users: Users[] }) {
                     type="number"
                     min={2}
                     placeholder="Digite sua idade"
-                    className="w-96 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                    className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   />
                 </Form.Item>
               </div>
@@ -287,7 +287,7 @@ function Index({ users }: { users: Users[] }) {
                 >
                   Usuário
                 </label>
-                <Form.Item className="w-96 md:w-full h-full" name="usuario">
+                <Form.Item className="w-72 md:w-full h-full" name="usuario">
                   <Select
                     disabled={!disabledUser}
                     placeholder="Selecione"
@@ -312,7 +312,7 @@ function Index({ users }: { users: Users[] }) {
                   Local da aplicação
                 </label>
                 <Form.Item
-                  className="w-96 md:w-full h-full"
+                  className="w-72 md:w-full h-full"
                   name="local_aplicacao"
                 >
                   <Select
@@ -350,7 +350,7 @@ function Index({ users }: { users: Users[] }) {
                     onChange={handleStartDateChange}
                     locale={ptBR}
                     lang="pt-br" // Adicione o locale correto aqui
-                    className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
+                    className={`w-72 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
                       disabledDate
                         ? "cursor-not-allowed bg-[#F5F5F5]"
                         : "cursor-pointer"
@@ -365,7 +365,7 @@ function Index({ users }: { users: Users[] }) {
                 >
                   Área
                 </label>
-                <Form.Item className="w-96 md:w-full h-full" name="area">
+                <Form.Item className="w-72 md:w-full h-full" name="area">
                   <Select
                     placeholder="Selecione"
                     disabled={disabledUser}
@@ -386,7 +386,7 @@ function Index({ users }: { users: Users[] }) {
                   Tipo de usuário
                 </label>
                 <Form.Item
-                  className="w-96 md:w-full h-full"
+                  className="w-72 md:w-full h-full"
                   name="definicaoLocalForm"
                 >
                   <Select
