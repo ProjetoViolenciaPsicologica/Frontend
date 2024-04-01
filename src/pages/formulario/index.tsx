@@ -4,7 +4,7 @@ import { Raleway, Karla } from "next/font/google";
 import Question from "@/components/Question";
 import { questions } from "@/utils/form";
 import { GetServerSideProps } from "next";
-import { parseCookies } from 'nookies';
+import { parseCookies } from "nookies";
 import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
 import { Steps, Form, InputNumber, Select } from "antd";
@@ -62,9 +62,9 @@ export default function Index() {
   useEffect(() => {
     if (okQuestion) {
       console.log(allOptions);
-      const questions =allOptions.split(",");
+      const questions = allOptions.split(",");
       const sum = questions.map(Number).reduce((acc, curr) => acc + curr, 0);
-      console.log(questions)
+      console.log(questions);
       setSumQuestion(sum);
 
       const data1: any = {
@@ -90,7 +90,7 @@ export default function Index() {
 
   return (
     <Layout>
-     <div className="flex flex-col items-center lg:items-start lg:pl-12">
+      <div className="flex flex-col items-center pl-4 lg:items-start lg:pl-12">
         <div className="mt-4 flex flex-col md:mt-10 pl-4 lg:pl-0">
           {isSmallScreen ? (
             <div className="absolute left-0 rigt-0">
@@ -173,7 +173,7 @@ export default function Index() {
         {page === 0 && (
           <div className="w-full mt-8 md:mt-16 flex justify-center lg:justify-start">
             <Form form={form} onFinish={onSubmit} layout="vertical">
-            <div className="flex flex-col">
+              <div className="flex flex-col">
                 <div className="flex items-center">
                   <span className="text-red-500 mr-1">*</span>
                   <label
@@ -302,7 +302,6 @@ export default function Index() {
   );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
 
@@ -320,14 +319,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
- 
   return {
     props: {
-      users:"users",
+      users: "users",
     },
   };
 };
-
-
-
-
