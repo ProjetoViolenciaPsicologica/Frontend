@@ -1,22 +1,26 @@
 import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
-
+import {parseCookies} from "nookies"
+import {api} from "@/services"
 interface ColumnChartProps {
   data: {
     [key: string]: number;
   };
 }
 
-const ColumnChart: React.FC<ColumnChartProps> = ({ data }) => {
+const ColumnChart: React.FC<ColumnChartProps> = ({ data }:any) => {
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any>(null); // Estado para armazenar os dados do gráfico
-
+  const cookies = parseCookies()
+  const token = cookies["psi-token"]
   // Função para buscar os dados do mês selecionado na API
   const fetchDataForMonth = async (month: string) => {
     try {
-      const response = await fetch(`https://projpsi.pythonanywhere.com/api/psicoapp/formulario/porMes/${month}`);
-      const responseData = await response.json();
+      const response = await api.get(`formulario/porMes/${month}`, {headers: {
+        Authorization: `Bearer ${token}`
+      }})
+      const responseData = await response.data
       setChartData(responseData);
     } catch (error) {
       console.error('Erro ao buscar os dados do mês:', error);
@@ -40,7 +44,7 @@ const ColumnChart: React.FC<ColumnChartProps> = ({ data }) => {
       type: 'bar',
     },
     xaxis: {
-      categories: chartData ? Object.keys(chartData) : Object.keys(data), // Usar os dados do mês selecionado ou todos os dados
+      categories: chartData ? Object.keys(chartData) : Object?.keys(data), // Usar os dados do mês selecionado ou todos os dados
     },
     plotOptions: {
       bar: {

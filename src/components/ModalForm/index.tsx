@@ -29,6 +29,7 @@ export default function Index({
   data,
 }: ValuePropsType) {
   const [loading, setLoading] = useState(false);
+  console.log(data)
   const { mutate } = useMutation(
     async (data: any) => {
       const token = nookies.get()["psi-token"];
@@ -73,7 +74,7 @@ export default function Index({
           });
 
           setTimeout(() => {
-            Router.push("/inicio");
+            Router.push("/dashboard");
           }, 2000);
         } else {
           toast.error("Erro ao enviar as respostas.", {

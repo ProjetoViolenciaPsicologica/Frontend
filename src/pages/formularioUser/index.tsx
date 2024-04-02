@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/LayoutUser";
-import { Raleway, Inter } from "next/font/google";
+import { Raleway, Karla } from "next/font/google";
 import Question from "@/components/Question";
 import { questions } from "@/utils/form";
 import { GetServerSideProps } from "next";
-import { parseCookies } from 'nookies';
+import { parseCookies } from "nookies";
 import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
 import { Steps, Form, InputNumber, Select } from "antd";
@@ -21,6 +21,11 @@ export interface dataForm {
   grau_de_instrucao: string;
   definicaoLocalForm: string;
 }
+
+const karla = Karla({
+  style: "normal",
+  subsets: ["latin"],
+});
 
 export default function Index() {
   const [form] = Form.useForm(); // Extrai a referência do form
@@ -57,16 +62,16 @@ export default function Index() {
   useEffect(() => {
     if (okQuestion) {
       console.log(allOptions);
-      const questions =allOptions.split(",");
+      const questions = allOptions.split(",");
       const sum = questions.map(Number).reduce((acc, curr) => acc + curr, 0);
-      console.log(questions)
+      console.log(questions);
       setSumQuestion(sum);
 
       const data1: any = {
         campo_questoes: allOptions,
         idade: formData?.idade,
         escolha_sexo: formData?.escolha_sexo,
-        grauInstrucao: {definicaoGrau:formData?.grau_de_instrucao},
+        grau_de_instrucao: formData?.grau_de_instrucao,
         localAplicacao: {
           definicaoLocalForm: formData?.definicaoLocalForm,
         },
@@ -85,8 +90,37 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="flex bg-[#F6FBF9] h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
-        <div className="mt-4 flex flex-col w-full md:mt-10">
+      <div className="flex flex-col items-center pl-4 lg:items-start lg:pl-12">
+      <button onClick={()=> {
+              router.back()
+          }} className="hover:cursor-pointer flex w-full mt-4">
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 30 30"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="30" height="30" rx="5" fill="#4239F2" />
+              <g clipPath="url(#clip0_1450_3668)">
+                <path
+                  d="M13.9023 15.0004L18.543 10.3598L17.2173 9.03418L11.2511 15.0004L17.2173 20.9667L18.543 19.6411L13.9023 15.0004Z"
+                  fill="white"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_1450_3668">
+                  <rect
+                    width="22.5"
+                    height="22.5"
+                    fill="white"
+                    transform="matrix(-1 0 0 1 26.25 3.75)"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
+          </button>
+        <div className="mt-4 flex flex-col md:mt-10 pl-4 lg:pl-0">
           {isSmallScreen ? (
             <div className="absolute left-0 rigt-0">
               <svg
@@ -166,31 +200,36 @@ export default function Index() {
           </h1>
         </div>
         {page === 0 && (
-          <div className="h-screen w-full md:mt-16 ">
+          <div className="w-full mt-8 md:mt-16 flex justify-center lg:justify-start">
             <Form form={form} onFinish={onSubmit} layout="vertical">
+              <div className="flex flex-col">
+                <div className="flex items-center">
+                  <span className="text-red-500 mr-1">*</span>
+                  <label
+                    htmlFor="idade"
+                    className={`${karla.className} text-xl text-[#000000e0] flex items-center`}
+                  >
+                    Idade
+                  </label>
+                </div>
+                <Form.Item name="idade" className="block">
+                  <InputNumber
+                    type="number"
+                    min={2}
+                    placeholder="Digite sua idade"
+                    className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  />
+                </Form.Item>
+              </div>
               <Form.Item
-                label="Idade"
-                name="idade"
-                rules={[
-                  { required: true, message: "Por favor, insira sua idade" },
-                ]}
-              >
-                <InputNumber
-                  type="number"
-                  min={2}
-                  placeholder="Digite sua idade"
-                  className="w-96 flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
-                />
-              </Form.Item>
-              <Form.Item
-                className="w-96"
+                className="w-72 md:w-full"
                 label="Sexo"
                 name="escolha_sexo"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="masculino">Masculino</Select.Option>
                   <Select.Option value="feminino">Feminino</Select.Option>
@@ -198,14 +237,14 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-96"
+                className="w-72 md:w-full"
                 label="Grau de instrução"
                 name="grau_de_instrucao"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  className="text-black font-bold text-lg w-full lg:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="fundamental">
                     Ensino fundamental completo
@@ -219,21 +258,21 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-96"
+                className="w-72 md:w-full"
                 label="Local da aplicação"
                 name="definicaoLocalForm"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="hospital">Hospital</Select.Option>
                   <Select.Option value="escola">Escola</Select.Option>
                   <Select.Option value="delegacia">Delegacia</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item className="flex w-80 md:w-[470px] justify-center mt-10 md:justify-end  items-center">
+              <Form.Item className="flex w-72 md:w-[470px] justify-center mt-10 lg:justify-end  items-center">
                 <button
                   type="submit"
                   className="w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
@@ -292,7 +331,6 @@ export default function Index() {
   );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
 
@@ -310,10 +348,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
- 
   return {
     props: {
-      users:"users",
+      users: "users",
     },
   };
 };

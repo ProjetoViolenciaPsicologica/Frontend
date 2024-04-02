@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import Layout from "@/components/Layout";
 import { Raleway, Karla } from "next/font/google";
 import { DatePicker } from "antd";
-import { Form, Input, Space, Switch, Select, InputNumber } from "antd";
+import { Form, Button, Space, Switch, Select, InputNumber } from "antd";
 import ptBR from "antd/lib/date-picker/locale/pt_BR";
 import * as XLSX from "xlsx";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { api } from "@/services";
+import  api  from "@/pages/api";
 import { GetServerSideProps } from "next";
-import { parseCookies, setCookie } from "nookies";
+import { destroyCookie, parseCookies, setCookie } from "nookies";
 import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 const { RangePicker } = DatePicker;
 type Users = {
   id: number;
@@ -28,7 +29,10 @@ const karla = Karla({
 
 function Index({ users }: { users: Users[] }) {
   const [form] = Form.useForm(); // Use a instância do Form
-  const router = useRouter()
+  const router = useRouter();
+  const cookies = parseCookies();
+ const [loading, setLoading] = useState(false)
+ const [loading1, setLoading1] = useState(false)
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [disabledDate, setDisabledDate] = useState(true);
@@ -42,24 +46,35 @@ function Index({ users }: { users: Users[] }) {
     }
   };
 
-  async function handleViewFilter(){
-   const data = await form.validateFields()
-   const params: any = {};
-   for (const [key, value] of Object.entries(data)) {
-     if (value !== undefined) {
-       params[key] = value;
-     }
-   }
-   if (startDate && endDate) {
-     params.data_inicio = startDate;
-     params.data_fim = endDate;
-   } else {
-     delete params.data_inicio;
-   }
-   const response = await api.get("formulario/filtro/", { params });
-   setCookie(undefined, "dataSearch", response.data.length);
-   setCookie(undefined, "dataFilter", JSON.stringify(params));
-   router.push("/filtro")
+  async function handleViewFilter() {
+    const data = await form.validateFields();
+    const params: any = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined) {
+        params[key] = value;
+      }
+    }
+    if (startDate && endDate) {
+      params.data_inicio = startDate;
+      params.data_fim = endDate;
+    } else {
+      delete params.data_inicio;
+    }
+    setLoading(true)
+    try {
+      const response = await api.filtro(params)
+      setCookie(undefined, "dataSearch", response.data.length);
+      setCookie(undefined, "dataFilter", JSON.stringify(params));
+      router.push("/filtro");
+    } catch (error) {
+      toast.error("Tempo expirado");
+      destroyCookie(null, "psi-token");
+      destroyCookie(null, "psi-refreshToken");
+      router.push("/login");
+    }
+    finally{
+      setLoading(false)
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -93,11 +108,22 @@ function Index({ users }: { users: Users[] }) {
       delete params.data_inicio;
     }
     console.log(params);
-
-    const response = await api.get("formulario/filtro/", { params });
-    console.log(response.data);
+    setLoading1(true)
+    try {
+      
+    const response = await api.filtro(params)
+    
 
     handleExportExcel(response.data);
+    } catch (error) {
+      toast.error("Tempo expirado");
+      destroyCookie(null, "psi-token");
+      destroyCookie(null, "psi-refreshToken");
+      router.push("/login");
+    }
+    finally {
+      setLoading1(false)
+    }
   }
 
   const handleExportExcel = (filteredData: any) => {
@@ -172,9 +198,12 @@ function Index({ users }: { users: Users[] }) {
     <Layout>
       <div className="flex w-full  flex-col items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
         <div className="mt-4 flex flex-col w-full md:mt-4">
-        <button onClick={()=> {
-              router.back()
-          }} className="mr-6 hover:cursor-pointer my-6">
+          <button
+            onClick={() => {
+              router.back();
+            }}
+            className="mr-6 hover:cursor-pointer my-6"
+          >
             <svg
               width="30"
               height="30"
@@ -212,7 +241,7 @@ function Index({ users }: { users: Users[] }) {
         </div>
 
         <Form className="h-full" form={form} onFinish={onSubmit}>
-          <div className="flex flex-col-reverse  md:flex-row gap-x-44 w-full mt-10">
+          <div className="flex flex-col-reverse lg:flex-row gap-x-44 w-full mt-10">
             <div className="flex flex-col ">
               <div className="flex flex-col">
                 <label
@@ -222,7 +251,7 @@ function Index({ users }: { users: Users[] }) {
                   Grau de instrução
                 </label>
                 <Form.Item
-                  className="w-96 md:w-full h-full"
+                  className="w-72 md:w-full h-full"
                   name="grau_de_instrucao"
                 >
                   <Select
@@ -249,7 +278,7 @@ function Index({ users }: { users: Users[] }) {
                 >
                   Sexo
                 </label>
-                <Form.Item className="w-96 md:w-full h-full" name="sexo">
+                <Form.Item className="w-72 md:w-full h-full" name="sexo">
                   <Select
                     placeholder="Selecione"
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
@@ -276,7 +305,7 @@ function Index({ users }: { users: Users[] }) {
                     type="number"
                     min={2}
                     placeholder="Digite sua idade"
-                    className="w-96 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                    className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   />
                 </Form.Item>
               </div>
@@ -287,7 +316,7 @@ function Index({ users }: { users: Users[] }) {
                 >
                   Usuário
                 </label>
-                <Form.Item className="w-96 md:w-full h-full" name="usuario">
+                <Form.Item className="w-72 md:w-full h-full" name="usuario">
                   <Select
                     disabled={!disabledUser}
                     placeholder="Selecione"
@@ -312,7 +341,7 @@ function Index({ users }: { users: Users[] }) {
                   Local da aplicação
                 </label>
                 <Form.Item
-                  className="w-96 md:w-full h-full"
+                  className="w-72 md:w-full h-full"
                   name="local_aplicacao"
                 >
                   <Select
@@ -350,7 +379,7 @@ function Index({ users }: { users: Users[] }) {
                     onChange={handleStartDateChange}
                     locale={ptBR}
                     lang="pt-br" // Adicione o locale correto aqui
-                    className={`w-96 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
+                    className={`w-72 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
                       disabledDate
                         ? "cursor-not-allowed bg-[#F5F5F5]"
                         : "cursor-pointer"
@@ -365,7 +394,7 @@ function Index({ users }: { users: Users[] }) {
                 >
                   Área
                 </label>
-                <Form.Item className="w-96 md:w-full h-full" name="area">
+                <Form.Item className="w-72 md:w-full h-full" name="area">
                   <Select
                     placeholder="Selecione"
                     disabled={disabledUser}
@@ -386,7 +415,7 @@ function Index({ users }: { users: Users[] }) {
                   Tipo de usuário
                 </label>
                 <Form.Item
-                  className="w-96 md:w-full h-full"
+                  className="w-72 md:w-full h-full"
                   name="definicaoLocalForm"
                 >
                   <Select
@@ -442,15 +471,21 @@ function Index({ users }: { users: Users[] }) {
           </Space>
 
           <div className="w-full  flex flex-col md:flex-row justify-center items-center mt-10 gap-y-4 md:gap-y-0 md:gap-x-3.5 bg-[#F6FBF9]">
-            <button type="button" onClick={handleViewFilter} className="w-[202px] h-[59px] bg-[#00FF85]  rounded-[32px] text-white font-bold font-['Inter']">
+            <Button
+             htmlType="button"
+             loading={loading}
+              onClick={handleViewFilter}
+              className="w-[202px] h-[59px] bg-[#00FF85]  rounded-[32px] text-white font-bold font-['Inter']"
+            >
               VISUALIZAR
-            </button>
-            <button
-              type="submit"
+            </Button>
+            <Button
+             loading={loading1}
+              htmlType="submit"
               className="w-[202px] h-[59px] bg-emerald-950 rounded-[32px] text-white font-bold font-['Inter']"
             >
               EXPORTAR
-            </button>
+            </Button>
           </div>
         </Form>
       </div>
@@ -462,9 +497,8 @@ export default Index;
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
-
+  const token = cookies['psi-token'];
   const isAuthenticated = !!cookies["psi-token"];
-
 
   if (!isAuthenticated) {
     return {
@@ -475,11 +509,25 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
-  const response = await api.get("user");
-  const users = response.data;
+  try {
+    const response = await api.get("user", {
+      headers:{
+        Authorization: `Bearer ${token}`
+      }
+    });
+    const users = response.data;
   return {
     props: {
       users: users,
     },
   };
+  } catch (error) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+  
 };

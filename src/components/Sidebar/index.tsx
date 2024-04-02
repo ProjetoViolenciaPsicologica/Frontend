@@ -38,7 +38,7 @@ export default function Sidebar() {
         <div className="flex w-full ">
           <Link
             href="/dashboard"
-            className={`${quicksand.className} flex items-center gap-x-2 text-white block truncate whitespace-nowrap p-4 `}
+            className={`${quicksand.className} flex items-center gap-x-2 text-white truncate whitespace-nowrap p-4 `}
           >
             <Image src="/icon.svg" width={44} height={44} alt={"icon"} />
             <h1 className="text-neutral-700 text-2xl font-bold font-['Montserrat'] leading-[46.80px]">
@@ -57,7 +57,7 @@ export default function Sidebar() {
 
       <aside
         id="sidebar"
-        className={`absolute inset-y-0 left-0 z-50 w-3/4 min-w-56 transform space-y-6  bg-gray px-0 pt-6 text-gray-100 transition duration-200 ease-in-out md:relative md:flex md:w-64 md:translate-x-0 md:flex-col md:justify-between ${
+        className={`absolute inset-y-0 left-0 z-50 w-3/4 min-w-52 transform space-y-6  bg-gray px-0 pt-6 text-gray-100 transition duration-200 ease-in-out md:relative md:flex md:w-64 md:translate-x-0 md:flex-col md:justify-between ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

@@ -113,6 +113,7 @@ const IndexPage: React.FC<any> = ({
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
+  const token = cookies["psi-token"];
   const isAuthenticated = !!cookies["psi-token"];
   if (!isAuthenticated) {
     return {
@@ -122,7 +123,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
-  const response4 = await api.get("desvio");
+  const response4 = await api.get("desvio", {headers: {
+    Authorization: `Bearer ${token}`
+  }});
   const quantidade = response4.data;
   const verde = quantidade.filter((item: any) => item.sinalizacao === "Verde");
   const amarelo = quantidade.filter(
@@ -144,8 +147,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const d2 = calcularSomatorioCampoQuestoes(amarelo);
   const d3 = calcularSomatorioCampoQuestoes(vermelho);
   const data = [d1, d2, d3];
-  const response = await api.get("formulario/sinalizacao");
-  const response1 = await api.get("formulario/quantidadeRespostas");
+  const response = await api.get("formulario/sinalizacao", {headers: {
+    Authorization: `Bearer ${token}`
+  }});
+  const response1 = await api.get("formulario/quantidadeRespostas", {headers: {
+    Authorization: `Bearer ${token}`
+  }});
   //const response3 = await api.get("dispersao")
   const dataDispersal = quantidade;
   const dataPie = response.data;
