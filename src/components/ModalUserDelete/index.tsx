@@ -1,6 +1,6 @@
 import { Modal } from "antd";
 import { toast } from "react-toastify";
-import { api } from "@/services";
+import  api  from "@/pages/api";
 import { useState } from "react";
 
 export type ModalDelete = {
@@ -23,7 +23,7 @@ export default function Index({
     setLoading(true);
     if (selectedUsers.length === 0) {
       try {
-        await api.delete(`user/${userId}`);
+        await api.deleteUser(userId);
         toast.success("Usuário excluído com sucesso!");
         setIsModalDeleteOpen(false);
         refetch();

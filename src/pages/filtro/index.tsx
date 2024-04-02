@@ -2,12 +2,12 @@ import React, { useRef } from "react";
 import Layout from "@/components/Layout";
 import { Raleway, DM_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
-import { api } from "@/services/";
+import  api  from "@/pages/api";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Button, Tooltip } from "antd";
+import { Button, Spin } from "antd";
 import { FaDownload } from "react-icons/fa";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -47,7 +47,7 @@ export interface Root {
 
 export default function Index({ cookies }: { cookies: any }) {
   const [data, setData] = useState<Root>();
-  const [qtForm, setQtForm] = useState<number>(0);
+  const [qtForm, setQtForm] = useState<number | null>(null);
   const [dataBar, setdBar] = useState<any>();
   const [dataPie, setDPie] = useState<any>();
   const [dataD, setDataD] = useState<any>();
@@ -80,11 +80,9 @@ export default function Index({ cookies }: { cookies: any }) {
     const params = { ...data1 }; // ou Object.assign({}, data1);
 
     try {
-      const response = await api.get("formulario/sinalizacao", { params });
-      const response1 = await api.get("formulario/quantidadeRespostas", {
-        params,
-      });
-      const response4 = await api.get("desvio", { params });
+      const response = await api.sinalizacao()
+      const response1 = await api.quantidadeRespostas()
+      const response4 = await api.desvio()
       const quantidade = response4.data;
       const verde = quantidade.filter(
         (item: any) => item.sinalizacao === "Verde"
@@ -228,21 +226,27 @@ export default function Index({ cookies }: { cookies: any }) {
                 : "---------"}
             </span>
 
-            <div
-              className={`bg-[#4339F2] w-[200px] h-[200px] rounded-[10px] gap-y-4 flex flex-col items-center`}
-            >
-              <span
-                className={`${raleway.className} mt-5 text-lg font-normal text-white`}
-              >
-                FORMULÁRIOS
-              </span>
+           {qtForm ? (
+             <div
+             className={`bg-[#4339F2] w-[200px] h-[200px] rounded-[10px] gap-y-4 flex flex-col items-center`}
+           >
+             <span
+               className={`${raleway.className} mt-5 text-lg font-normal text-white`}
+             >
+               FORMULÁRIOS
+             </span>
 
+            
               <span
-                className={`${raleway.className} text-5xl font-normal text-white mt-4`}
-              >
-                {qtForm}
-              </span>
-            </div>
+              className={`${raleway.className} text-5xl font-normal text-white mt-4`}
+            >
+             {qtForm}
+            </span>
+           
+           </div>
+           ) : (
+            <Spin size="large" className="text-white"/>
+           )}
             <Button
               type="default"
               icon={<FaDownload />}
@@ -274,7 +278,7 @@ export default function Index({ cookies }: { cookies: any }) {
           </div>
 
           <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-            <Box data={dataD} />
+            {dataD && <Box data={dataD} />}
           </div>
         </div>
       </div>

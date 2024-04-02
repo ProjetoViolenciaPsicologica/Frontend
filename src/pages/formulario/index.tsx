@@ -8,6 +8,7 @@ import { parseCookies } from "nookies";
 import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
 import { Steps, Form, InputNumber, Select } from "antd";
+import { jwtDecode } from "jwt-decode";
 
 const raleway = Raleway({
   weight: "700",
@@ -71,7 +72,9 @@ export default function Index() {
         campo_questoes: allOptions,
         idade: formData?.idade,
         escolha_sexo: formData?.escolha_sexo,
-        grau_de_instrucao: formData?.grau_de_instrucao,
+        grauInstrucao: { 
+          definicaoGrau: formData?.grau_de_instrucao 
+        },
         localAplicacao: {
           definicaoLocalForm: formData?.definicaoLocalForm,
         },
@@ -304,7 +307,17 @@ export default function Index() {
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
+  const token = cookies["psi-token"];
+  const decoded: { is_superuser: boolean } = jwtDecode(token);
 
+  if (!decoded?.is_superuser) {
+    return {
+      redirect: {
+        destination: "/inicio",
+        permanent: false,
+      },
+    };
+  }
   // Acesse o cookie ou qualquer outra informação de autenticação
   const isAuthenticated = !!cookies["psi-token"];
 

@@ -3,7 +3,7 @@ import { Raleway } from "next/font/google";
 import { FaSearch } from "react-icons/fa";
 import { TbPencil } from "react-icons/tb";
 import { SlTrash } from "react-icons/sl";
-import { api } from "@/services";
+import  api  from "@/pages/api";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { schema } from "@/utils/users";
@@ -11,7 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "react-query";
 import { toast } from "react-toastify";
 import { GetServerSideProps } from "next";
-import { parseCookies } from 'nookies';
+import { destroyCookie, parseCookies } from 'nookies';
 import {
   Button,
   Checkbox,
@@ -24,6 +24,7 @@ import {
   Pagination,
 } from "antd";
 import ModalUserDelete from "@/components/ModalUserDelete";
+import router from "next/router";
 const raleway = Raleway({
   weight: "400",
   style: "normal",
@@ -54,8 +55,15 @@ export default function Index() {
     isLoading,
     refetch,
   } = useQuery("user", async () => {
-    const response = await api.get("user");
+   try {
+    const response = await api.getAllUsers()
     return response.data;
+   } catch (error) {
+    toast.error("Tempo expirado");
+    destroyCookie(null, "psi-token");
+    destroyCookie(null, "psi-refreshToken");
+    router.push("/login");
+   }
   });
   const [form] = Form.useForm(); // Extrai a referência do form
 
@@ -68,7 +76,6 @@ export default function Index() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<number>();
-  console.log(selectedUsers);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 6;
   const {
@@ -113,7 +120,7 @@ export default function Index() {
 
   const editUser = async (id: number) => {
     try {
-      const response = await api.get(`user/${id}`);
+      const response = await api.getUser(id)
       const user = response.data;
       setIsEditMode(true);
       setUserId(id);
@@ -125,8 +132,12 @@ export default function Index() {
         area: user.area?.definicaoArea,
       });
       setIsModalEditOpen(true);
-    } catch (error) {
-      toast.error("Erro ao buscar usuário.");
+    } catch (error:any) {
+        toast.error("Tempo expirado");
+        destroyCookie(null, "psi-token");
+        destroyCookie(null, "psi-refreshToken");
+        router.push("/login");
+   
     }
   };
 
@@ -148,11 +159,25 @@ export default function Index() {
         area: { definicaoArea: data.area },
       };
       if (userId) {
-        await api.put(`user/${userId}`, dataUser);
+        try {
+          await api.updateUser(userId, dataUser);
         toast.success("Usuário editado com sucesso!");
+        } catch (error) {
+          toast.error("Tempo expirado");
+          destroyCookie(null, "psi-token");
+          destroyCookie(null, "psi-refreshToken");
+          router.push("/login");
+        }
       } else {
-        await api.post("user/register", dataUser);
+        try {
+          await api.createUser(dataUser);
         toast.success("Usuário criado com sucesso!");
+        } catch (error) {
+          toast.error("Tempo expirado");
+          destroyCookie(null, "psi-token");
+          destroyCookie(null, "psi-refreshToken");
+          router.push("/login");
+        }
       }
       setIsModalOpen(false);
       setIsModalEditOpen(false);
@@ -323,6 +348,7 @@ export default function Index() {
           <>
             <Table
               columns={columns}
+              
               dataSource={currentUsers}
               pagination={false} // Desabilitar a paginação dentro do componente Table
               onChange={handleTableChange}
