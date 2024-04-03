@@ -20,6 +20,10 @@ const Bar = dynamic(() => import("@/components/Charts/BarHorizontal"), {
   ssr: false,
 });
 
+const Dispersal = dynamic(() => import("@/components/Charts/Dispersal"), {
+  ssr: false,
+});
+
 const raleway = Raleway({
   weight: "400",
   style: "normal",
@@ -51,6 +55,7 @@ export default function Index({ cookies }: { cookies: any }) {
   const [dataBar, setdBar] = useState<any>();
   const [dataPie, setDPie] = useState<any>();
   const [dataD, setDataD] = useState<any>();
+  const [dataDispersao, setDataDispersao] = useState<any>()
   const [hiddenButton, setHiddenButton] = useState<boolean>(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
@@ -80,9 +85,21 @@ export default function Index({ cookies }: { cookies: any }) {
     const params = { ...data1 }; // ou Object.assign({}, data1);
 
     try {
-      const response = await api.sinalizacao()
-      const response1 = await api.quantidadeRespostas()
-      const response4 = await api.desvio()
+      const response = await api.sinalizacao(params)
+      const response1 = await api.quantidadeRespostas(params)
+      const response4 = await api.desvio(params)
+      const response5 = await api.dispersao(params)
+      const data1 = response5.data
+      const arrayTransformado = data1.map((objeto:any) => {
+        // Dividindo a string 'campo_questoes' em um array de números
+        const pontuacoes = objeto.campo_questoes.split(',').map(Number);
+        // Calculando a pontuação total
+        const pontuacaoTotal = pontuacoes.reduce((total:any, pontuacao:any) => total + pontuacao, 0);
+        // Retornando um novo objeto com as chaves 'idade' e 'pontuacao'
+        return { idade: objeto.idade, pontuacao: pontuacaoTotal };
+      });
+      
+     setDataDispersao(arrayTransformado)
       const quantidade = response4.data;
       const verde = quantidade.filter(
         (item: any) => item.sinalizacao === "Verde"
@@ -260,7 +277,7 @@ export default function Index({ cookies }: { cookies: any }) {
           </div>
         </div>
         <div className="mt-10 gap-y-5 md:gap-x-5 w-full flex flex-col flex-wrap md:flex-row items-center">
-          <div className="w-[80vw] lg:w-[30vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="w-[80vw] lg:w-[30%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
@@ -268,7 +285,7 @@ export default function Index({ cookies }: { cookies: any }) {
             </h1>
             {dataPie && <Pie chartData={dataPie} />}
           </div>
-          <div className="w-[80vw] lg:w-[49vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="w-[80vw] lg:w-[65%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
@@ -279,6 +296,9 @@ export default function Index({ cookies }: { cookies: any }) {
 
           <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             {dataD && <Box data={dataD} />}
+          </div>
+          <div className="w-[80vw] px-4 h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
+            {dataDispersao && <Dispersal data={dataDispersao}/>}
           </div>
         </div>
       </div>

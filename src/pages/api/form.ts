@@ -83,6 +83,17 @@ api_form.desvio = async (params:any) => {
       }
 }
 
+api_form.dispersao = async (params:any) => {
+    try {
+        const response = await   await api_form.get("dispersao", { params });
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
+
 api_form.getAllUsers = async () => {
     try {
         const response = await  api_form.get("user");
