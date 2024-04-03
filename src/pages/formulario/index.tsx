@@ -175,8 +175,8 @@ export default function Index() {
         </div>
         {page === 0 && (
           <div className="w-full mt-8 md:mt-16 flex justify-center lg:justify-start">
-            <Form form={form} onFinish={onSubmit} layout="vertical">
-              <div className="flex flex-col">
+            <Form form={form} onFinish={onSubmit} layout="vertical" className="w-72 md:w-[381px]">
+              <div className="flex flex-col w-full">
                 <div className="flex items-center">
                   <span className="text-red-500 mr-1">*</span>
                   <label
@@ -186,24 +186,24 @@ export default function Index() {
                     Idade
                   </label>
                 </div>
-                <Form.Item name="idade" className="block">
+                <Form.Item name="idade" >
                   <InputNumber
                     type="number"
                     min={2}
                     placeholder="Digite sua idade"
-                    className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                    className="flex w-72 md:w-[381px] items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   />
                 </Form.Item>
               </div>
               <Form.Item
-                className="w-72 md:w-full"
+                className="w-full"
                 label="Sexo"
                 name="escolha_sexo"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="masculino">Masculino</Select.Option>
                   <Select.Option value="feminino">Feminino</Select.Option>
@@ -211,14 +211,14 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-72 md:w-full"
+                className="w-full"
                 label="Grau de instrução"
                 name="grau_de_instrucao"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg w-full lg:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="fundamental">
                     Ensino fundamental completo
@@ -232,7 +232,7 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-72 md:w-full"
+                className="w-full"
                 label="Local da aplicação"
                 name="definicaoLocalForm"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
@@ -313,7 +313,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   if (!decoded?.is_superuser) {
     return {
       redirect: {
-        destination: "/inicio",
+        destination: "/formularioUser",
         permanent: false,
       },
     };
