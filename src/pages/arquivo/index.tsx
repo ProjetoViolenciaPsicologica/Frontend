@@ -377,6 +377,7 @@ function Index({ users }: { users: Users[] }) {
                     placeholder={["Data e hora inicial", "Data e hora final"]}
                     format="DD/MM/YYYY HH:mm"
                     onChange={handleStartDateChange}
+                    
                     locale={ptBR}
                     lang="pt-br" // Adicione o locale correto aqui
                     className={`w-72 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${

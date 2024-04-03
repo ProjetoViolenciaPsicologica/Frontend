@@ -1,9 +1,7 @@
 // components/StandardDeviationChart.tsx
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
-import { api } from "@/services";
-import { useQuery } from "react-query";
 import { ApexOptions } from "apexcharts";
 
 type StandardDeviationChartProps = {
@@ -18,13 +16,24 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
       data?.length
   );
   const cores = ["Verde", "Amarelo", "Vermelho"];
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 490);
+    };
+
+    handleResize(); // Define o tamanho inicial da tela
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Executa este efeito apenas uma vez no momento da montage
 
   const chartOptions: ApexOptions = {
     chart: {
       type: "line",
       height: 350,
       toolbar: {
-        show: true,
+        show: isSmallScreen ? false : true,
       },
     },
     stroke: {
@@ -32,7 +41,7 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
       curve: "smooth",
     },
     title: {
-      text: "Média e Desvio Padrão",
+      text: "Desvio Padrão",
       align: "center",
       style: {
         fontSize: "16px",
@@ -85,7 +94,7 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
       data: data,
     },
   ];
-
+  
   return (
     <div className="w-full h-full">
       <Chart

@@ -23,6 +23,7 @@ const Dispersal = dynamic(() => import("@/components/Charts/Dispersal"), {
 const raleway = Raleway({
   weight: "400",
   style: "normal",
+  
   subsets: ["latin"],
 });
 
@@ -52,12 +53,12 @@ const IndexPage: React.FC<any> = ({
     pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
     pdf.save("download.pdf");
   };
-
+  
   return (
     <Layout>
       <div
         ref={contentRef}
-        className="flex h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12"
+        className="flex h-full flex-col items-center pl-4 lg:items-start"
       >
         <div className="flex w-[92%] gap-y-4 md:items-center  flex-col md:flex-row">
           <div className="mt-4 flex h-full flex-col w-full  md:mt-4">
@@ -82,7 +83,7 @@ const IndexPage: React.FC<any> = ({
         </div>
 
         <div className="mt-10 gap-y-5 md:gap-x-5 w-full flex flex-col flex-wrap md:flex-row items-center">
-          <div className="w-[80vw] lg:w-[30vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="w-[80vw] lg:w-[30%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
@@ -90,7 +91,7 @@ const IndexPage: React.FC<any> = ({
             </h1>
             <Pie chartData={dataPie} />
           </div>
-          <div className="w-[80vw] lg:w-[49vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="w-[80vw] lg:w-[65%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
@@ -102,9 +103,9 @@ const IndexPage: React.FC<any> = ({
           <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <Box data={data} />
           </div>
-          {/* <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
-            <Dispersal data={dataDispersal} />
-          </div> */}
+          <div className="w-[80vw] px-4 h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
+            <Dispersal data={dataDispersal}/>
+          </div>
         </div>
       </div>
     </Layout>
@@ -142,7 +143,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     });
     return somatorio;
   };
-
+ 
+  const response5 =  await api.get("dispersao", {headers: {
+    Authorization: `Bearer ${token}`
+  }});
+  const data1 = response5.data
   const d1 = calcularSomatorioCampoQuestoes(verde);
   const d2 = calcularSomatorioCampoQuestoes(amarelo);
   const d3 = calcularSomatorioCampoQuestoes(vermelho);
@@ -154,7 +159,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     Authorization: `Bearer ${token}`
   }});
   //const response3 = await api.get("dispersao")
-  const dataDispersal = quantidade;
+  const arrayTransformado = data1.map((objeto:any) => {
+    // Dividindo a string 'campo_questoes' em um array de números
+    const pontuacoes = objeto.campo_questoes.split(',').map(Number);
+    // Calculando a pontuação total
+    const pontuacaoTotal = pontuacoes.reduce((total:any, pontuacao:any) => total + pontuacao, 0);
+    // Retornando um novo objeto com as chaves 'idade' e 'pontuacao'
+    return { idade: objeto.idade, pontuacao: pontuacaoTotal };
+  });
+  
+  const dataDispersal = arrayTransformado
   const dataPie = response.data;
   const dataBar = response1.data;
   return {

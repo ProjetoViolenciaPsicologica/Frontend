@@ -8,6 +8,7 @@ import { parseCookies } from "nookies";
 import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
 import { Steps, Form, InputNumber, Select } from "antd";
+import { jwtDecode } from "jwt-decode";
 
 const raleway = Raleway({
   weight: "700",
@@ -71,7 +72,9 @@ export default function Index() {
         campo_questoes: allOptions,
         idade: formData?.idade,
         escolha_sexo: formData?.escolha_sexo,
-        grau_de_instrucao: formData?.grau_de_instrucao,
+        grauInstrucao: { 
+          definicaoGrau: formData?.grau_de_instrucao 
+        },
         localAplicacao: {
           definicaoLocalForm: formData?.definicaoLocalForm,
         },
@@ -91,35 +94,6 @@ export default function Index() {
   return (
     <Layout>
       <div className="flex flex-col items-center pl-4 lg:items-start lg:pl-12">
-      <button onClick={()=> {
-              router.back()
-          }} className="hover:cursor-pointer flex w-full mt-4">
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 30 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect width="30" height="30" rx="5" fill="#4239F2" />
-              <g clipPath="url(#clip0_1450_3668)">
-                <path
-                  d="M13.9023 15.0004L18.543 10.3598L17.2173 9.03418L11.2511 15.0004L17.2173 20.9667L18.543 19.6411L13.9023 15.0004Z"
-                  fill="white"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_1450_3668">
-                  <rect
-                    width="22.5"
-                    height="22.5"
-                    fill="white"
-                    transform="matrix(-1 0 0 1 26.25 3.75)"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
-          </button>
         <div className="mt-4 flex flex-col md:mt-10 pl-4 lg:pl-0">
           {isSmallScreen ? (
             <div className="absolute left-0 rigt-0">
@@ -201,8 +175,8 @@ export default function Index() {
         </div>
         {page === 0 && (
           <div className="w-full mt-8 md:mt-16 flex justify-center lg:justify-start">
-            <Form form={form} onFinish={onSubmit} layout="vertical">
-              <div className="flex flex-col">
+            <Form form={form} onFinish={onSubmit} layout="vertical" className="w-72 md:w-[381px]">
+              <div className="flex flex-col w-full">
                 <div className="flex items-center">
                   <span className="text-red-500 mr-1">*</span>
                   <label
@@ -212,24 +186,24 @@ export default function Index() {
                     Idade
                   </label>
                 </div>
-                <Form.Item name="idade" className="block">
+                <Form.Item name="idade" >
                   <InputNumber
                     type="number"
                     min={2}
                     placeholder="Digite sua idade"
-                    className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                    className="flex w-72 md:w-[381px] items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   />
                 </Form.Item>
               </div>
               <Form.Item
-                className="w-72 md:w-full"
+                className="w-full"
                 label="Sexo"
                 name="escolha_sexo"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="masculino">Masculino</Select.Option>
                   <Select.Option value="feminino">Feminino</Select.Option>
@@ -237,14 +211,14 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-72 md:w-full"
+                className="w-full"
                 label="Grau de instrução"
                 name="grau_de_instrucao"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
               >
                 <Select
                   placeholder="---------"
-                  className="text-black font-bold text-lg w-full lg:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                  className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
                   <Select.Option value="fundamental">
                     Ensino fundamental completo
@@ -258,7 +232,7 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-72 md:w-full"
+                className="w-full"
                 label="Local da aplicação"
                 name="definicaoLocalForm"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
@@ -333,7 +307,10 @@ export default function Index() {
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
+  const token = cookies["psi-token"];
+  const decoded: { is_superuser: boolean } = jwtDecode(token);
 
+  
   // Acesse o cookie ou qualquer outra informação de autenticação
   const isAuthenticated = !!cookies["psi-token"];
 
