@@ -62,29 +62,34 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
       },
     },
     xaxis: {
-      title: { text: "cores de sinalização",  style: {
-        color: undefined,
-        fontSize: '18px',
-        fontFamily: 'Helvetica, Arial, sans-serif',
-        fontWeight: 700,
-        
-    }},
-      categories: Object.keys(corMeans), // Categorias são as cores
-    } as any,
-    yaxis: [
-      {
-        title: { text: "Valores",  style: {
+      title: { 
+        text: "cores de sinalização",  
+        style: {
           color: undefined,
           fontSize: '18px',
           fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: 700,
-          
-      }},
+        }
+      },
+      categories: Object.keys(corMeans), // Categorias são as cores
+    } as any,
+    yaxis: [
+      {
+        title: { 
+          text: "Valores",
+          style: {
+            color: undefined,
+            fontSize: '18px',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontWeight: 700,
+          }
+        },
         labels: {
           formatter: function (val: any) {
-            return Math.round(val).toString();
+            return (val / 100).toString(); // Dividindo por 100 para exibir na base 10
           },
         },
+        tickAmount: 3, // Definindo a quantidade de marcações no eixo y
       },
     ],
     title: {
@@ -97,8 +102,11 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
     legend: {
       show: true,
       position: "top",
+      fontSize: '18px',
+      fontFamily: 'Helvetica, Arial, sans-serif',
+      fontWeight: 700,
     },
-    colors: ["#58FF94", "#0000FF", "#FFFF58","#0000FF", "#FFFF58", "#0000FF"], // Cores correspondentes a Verde, Amarelo, Vermelho e Desvio Padrão
+    colors: ["#58FF94", "#0000FF", "#FFFF58","#0000FF", "#FFFF58", "#58FF94"], // Cores correspondentes a Verde, Amarelo, Vermelho e Desvio Padrão
   };
 
   const chartSeries = [

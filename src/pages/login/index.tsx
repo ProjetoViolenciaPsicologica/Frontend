@@ -95,7 +95,7 @@ export default function Login() {
                 htmlFor="email"
                 className={`${karla.className} font-bold text-2xl`}
               >
-                Usuário
+                Email
               </label>
               <input
                 type="text"

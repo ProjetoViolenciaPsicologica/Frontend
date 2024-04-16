@@ -3,9 +3,9 @@ import Sidebar from "../Sidebar";
 
 export default function index({ children }: { children: React.ReactNode }) {
   return (
-    <div className=" ">
+    <div className="">
       <div
-        className="relative md:flex bg-[#F6FBF9] h-full"
+        className="relative md:flex bg-[#F6FBF9]"
         data-dev-hint="container"
       >
         <Sidebar />

@@ -40,7 +40,7 @@ const IndexPage: React.FC<any> = ({
   dataDispersal,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
-
+  console.log(data)
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
 
@@ -102,7 +102,7 @@ const IndexPage: React.FC<any> = ({
           </div>
 
           <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-            <Box data={data} />
+           {data && <Box data={data} /> }
           </div>
           <div className="w-[80vw] px-4 h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
             <Dispersal data={dataDispersal}/>

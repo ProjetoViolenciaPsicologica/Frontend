@@ -6,22 +6,26 @@ type ChartData = {
 };
 
 const HorizontalBarChart: React.FC<{ data: ChartData }> = ({ data }) => {
-  const categories = Object?.keys(data);
+  const categories = Object.keys(data);
   const values = Object.values(data);
   const colors = ["#FFB200", "#4339F2", "#02A0FC", "#FF3A29"]; // Cores correspondentes às categorias
+
+  // Ordena as categorias com base nos valores associados (do maior para o menor)
+  const sortedCategories = categories.sort((a, b) => data[b] - data[a]);
+
+  // Ordena os dados com base nas categorias ordenadas
+  const sortedData = sortedCategories.map((resposta, index) => ({
+    resposta,
+    color: colors[index],
+    value: data[resposta],
+  }));
 
   // Verifica se existem categorias para mostrar
   const hasData = categories.length > 0;
 
   // Configuração do gráfico apenas se houver dados para mostrar
   const config = {
-    data: hasData
-      ? categories.map((resposta, index) => ({
-          resposta,
-          color: colors[index],
-          value: values[index],
-        }))
-      : [],
+    data: hasData ? sortedData : [],
     xField: "resposta",
     yField: "value",
     seriesField: "resposta",
