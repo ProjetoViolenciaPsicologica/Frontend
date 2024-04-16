@@ -65,11 +65,12 @@ export default function Sidebar() {
       <aside
         id="sidebar"
         className={`absolute inset-y-0 left-0 z-50 w-3/4 min-w-52 transform space-y-6  bg-gray px-0 pt-6 text-gray-100 transition duration-200 ease-in-out md:relative md:flex md:w-64 md:translate-x-0 md:flex-col md:justify-between ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          isOpen ? "translate-x-0" : "-translate-x-full "
         }`}
+       
       >
         <div
-          className="flex flex-col space-y-6"
+          className="flex flex-col space-y-6 h-screen"
           data-dev-hint="optional div for having an extra footer navigation"
         >
           <Link

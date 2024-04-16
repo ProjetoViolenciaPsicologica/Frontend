@@ -90,7 +90,7 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="flex flex-col  items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
+      <div className="flex flex-col h-full  items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]" >
         <div className="mt-4 flex flex-col md:mt-10 pl-4 lg:pl-0">
           {isSmallScreen ? (
             <div className="absolute left-0 rigt-0">
@@ -209,7 +209,7 @@ export default function Index() {
           />
         )}
         {page === 3 && (
-          <div className="w-full h-full mt-8 md:mt-16 flex justify-center lg:justify-start">
+          <div className="w-full mt-8 flex justify-center lg:justify-start">
             <Form
               form={form}
               onFinish={onSubmit}

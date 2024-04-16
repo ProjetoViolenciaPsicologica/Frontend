@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Layout from "@/components/Layout";
-import { Raleway, Karla } from "next/font/google";
+import { Raleway, Karla, Inter } from "next/font/google";
 import { DatePicker } from "antd";
 import { Form, Button, Space, Switch, Select, InputNumber } from "antd";
 import ptBR from "antd/lib/date-picker/locale/pt_BR";
@@ -18,6 +18,11 @@ type Users = {
 };
 
 const raleway = Raleway({
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
   style: "normal",
   subsets: ["latin"],
 });
@@ -476,14 +481,14 @@ function Index({ users }: { users: Users[] }) {
              htmlType="button"
              loading={loading}
               onClick={handleViewFilter}
-              className="w-[202px] h-[59px] bg-[#00FF85]  rounded-[32px] text-white font-bold font-['Inter']"
+              className={`${inter.className} w-[202px] h-[59px] bg-[#00FF85]  rounded-[32px] text-white font-bold `}
             >
               VISUALIZAR
             </Button>
             <Button
              loading={loading1}
               htmlType="submit"
-              className="w-[202px] h-[59px] bg-emerald-950 rounded-[32px] text-white font-bold font-['Inter']"
+              className={`${inter.className} w-[202px] h-[59px] bg-emerald-950 rounded-[32px] text-white font-bold `}
             >
               EXPORTAR
             </Button>
