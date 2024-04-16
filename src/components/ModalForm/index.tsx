@@ -29,8 +29,7 @@ export default function Index({
   data,
 }: ValuePropsType) {
   const [loading, setLoading] = useState(false);
-  console.log(data)
-  const { mutate } = useMutation(
+ const { mutate } = useMutation(
     async (data: any) => {
       const token = nookies.get()["psi-token"];
       const response = await api.post("/formulario/novo", data, {
@@ -55,9 +54,9 @@ export default function Index({
           progress: undefined,
           theme: "light",
         });
-        destroyCookie(null, "psi-token");
-        destroyCookie(null, "psi-refreshToken");
-        Router.push("/login");
+        // destroyCookie(null, "psi-token");
+        // destroyCookie(null, "psi-refreshToken");
+        // Router.push("/login");
       },
       onSuccess: (response) => {
         if (response.status === 201) {

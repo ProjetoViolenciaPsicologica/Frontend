@@ -1,5 +1,5 @@
 import React from "react";
-import { Bar } from "@ant-design/charts";
+import { Bar } from '@ant-design/charts';
 
 type ChartData = {
   [key: string]: number;

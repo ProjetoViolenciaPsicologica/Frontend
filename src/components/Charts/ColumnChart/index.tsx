@@ -1,29 +1,38 @@
-import React, { useState } from 'react';
-import Chart from 'react-apexcharts';
-import { ApexOptions } from 'apexcharts';
-import {parseCookies} from "nookies"
-import {api} from "@/services"
+import React, { useState } from "react";
+import Chart from "react-apexcharts";
+import { ApexOptions } from "apexcharts";
+import { parseCookies } from "nookies";
+import { api } from "@/services";
+import { Karla } from "next/font/google";
+
 interface ColumnChartProps {
   data: {
     [key: string]: number;
   };
 }
 
-const ColumnChart: React.FC<ColumnChartProps> = ({ data }:any) => {
+const karla = Karla({
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const ColumnChart: React.FC<ColumnChartProps> = ({ data }: any) => {
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any>(null); // Estado para armazenar os dados do gráfico
-  const cookies = parseCookies()
-  const token = cookies["psi-token"]
+  const cookies = parseCookies();
+  const token = cookies["psi-token"];
   // Função para buscar os dados do mês selecionado na API
   const fetchDataForMonth = async (month: string) => {
     try {
-      const response = await api.get(`formulario/porMes/${month}`, {headers: {
-        Authorization: `Bearer ${token}`
-      }})
-      const responseData = await response.data
+      const response = await api.get(`formulario/porMes/${month}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const responseData = await response.data;
       setChartData(responseData);
     } catch (error) {
-      console.error('Erro ao buscar os dados do mês:', error);
+      console.error("Erro ao buscar os dados do mês:", error);
     }
   };
 
@@ -41,7 +50,7 @@ const ColumnChart: React.FC<ColumnChartProps> = ({ data }:any) => {
   // Configurações do gráfico
   const chartOptions: ApexOptions = {
     chart: {
-      type: 'bar',
+      type: "bar",
     },
     xaxis: {
       categories: chartData ? Object.keys(chartData) : Object?.keys(data), // Usar os dados do mês selecionado ou todos os dados
@@ -50,33 +59,60 @@ const ColumnChart: React.FC<ColumnChartProps> = ({ data }:any) => {
       bar: {
         horizontal: false,
         borderRadius: 10,
-        columnWidth: '32px',
+        columnWidth: "32px",
       },
     },
   };
 
   const chartSeries = [
     {
-      name: 'Quantidade',
+      name: "Quantidade",
       data: chartData ? Object.values(chartData) : Object.values(data), // Usar os dados do mês selecionado ou todos os dados
     },
   ];
 
-  const allMonths = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  const allMonths = [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro",
+  ];
 
   return (
     <>
-      <select
-        value={selectedMonth || ''}
-        onChange={handleMonthChange}
-        className="w-[90%] sm:w-[269px] h-[46px] mb-4 bg-white rounded-[10px] shadow border border-black border-opacity-10"
-      >
-        <option value="">-------</option>
-        {allMonths.map((month, index) => (
-          <option key={month} value={index + 1}>{month}</option> // O value é o índice do mês + 1
-        ))}
-      </select>
-      <Chart options={chartOptions} series={chartSeries as ApexAxisChartSeries} type="bar" height="70%" width="100%" />
+      <div className="flex flex-col mt-20">
+        <span className={`text-black text-xl font-bold ${karla.className}`}>
+          Filtro por Meses
+        </span>
+        <select
+          value={selectedMonth || ""}
+          onChange={handleMonthChange}
+          className="w-[90%] sm:w-[269px] h-[46px] mb-4 bg-white rounded-[10px] shadow border border-black border-opacity-10"
+        >
+          <option value="">-------</option>
+          {allMonths.map((month, index) => (
+            <option key={month} value={index + 1}>
+              {month}
+            </option> // O value é o índice do mês + 1
+          ))}
+        </select>
+      </div>
+
+      <Chart
+        options={chartOptions}
+        series={chartSeries as ApexAxisChartSeries}
+        type="bar"
+        height="70%"
+        width="100%"
+      />
     </>
   );
 };

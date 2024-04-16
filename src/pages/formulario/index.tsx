@@ -53,11 +53,7 @@ export default function Index() {
 
   const onSubmit = async (data: any) => {
     setFormData(data);
-    setPage(page + 1);
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    setOkQuestion(true)
   };
 
   useEffect(() => {
@@ -72,13 +68,14 @@ export default function Index() {
         campo_questoes: allOptions,
         idade: formData?.idade,
         escolha_sexo: formData?.escolha_sexo,
-        grauInstrucao: { 
-          definicaoGrau: formData?.grau_de_instrucao 
+        grauInstrucao: {
+          definicaoGrau: formData?.grau_de_instrucao,
         },
         localAplicacao: {
           definicaoLocalForm: formData?.definicaoLocalForm,
         },
       };
+     
       setIsModalOpen(true);
       setData(data1);
     }
@@ -170,12 +167,54 @@ export default function Index() {
           <h1
             className={`${raleway.className} flex items-center mt-9 text-2xl md:text-4xl font-bold text-black`}
           >
-            {page === 0 ? "Dados de Entrevistado" : `CATEGORIA ${page}`}
+            {page === 3 ? "Dados de Entrevistado" : `CATEGORIA ${page +1}`}
           </h1>
         </div>
+
         {page === 0 && (
+          <Question
+            question={questions.MEDO}
+            page={page}
+            setPage={setPage}
+            allOptions={allOptions}
+            setOkQuestion={setOkQuestion}
+            setAllOptions={setAllOptions}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
+          />
+        )}
+        {page === 1 && (
+          <Question
+            question={questions.DEPENDENCIA}
+            page={page}
+            setPage={setPage}
+            allOptions={allOptions}
+            setOkQuestion={setOkQuestion}
+            setAllOptions={setAllOptions}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
+          />
+        )}
+        {page === 2 && (
+          <Question
+            question={questions.CONTROLE}
+            page={page}
+            setPage={setPage}
+            setOkQuestion={setOkQuestion}
+            allOptions={allOptions}
+            setAllOptions={setAllOptions}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
+          />
+        )}
+        {page === 3 && (
           <div className="w-full mt-8 md:mt-16 flex justify-center lg:justify-start">
-            <Form form={form} onFinish={onSubmit} layout="vertical" className="w-72 md:w-[381px]">
+            <Form
+              form={form}
+              onFinish={onSubmit}
+              layout="vertical"
+              className="w-72 md:w-[381px]"
+            >
               <div className="flex flex-col w-full">
                 <div className="flex items-center">
                   <span className="text-red-500 mr-1">*</span>
@@ -186,7 +225,7 @@ export default function Index() {
                     Idade
                   </label>
                 </div>
-                <Form.Item name="idade" >
+                <Form.Item name="idade">
                   <InputNumber
                     type="number"
                     min={2}
@@ -249,6 +288,7 @@ export default function Index() {
               <Form.Item className="flex w-72 md:w-[470px] justify-center mt-10 lg:justify-end  items-center">
                 <button
                   type="submit"
+                 
                   className="w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
                 >
                   Avançar
@@ -256,42 +296,6 @@ export default function Index() {
               </Form.Item>
             </Form>
           </div>
-        )}
-        {page === 1 && (
-          <Question
-            question={questions.MEDO}
-            page={page}
-            setPage={setPage}
-            allOptions={allOptions}
-            setOkQuestion={setOkQuestion}
-            setAllOptions={setAllOptions}
-            selectedOptions={selectedOptions}
-            setSelectedOptions={setSelectedOptions}
-          />
-        )}
-        {page === 2 && (
-          <Question
-            question={questions.DEPENDENCIA}
-            page={page}
-            setPage={setPage}
-            allOptions={allOptions}
-            setOkQuestion={setOkQuestion}
-            setAllOptions={setAllOptions}
-            selectedOptions={selectedOptions}
-            setSelectedOptions={setSelectedOptions}
-          />
-        )}
-        {page === 3 && (
-          <Question
-            question={questions.CONTROLE}
-            page={page}
-            setPage={setPage}
-            setOkQuestion={setOkQuestion}
-            allOptions={allOptions}
-            setAllOptions={setAllOptions}
-            selectedOptions={selectedOptions}
-            setSelectedOptions={setSelectedOptions}
-          />
         )}
       </div>
       <Modal
@@ -306,24 +310,15 @@ export default function Index() {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  // Parse cookies
   const cookies = parseCookies({ req });
+
+  // Get token from cookies
   const token = cookies["psi-token"];
-  const decoded: { is_superuser: boolean } = jwtDecode(token);
 
-  if (!decoded?.is_superuser) {
-    return {
-      redirect: {
-        destination: "/formularioUser",
-        permanent: false,
-      },
-    };
-  }
-  // Acesse o cookie ou qualquer outra informação de autenticação
-  const isAuthenticated = !!cookies["psi-token"];
-
-  // Faça qualquer lógica adicional necessária
-
-  if (!isAuthenticated) {
+  // Check if token exists and is a string
+  if (!token || typeof token !== "string") {
+    // Redirect to login page
     return {
       redirect: {
         destination: "/login",
@@ -332,9 +327,38 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
+  // Decode token
+  let decoded:any;
+  try {
+    decoded = jwtDecode(token);
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    // Redirect to login page or handle error appropriately
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  // Check if user is superuser
+  const isSuperuser = decoded?.is_superuser;
+
+  // If user is not superuser, redirect to home page
+  if (!isSuperuser) {
+    return {
+      redirect: {
+        destination: "/formularioUser",
+        permanent: false,
+      },
+    };
+  }
+
+  // Authentication successful, proceed with rendering the page
   return {
     props: {
-      users: "users",
+      title: "ok",
     },
   };
 };

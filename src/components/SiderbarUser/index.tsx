@@ -1,11 +1,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Raleway, Quicksand } from "next/font/google";
+import { Raleway, Quicksand, Montserrat } from "next/font/google";
 import { Squash as Hamburger } from "hamburger-react";
 import Router from "next/router";
 import { destroyCookie } from "nookies";
 import { Modal, Divider } from "antd";
+
+const montserrat = Montserrat({
+  style: "normal",
+  subsets: ["latin"],
+});
 
 const raleway = Raleway({
   weight: "400",
@@ -37,11 +42,16 @@ export default function Sidebar() {
 
       <header className="flex w-screen items-center justify-between bg-gray text-gray-100 md:hidden pr-4">
         <div className="flex w-full ">
-          <Link
-            href="/inicio"
-            className={`${quicksand.className}  text-white block truncate whitespace-nowrap p-4 `}
+        <Link
+            href="/dashboard"
+            className={`${quicksand.className} flex items-center gap-x-2 text-white truncate whitespace-nowrap p-4 `}
           >
             <Image src="/icon.svg" width={44} height={44} alt={"icon"} />
+            <h1
+              className={`text-neutral-700 text-2xl font-medium ${montserrat.className} leading-[46.80px]`}
+            >
+              KM-QUEST
+            </h1>
           </Link>
         </div>
 
@@ -68,7 +78,7 @@ export default function Sidebar() {
             className="text-white flex flex-col items-center justify-center mb-24"
           >
             <Image src="/icon.svg" width={144} height={144} alt={"icon"} />
-            <h1 className="text-neutral-700 text-4xl font-bold font-['Montserrat'] leading-[46.80px]">
+            <h1 className={`text-neutral-700 text-3xl font-medium ${montserrat.className} leading-[46.80px]`}>
               KM-QUEST
             </h1>
           </Link>

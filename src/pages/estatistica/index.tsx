@@ -5,7 +5,7 @@ import Layout from "@/components/Layout";
 import { Raleway, DM_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
 import { api } from "@/services/";
-import { Button, Tooltip } from "antd";
+import { Button, Spin } from "antd";
 import { FaDownload } from "react-icons/fa";
 
 import { GetServerSideProps } from "next";
@@ -89,7 +89,8 @@ const IndexPage: React.FC<any> = ({
             >
               Resultado por sinalização
             </h1>
-            <Pie chartData={dataPie} />
+            {dataPie ? <Pie chartData={dataPie} /> : <Spin size="large" className="text-white"/> }
+            
           </div>
           <div className="w-[80vw] lg:w-[65%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1

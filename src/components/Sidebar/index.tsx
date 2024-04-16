@@ -46,7 +46,9 @@ export default function Sidebar() {
             className={`${quicksand.className} flex items-center gap-x-2 text-white truncate whitespace-nowrap p-4 `}
           >
             <Image src="/icon.svg" width={44} height={44} alt={"icon"} />
-            <h1 className={`text-neutral-700 text-2xl font-medium ${montserrat.className} leading-[46.80px]`}>
+            <h1
+              className={`text-neutral-700 text-2xl font-medium ${montserrat.className} leading-[46.80px]`}
+            >
               KM-QUEST
             </h1>
           </Link>
@@ -72,10 +74,12 @@ export default function Sidebar() {
         >
           <Link
             href="/dashboard"
-            className="text-white flex flex-col items-center justify-center mb-20"
+            className="text-white flex flex-col items-center justify-center mb-16"
           >
             <Image src="/icon.svg" width={144} height={144} alt={"icon"} />
-            <h1 className={`text-neutral-700 text-3xl font-medium ${montserrat.className} leading-[46.80px]`}>
+            <h1
+              className={`text-neutral-700 text-3xl font-medium ${montserrat.className} leading-[46.80px]`}
+            >
               KM-QUEST
             </h1>
           </Link>
@@ -90,17 +94,10 @@ export default function Sidebar() {
             </Link>
             <Link
               href="/arquivo"
-              className="flex items-center pl-7 mt-4 md:mt-0 gap-x-2"
+              className="flex items-center pl-8 mt-4 md:mt-0 gap-x-2"
             >
               <Image src="/arquivo.svg" width={29} height={29} alt={"icon"} />
               <span className="">ARQUIVOS</span>
-            </Link>
-            <Link
-              href="/formulario"
-              className="flex items-center pl-7 py-4 md:py-0 gap-x-2"
-            >
-              <Image src="/form.svg" width={29} height={29} alt={"form"} />
-              <span>FORMULÁRIO</span>
             </Link>
             <Link href="/usuarios" className="flex items-center pl-7  gap-x-2">
               <Image src="/user.svg" width={29} height={29} alt={"user"} />
@@ -117,6 +114,21 @@ export default function Sidebar() {
                 alt={"statistic"}
               />
               <span>ESTATÍSTICA</span>
+            </Link>
+            <Link
+              href="/formulario"
+              className="flex items-center pl-7 py-4 md:py-0 gap-x-2"
+            >
+              <Image src="/form.svg" width={29} height={29} alt={"form"} />
+              <span>FORMULÁRIO</span>
+            </Link>
+
+            <Link
+              href="/editar_formulario"
+              className="flex items-center pl-7 py-4 md:py-0 gap-x-2"
+            >
+              <Image src="/edit_form.svg" width={29} height={29} alt={"form"} />
+              <span>EDIT FORM</span>
             </Link>
             <button
               type="button"

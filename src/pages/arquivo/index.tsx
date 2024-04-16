@@ -314,7 +314,7 @@ function Index({ users }: { users: Users[] }) {
                   htmlFor="usuario"
                   className={`${karla.className} text-xl font-bold`}
                 >
-                  Usuário
+                  Aplicador
                 </label>
                 <Form.Item className="w-72 md:w-full h-full" name="usuario">
                   <Select
@@ -413,7 +413,7 @@ function Index({ users }: { users: Users[] }) {
                   htmlFor="tipo"
                   className={`${karla.className} text-xl font-bold`}
                 >
-                  Tipo de usuário
+                  Tipo de aplicador
                 </label>
                 <Form.Item
                   className="w-72 md:w-full h-full"
@@ -428,8 +428,8 @@ function Index({ users }: { users: Users[] }) {
                     <Select.Option value="Agente de Saúde">
                       Agente de Saúde
                     </Select.Option>
-                    <Select.Option value="Agente de Educacao">
-                      Agente de Educacao
+                    <Select.Option value="Agente de Educação">
+                      Agente de Educação
                     </Select.Option>
                     <Select.Option value="Agente de Segurança">
                       Agente de Segurança

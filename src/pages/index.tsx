@@ -25,7 +25,7 @@ export default function Home() {
           <Image src="/icon.svg" alt="logo" width={150} height={150} />
       <h1 className={`text-4xl font-bold ${montserrat.className} text-[#2D3A3A]`}>KM-QUEST</h1>
       <div className="flex items-center h-full justify-center flex-col w-full">
-      <p className={`text-4xl text-justify px-12 mb-8  text-[#2D3A3A] ${aclonica.className}`}>Rompendo o silêncio para construir a força: Sua voz importa</p>
+      <p className={`text-4xl text-justify px-12 mb-8  text-[#2D3A3A] ${aclonica.className}`}>O formulário de rastreamento de violência psicológica (KM-QUEST)</p>
 
       <Link href="/login">
        

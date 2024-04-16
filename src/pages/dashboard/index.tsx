@@ -139,24 +139,15 @@ export default function Index() {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  // Parse cookies
   const cookies = parseCookies({ req });
+
+  // Get token from cookies
   const token = cookies["psi-token"];
-  const decoded: { is_superuser: boolean } = jwtDecode(token);
 
-  if (!decoded?.is_superuser) {
-    return {
-      redirect: {
-        destination: "/inicio",
-        permanent: false,
-      },
-    };
-  }
-  // Acesse o cookie ou qualquer outra informação de autenticação
-  const isAuthenticated = !!token;
-
-  // Faça qualquer lógica adicional necessária
-
-  if (!isAuthenticated) {
+  // Check if token exists and is a string
+  if (!token || typeof token !== "string") {
+    // Redirect to login page
     return {
       redirect: {
         destination: "/login",
@@ -165,6 +156,35 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
+  // Decode token
+  let decoded:any;
+  try {
+    decoded = jwtDecode(token);
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    // Redirect to login page or handle error appropriately
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  // Check if user is superuser
+  const isSuperuser = decoded?.is_superuser;
+
+  // If user is not superuser, redirect to home page
+  if (!isSuperuser) {
+    return {
+      redirect: {
+        destination: "/inicio",
+        permanent: false,
+      },
+    };
+  }
+
+  // Authentication successful, proceed with rendering the page
   return {
     props: {
       title: "ok",

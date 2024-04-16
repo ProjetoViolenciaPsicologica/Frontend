@@ -26,8 +26,7 @@ const roboto = Roboto({
 });
 
 const montserrat = Montserrat({
-  weight: "700",
-  style: "normal",
+   style: "normal",
   subsets: ["latin"],
 });
 
@@ -76,7 +75,7 @@ export default function Login() {
           <Image src="/icon.svg" alt="logo" width={150} height={150} />
         </Link>
         <h1
-          className={`text-4xl font-bold ${montserrat.className} text-[#2D3A3A]`}
+          className={`text-4xl font-medium ${montserrat.className} text-[#2D3A3A]`}
         >
           KM-QUEST
         </h1>

@@ -60,14 +60,12 @@ const Question = ({
 
     if (allQuestionsAnswered) {
       // Move to the next page if not the last page
-      if (page < 3) {
         setPage(page + 1);
         window.scrollTo({
           top: 0,
           behavior: "smooth",
         });
-        return;
-      }
+       
 
       // Combine options from all pages
       const combinedOptions = Object.values(selectedOptions).flatMap((options) => options).join(",");
@@ -76,8 +74,8 @@ const Question = ({
       // For example, send the string to the API
       console.log("Send to API:", combinedOptions);
       setAllOptions(combinedOptions);
-      setOkQuestion(true);
-
+      
+      
       // Scroll to top
      
     } else {

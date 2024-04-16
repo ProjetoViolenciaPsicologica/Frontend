@@ -1,5 +1,5 @@
 import React from "react";
-import Chart from "react-apexcharts";
+import { Pie } from "@ant-design/plots";
 
 type ChartData = {
   Vermelho: number;
@@ -14,43 +14,38 @@ const PieChart: React.FC<{ chartData: ChartData }> = ({ chartData }) => {
   // Retorna null se não houver dados
   if (!hasData) return null;
 
-  const options = {
-    labels: ["Vermelho", "Amarelo", "Verde"],
-    colors: ["#FF3A29", "#FFF500", "#00FF66"],
-    dataLabels: {
-      enabled: false,
-    },
-    legend: {
-      show: true,
-      position: "top",
-      onItemClick: {
-        toggleDataSeries: true,
+
+  const config = {
+  data: [
+    { name: "Vermelho", sinalizacao: chartData.Vermelho },
+    { name: "Amarelo", sinalizacao: chartData.Amarelo },
+    { name: "Verde", sinalizacao: chartData.Verde },
+  ],
+    angleField: 'sinalizacao',
+    colorField: 'name',
+    color: ["#d6514a", "#FFFF58", "#58FF94"],
+    label: {
+      text: 'sinalizacao',
+      style: {
+        fontWeight: 'bold',
+        size:"20px"
       },
     },
-    tooltip: {
-      enabled: true,
-      style: {
-        fontSize: "14px",
-        fontFamily: "Helvetica, Arial, sans-serif",
-        fontWeight: "bold",
-        colors: ["#0000"],
-      }, // Habilita a exibição dos dados ao passar o mouse
+    legend: {
+      color: {
+        title: false,
+        position: 'top',
+        rowPadding: 5,
+      },
+      
     },
   };
 
+
   return (
-    <Chart
-      options={{
-        ...options,
-        legend: {
-          ...options.legend,
-          position: "bottom",
-        },
-      }}
-      series={[chartData?.Vermelho, chartData?.Amarelo, chartData?.Verde]}
-      type="pie"
-      width="350px"
-    />
+    <div className="w-full h-full ml-8">
+      {<Pie {...config} />}
+    </div>
   );
 };
 
