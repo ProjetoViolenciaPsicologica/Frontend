@@ -1,9 +1,9 @@
 import Layout from "@/components/Layout";
-import { Raleway } from "next/font/google";
+import { Raleway, DM_Sans } from "next/font/google";
 import { FaSearch } from "react-icons/fa";
 import { TbPencil } from "react-icons/tb";
 import { SlTrash } from "react-icons/sl";
-import  api  from "@/pages/api";
+import api from "@/pages/api";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { schema } from "@/utils/users";
@@ -11,7 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "react-query";
 import { toast } from "react-toastify";
 import { GetServerSideProps } from "next";
-import { destroyCookie, parseCookies } from 'nookies';
+import { destroyCookie, parseCookies } from "nookies";
 import {
   Button,
   Checkbox,
@@ -25,7 +25,14 @@ import {
 } from "antd";
 import ModalUserDelete from "@/components/ModalUserDelete";
 import router from "next/router";
+
 const raleway = Raleway({
+  weight: "400",
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const dm = DM_Sans({
   weight: "400",
   style: "normal",
   subsets: ["latin"],
@@ -55,15 +62,15 @@ export default function Index() {
     isLoading,
     refetch,
   } = useQuery("user", async () => {
-   try {
-    const response = await api.getAllUsers()
-    return response.data;
-   } catch (error) {
-    toast.error("Tempo expirado");
-    destroyCookie(null, "psi-token");
-    destroyCookie(null, "psi-refreshToken");
-    router.push("/login");
-   }
+    try {
+      const response = await api.getAllUsers();
+      return response.data;
+    } catch (error) {
+      toast.error("Tempo expirado");
+      destroyCookie(null, "psi-token");
+      destroyCookie(null, "psi-refreshToken");
+      router.push("/login");
+    }
   });
   const [form] = Form.useForm(); // Extrai a referência do form
 
@@ -120,7 +127,7 @@ export default function Index() {
 
   const editUser = async (id: number) => {
     try {
-      const response = await api.getUser(id)
+      const response = await api.getUser(id);
       const user = response.data;
       setIsEditMode(true);
       setUserId(id);
@@ -132,12 +139,11 @@ export default function Index() {
         area: user.area?.definicaoArea,
       });
       setIsModalEditOpen(true);
-    } catch (error:any) {
-        toast.error("Tempo expirado");
-        destroyCookie(null, "psi-token");
-        destroyCookie(null, "psi-refreshToken");
-        router.push("/login");
-   
+    } catch (error: any) {
+      toast.error("Tempo expirado");
+      destroyCookie(null, "psi-token");
+      destroyCookie(null, "psi-refreshToken");
+      router.push("/login");
     }
   };
 
@@ -161,7 +167,7 @@ export default function Index() {
       if (userId) {
         try {
           await api.updateUser(userId, dataUser);
-        toast.success("Usuário editado com sucesso!");
+          toast.success("Usuário editado com sucesso!");
         } catch (error) {
           toast.error("Tempo expirado");
           destroyCookie(null, "psi-token");
@@ -171,7 +177,7 @@ export default function Index() {
       } else {
         try {
           await api.createUser(dataUser);
-        toast.success("Usuário criado com sucesso!");
+          toast.success("Usuário criado com sucesso!");
         } catch (error) {
           toast.error("Tempo expirado");
           destroyCookie(null, "psi-token");
@@ -240,7 +246,7 @@ export default function Index() {
           <button
             type="button"
             onClick={() => deleteUsers()}
-            className="w-[98px] h-[28.62px] bg-emerald-950 rounded-[32px] text-white text-base font-normal font-['DM Sans'] ml-4 flex items-center justify-center"
+            className={`w-[98px] h-[28.62px] bg-emerald-950 rounded-[32px] text-white text-base font-normal ml-4 flex items-center justify-center ${dm.className}`}
           >
             DELETAR
           </button>
@@ -334,7 +340,7 @@ export default function Index() {
             />
           </div>
           <button
-            className="w-[197px] h-10 bg-emerald-950 shadow text-white text-base font-normal font-['DM Sans'] "
+            className={`w-[197px] h-10 bg-emerald-950 shadow text-white text-base font-normal ${dm.className}`}
             onClick={() => showModal()}
           >
             ADICIONAR USUÁRIO
@@ -348,7 +354,6 @@ export default function Index() {
           <>
             <Table
               columns={columns}
-              
               dataSource={currentUsers}
               pagination={false} // Desabilitar a paginação dentro do componente Table
               onChange={handleTableChange}
@@ -501,10 +506,10 @@ export default function Index() {
             name="tipo"
             rules={[{ required: true, message: "Por favor, selecione o tipo" }]}
           >
-           <Select
-                  placeholder="---------"
-                  className="text-black font-bold text-lg"
-                >
+            <Select
+              placeholder="---------"
+              className="text-black font-bold text-lg"
+            >
               <Select.Option value="Agente de Saude">
                 Agente de Saúde
               </Select.Option>
@@ -517,10 +522,10 @@ export default function Index() {
             name="area"
             rules={[{ required: true, message: "Por favor, selecione a área" }]}
           >
-           <Select
-                  placeholder="---------"
-                  className="text-black font-bold text-lg"
-                >
+            <Select
+              placeholder="---------"
+              className="text-black font-bold text-lg"
+            >
               <Select.Option value="Saúde">Saúde</Select.Option>
               <Select.Option value="Educação">Educação</Select.Option>
               <Select.Option value="Segurança">Segurança</Select.Option>
@@ -548,7 +553,6 @@ export default function Index() {
   );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
 
@@ -568,7 +572,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   return {
     props: {
-      users:"users",
+      users: "users",
     },
   };
 };

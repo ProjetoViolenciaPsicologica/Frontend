@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Raleway, Quicksand, Montserrat } from "next/font/google";
+import { Raleway, Quicksand, Montserrat, Inter } from "next/font/google";
 import { Squash as Hamburger } from "hamburger-react";
 import Router from "next/router";
 import { destroyCookie } from "nookies";
@@ -12,7 +12,13 @@ const raleway = Raleway({
   style: "normal",
   subsets: ["latin"],
 });
+
 const montserrat = Montserrat({
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
   style: "normal",
   subsets: ["latin"],
 });
@@ -67,7 +73,6 @@ export default function Sidebar() {
         className={`absolute inset-y-0 left-0 z-50 w-3/4 min-w-52 transform space-y-6  bg-gray px-0 pt-6 text-gray-100 transition duration-200 ease-in-out md:relative md:flex md:w-64 md:translate-x-0 md:flex-col md:justify-between ${
           isOpen ? "translate-x-0" : "-translate-x-full "
         }`}
-       
       >
         <div
           className="flex flex-col space-y-6 h-screen"
@@ -190,7 +195,9 @@ export default function Sidebar() {
         footer={null}
       >
         <Divider />
-        <span className="mt-8 text-center text-black text-2xl font-semibold font-['Montserrat']">
+        <span
+          className={`mt-8 text-center text-black text-2xl font-semibold ${montserrat.className}`}
+        >
           Ao deixar a página, todas as informações preenchidas e selecionadas
           para formulário serão perdidas.{" "}
         </span>
@@ -199,13 +206,13 @@ export default function Sidebar() {
         <div className="flex justify-center mt-4 gap-x-5">
           <button
             onClick={handleCancel}
-            className="w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+            className={`w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
           >
             CANCELAR
           </button>
           <button
             onClick={handleLogout}
-            className="w-[172px] h-[59px] hover:bg-esmerald-900 bg-black rounded-[32px] text-white text-xl font-bold font-['Inter']"
+            className={`w-[172px] h-[59px] hover:bg-esmerald-900 bg-black rounded-[32px] text-white text-xl font-bold ${inter.className}`}
           >
             SAIR
           </button>

@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import { Modal, Divider, Button } from "antd";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Inter } from "next/font/google";
 import Image from "next/image";
 import { useMutation } from "react-query";
 import { toast } from "react-toastify";
 import { api } from "@/services";
 import nookies from "nookies";
 import Router from "next/router";
-import { destroyCookie } from "nookies";
+
 const montserrat = Montserrat({
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
   style: "normal",
   subsets: ["latin"],
 });
@@ -29,7 +34,7 @@ export default function Index({
   data,
 }: ValuePropsType) {
   const [loading, setLoading] = useState(false);
- const { mutate } = useMutation(
+  const { mutate } = useMutation(
     async (data: any) => {
       const token = nookies.get()["psi-token"];
       const response = await api.post("/formulario/novo", data, {
@@ -137,14 +142,14 @@ export default function Index({
           <div className="flex flex-col-reverse md:flex-row gap-y-2 md:justify-center md:mt-4  md:gap-x-5">
             <button
               onClick={handleCancel}
-              className="w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+              className={`w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
             >
               CANCELAR
             </button>
             <Button
               loading={false}
               onClick={handleOk}
-              className="w-[172px] h-[59px] hover:bg-esmerald-900 bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+              className={`w-[172px] h-[59px] hover:bg-esmerald-900 bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
             >
               REGISTRAR
             </Button>
@@ -183,14 +188,14 @@ export default function Index({
           <div className="flex justify-center mt-4 gap-x-5">
             <button
               onClick={handleCancel}
-              className="w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+              className={`w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
             >
               CANCELAR
             </button>
             <Button
               loading={loading}
               onClick={handleOk}
-              className="w-[172px] h-[59px] hover:bg-esmerald-900 bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+              className={`w-[172px] h-[59px] hover:bg-esmerald-900 bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
             >
               REGISTRAR
             </Button>
@@ -224,14 +229,14 @@ export default function Index({
           <div className="flex justify-center mt-4 gap-x-5">
             <button
               onClick={handleCancel}
-              className="w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+              className={`w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
             >
               CANCELAR
             </button>
             <Button
               loading={false}
               onClick={handleOk}
-              className="w-[172px] h-[59px] hover:bg-esmerald-900 bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+              className={`w-[172px] h-[59px] hover:bg-esmerald-900 bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
             >
               REGISTRAR
             </Button>

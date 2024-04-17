@@ -1,13 +1,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Raleway, Quicksand, Montserrat } from "next/font/google";
+import { Raleway, Quicksand, Montserrat, Inter } from "next/font/google";
 import { Squash as Hamburger } from "hamburger-react";
 import Router from "next/router";
 import { destroyCookie } from "nookies";
 import { Modal, Divider } from "antd";
 
 const montserrat = Montserrat({
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
   style: "normal",
   subsets: ["latin"],
 });
@@ -42,7 +47,7 @@ export default function Sidebar() {
 
       <header className="flex w-screen items-center justify-between bg-gray text-gray-100 md:hidden pr-4">
         <div className="flex w-full ">
-        <Link
+          <Link
             href="/dashboard"
             className={`${quicksand.className} flex items-center gap-x-2 text-white truncate whitespace-nowrap p-4 `}
           >
@@ -78,7 +83,9 @@ export default function Sidebar() {
             className="text-white flex flex-col items-center justify-center mb-24"
           >
             <Image src="/icon.svg" width={144} height={144} alt={"icon"} />
-            <h1 className={`text-neutral-700 text-3xl font-medium ${montserrat.className} leading-[46.80px]`}>
+            <h1
+              className={`text-neutral-700 text-3xl font-medium ${montserrat.className} leading-[46.80px]`}
+            >
               KM-QUEST
             </h1>
           </Link>
@@ -158,7 +165,9 @@ export default function Sidebar() {
         footer={null}
       >
         <Divider />
-        <span className="mt-8 text-center text-black text-2xl font-semibold font-['Montserrat']">
+        <span
+          className={`mt-8 text-center text-black text-2xl font-semibold ${montserrat.className}`}
+        >
           Ao deixar a página, todas as informações preenchidas e selecionadas
           para formulário serão perdidas.{" "}
         </span>
@@ -167,13 +176,13 @@ export default function Sidebar() {
         <div className="flex justify-center mt-4 gap-x-5">
           <button
             onClick={handleCancel}
-            className="w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+            className={`w-[172px] h-[59px]  bg-red-600 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
           >
             CANCELAR
           </button>
           <button
             onClick={handleLogout}
-            className="w-[172px] h-[59px] hover:bg-esmerald-900 bg-black rounded-[32px] text-white text-xl font-bold font-['Inter']"
+            className={`w-[172px] h-[59px] hover:bg-esmerald-900 bg-black rounded-[32px] text-white text-xl font-bold ${inter.className}`}
           >
             SAIR
           </button>

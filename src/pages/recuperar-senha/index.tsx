@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import { Karla, Quicksand, Montserrat } from "next/font/google";
+import { Karla, Quicksand, Montserrat, Roboto, Inter } from "next/font/google";
 import { Form, Input, Button } from "antd";
 import { api } from "@/services";
 import { toast } from "react-toastify";
+
 const montserrat = Montserrat({
-  weight: "700",
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  style: "normal",
+  subsets: ["latin"],
+});
+
+const roboto = Roboto({
+  weight: "400",
   style: "normal",
   subsets: ["latin"],
 });
@@ -46,13 +57,13 @@ export default function Index() {
       >
         <Image src="/icon.svg" width={150} height={150} alt={"icon"} />
         <h1
-          className={`${montserrat.className} text-center text-neutral-700 text-4xl font-bold leading-[46.80px]`}
+          className={`${montserrat.className} text-center text-neutral-700 text-4xl font-medium leading-[46.80px]`}
         >
           KM-QUEST
         </h1>
       </div>
 
-      <div className="mt-10 md:mt-24 w-full flex flex-col items-center px-4">
+      <div className="mt-10 w-full flex flex-col items-center px-4">
         <h1
           className={`${karla.className} ml-4 md:ml-0 text-black text-2xl font-bold`}
         >
@@ -83,15 +94,15 @@ export default function Index() {
               <Input
                 placeholder="Digite seu E-mail aqui"
                 name={"email"}
-                className="text-neutral-400 text-lg font-normal font-['Roboto'] md:w-[926px] h-[60px] bg-white rounded-[10px] shadow border border-black border-opacity-10  "
+                className={`text-neutral-400 text-lg font-normal  md:w-[926px] h-[60px] bg-white rounded-[10px] shadow border border-black border-opacity-10  ${roboto.className}`}
               />
             </Form.Item>
           </div>
-          <div className="mt-4 md:mt-20  flex justify-center w-full">
+          <div className="mt-4 md:mt-10  flex justify-center w-full">
             <Button
               htmlType="submit"
               loading={loading}
-              className="w-[175px] h-[51px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+              className={`w-[175px] h-[51px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
             >
               ENVIAR
             </Button>

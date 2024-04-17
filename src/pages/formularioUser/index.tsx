@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/LayoutUser";
-import { Raleway, Karla } from "next/font/google";
+import { Raleway, Karla, Inter } from "next/font/google";
 import Question from "@/components/Question";
 import { questions } from "@/utils/form";
 import { GetServerSideProps } from "next";
@@ -16,6 +16,10 @@ const raleway = Raleway({
   subsets: ["latin"],
 });
 
+const inter = Inter({
+  style: "normal",
+  subsets: ["latin"],
+});
 export interface dataForm {
   idade: number;
   escolha_sexo: string;
@@ -53,7 +57,7 @@ export default function Index() {
 
   const onSubmit = async (data: any) => {
     setFormData(data);
-    setOkQuestion(true)
+    setOkQuestion(true);
   };
 
   useEffect(() => {
@@ -75,7 +79,7 @@ export default function Index() {
           definicaoLocalForm: formData?.definicaoLocalForm,
         },
       };
-     
+
       setIsModalOpen(true);
       setData(data1);
     }
@@ -167,7 +171,7 @@ export default function Index() {
           <h1
             className={`${raleway.className} flex items-center mt-9 text-2xl md:text-4xl font-bold text-black`}
           >
-            {page === 3 ? "Dados de Entrevistado" : `CATEGORIA ${page +1}`}
+            {page === 3 ? "Dados de Entrevistado" : `CATEGORIA ${page + 1}`}
           </h1>
         </div>
 
@@ -288,8 +292,7 @@ export default function Index() {
               <Form.Item className="flex w-72 md:w-[470px] justify-center mt-10 lg:justify-end  items-center">
                 <button
                   type="submit"
-                 
-                  className="w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold font-['Inter']"
+                  className={`w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
                 >
                   Avançar
                 </button>
@@ -328,7 +331,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   }
 
   // Decode token
-  let decoded:any;
+  let decoded: any;
   try {
     decoded = jwtDecode(token);
   } catch (error) {
