@@ -32,7 +32,6 @@ const quicksand = Quicksand({
 export default function Sidebar() {
   const [isOpen, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   function handleCancel() {
     setIsModalOpen(false);
   }
@@ -110,7 +109,14 @@ export default function Sidebar() {
             <button
               type="button"
               onClick={() => {
-                setIsModalOpen(true);
+                if (
+                  Router.asPath === "/formularioUser" ||
+                  Router.asPath === "/formulario"
+                ) {
+                  setIsModalOpen(true);
+                } else {
+                  handleLogout();
+                }
               }}
               className={`group flex w-full items-center space-x-2 px-3 py-2 ${raleway.className} transition duration-200 ml-4 text-bgGray  font-normal`}
             >

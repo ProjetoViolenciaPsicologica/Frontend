@@ -337,12 +337,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   } catch (error) {
     console.error("Error decoding token:", error);
     // Redirect to login page or handle error appropriately
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
   }
 
   // Check if user is superuser
