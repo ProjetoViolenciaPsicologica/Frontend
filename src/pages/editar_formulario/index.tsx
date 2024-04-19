@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Raleway } from "next/font/google";
 import { Form, Button, Table, Space, Modal, Input, Select } from "antd";
 import { api } from "@/services";
-import { parseCookies } from "nookies";
+import apiForm from "@/pages/api"
+import { destroyCookie, parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
+import { useQuery } from "react-query";
+import { toast } from "react-toastify";
+import router from "next/router";
 
 interface IGrau {
   id: number;
@@ -33,29 +37,89 @@ const raleway = Raleway({
   subsets: ["latin"],
 });
 
-export default function Index({
-  graus,
-  areas,
-  locais,
-  tipos
-}: {
-  graus: IGrau[];
-  areas: IArea[];
-  locais: ILocal[];
-  tipos: ITipo[];
-}) {
+export default function Index(){
   const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null);
+
+  const {
+    data: graus,
+    isLoading: isLoadingGraus,
+    refetch,
+  } = useQuery("graus", async () => {
+    try {
+      const response = await apiForm.getAllGraus();
+      return response.data;
+    } catch (error) {
+      toast.error("Tempo expirado");
+      destroyCookie(null, "psi-token");
+      destroyCookie(null, "psi-refreshToken");
+      router.push("/login");
+    }
+  });
+
+  const {
+    data: locais,
+    isLoading: isLoadingLocais,
+    refetch: refetchLocais,
+  } = useQuery("graus", async () => {
+    try {
+      const response = await apiForm.getAllLocais();
+      return response.data;
+    } catch (error) {
+      toast.error("Tempo expirado");
+      destroyCookie(null, "psi-token");
+      destroyCookie(null, "psi-refreshToken");
+      router.push("/login");
+    }
+  });
+
+  const {
+    data: areas,
+    isLoading: isLoadingAreas,
+    refetch: refetchAreas,
+  } = useQuery("graus", async () => {
+    try {
+      const response = await apiForm.getAllAreas();
+      return response.data;
+    } catch (error) {
+      toast.error("Tempo expirado");
+      destroyCookie(null, "psi-token");
+      destroyCookie(null, "psi-refreshToken");
+      router.push("/login");
+    }
+  });
+
+  const {
+    data: tipos,
+    isLoading: isLoadingTipos,
+    refetch: refetchTipos,
+  } = useQuery("graus", async () => {
+    try {
+      const response = await apiForm.getAllTipos();
+      return response.data;
+    } catch (error) {
+      toast.error("Tempo expirado");
+      destroyCookie(null, "psi-token");
+      destroyCookie(null, "psi-refreshToken");
+      router.push("/login");
+    }
+  });
   const [tableData, setTableData] = useState<any>([
     {
-      key: "1",
-      grau: graus[0].definicaoGrau,
-      area: areas[0].definicaoArea,
-      local: locais[0].definicaoLocalForm,
-      tipo: tipos[0].definicaoTipo
+      key: '0',
+      grau:graus && graus[0].definicaoGrau,
+      grauId: graus &&graus[0].id,
+      area: areas && areas[0].definicaoArea,
+      areaId:areas && areas[0].id,
+      local: locais && locais[0].definicaoLocalForm,
+      localId:locais && locais[0].id,
+      tipo:  tipos && tipos[0].definicaoTipo,
+      tipoId: tipos &&  tipos[0].id
     }
   ]);
+
+
 
   // Função para confirmar exclusão
   const showConfirm = (record: any) => {
@@ -74,9 +138,60 @@ export default function Index({
 
   // Função para abrir o modal de edição
   const openEditModal = (record: any) => {
+    console.log("Editar", record);
     setSelectedRow(record);
+    form.setFieldsValue({
+      grau: record.grau,
+      grauId: record.grauId,
+      area: record.area,
+      areaId: record.areaId,
+      local: record.local,
+      localId: record.localId,
+      tipo: record.tipo,
+      tipoId: record.tipoId
+    });
     setModalVisible(true);
   };
+
+  const saveUpdatedData = async () => {
+    const { grauId, areaId, localId, tipoId } = form.getFieldsValue();
+    const selectedId = selectedRow.key;
+    console.log(form.getFieldsValue());
+    try {
+      await Promise.all([
+        apiForm.updateGrau(grauId, form.getFieldValue('grau')),
+        apiForm.updateArea(areaId, form.getFieldValue('area')),
+        apiForm.updateLocal(localId, form.getFieldValue('local')),
+        apiForm.updateTipo(tipoId, form.getFieldValue('tipo'))
+      ]);
+  
+      // Atualizar os dados da tabela com os novos valores
+     refetch();
+     refetchAreas();
+      refetchLocais();
+      refetchTipos();
+      setTableData((prev:any) =>
+        prev.map((item: any) => {
+          if (item.key === selectedId) {
+            return {
+              ...item,
+              grau: form.getFieldValue('grau'),
+              area: form.getFieldValue('area'),
+              local: form.getFieldValue('local'),
+              tipo: form.getFieldValue('tipo')
+            };
+          }
+          return item;
+        })
+      );
+    } catch (error) {
+      console.error('Erro ao salvar os dados:', error);
+    }
+    finally {
+      closeModal();
+    }
+  };
+  
 
   // Função para fechar o modal
   const closeModal = () => {
@@ -95,9 +210,9 @@ export default function Index({
         <Select
           style={{ width: "100%" }}
           value={record.grau}
-          onChange={(value) => onTableSelectChange(record.key, 'grau', value)}
+          onChange={(value, option:any) => onTableSelectChange(record.key, 'grau', value, option.key)}
         >
-          {graus.map(grau => (
+          {graus?.map((grau:IGrau) => (
             <Select.Option key={grau.id} value={grau.definicaoGrau}>
               {grau.definicaoGrau}
             </Select.Option>
@@ -114,9 +229,9 @@ export default function Index({
         <Select
           style={{ width: "100%" }}
           value={record.area}
-          onChange={(value) => onTableSelectChange(record.key, 'area', value)}
+          onChange={(value, option:any) => onTableSelectChange(record.key, 'area', value, option.key)}
         >
-          {areas.map(area => (
+          {areas?.map((area:IArea) => (
             <Select.Option key={area.id} value={area.definicaoArea}>
               {area.definicaoArea}
             </Select.Option>
@@ -133,9 +248,9 @@ export default function Index({
         <Select
           style={{ width: "100%" }}
           value={record.local}
-          onChange={(value) => onTableSelectChange(record.key, 'local', value)}
+          onChange={(value, option:any) => onTableSelectChange(record.key, 'local', value, option.key)}
         >
-          {locais.map(local => (
+          {locais?.map((local:ILocal) => (
             <Select.Option key={local.id} value={local.definicaoLocalForm}>
               {local.definicaoLocalForm}
             </Select.Option>
@@ -152,9 +267,9 @@ export default function Index({
         <Select
           style={{ width: "100%" }}
           value={record.tipo}
-          onChange={(value) => onTableSelectChange(record.key, 'tipo', value)}
+          onChange={(value, option:any) => onTableSelectChange(record.key, 'tipo', value, option.key)}
         >
-          {tipos.map(tipo => (
+          {tipos?.map((tipo:ITipo) => (
             <Select.Option key={tipo.id} value={tipo.definicaoTipo}>
               {tipo.definicaoTipo}
             </Select.Option>
@@ -180,18 +295,25 @@ export default function Index({
   ];
 
   // Função para atualizar o estado do formulário com base na seleção feita na tabela
-  const onTableSelectChange = (key: string, field: string, value: string) => {
+  const onTableSelectChange = (key: string, field: string, value: string, id: number) => {
     const newData = tableData.map((item: any) => ({ ...item }));
-    const index = newData.findIndex((item: { key: string; }) => item.key === key);
+    const index = newData.findIndex((item: { key: string }) => item.key === key);
     if (index > -1) {
       newData[index][field] = value;
+      newData[index][`${field}Id`] = id; // Atualiza o ID correspondente ao campo
       setTableData(newData); // Atualiza o estado da tabela
+
+      // Atualiza o valor do campo oculto com o ID correspondente
+      form.setFieldsValue({
+        ...form.getFieldsValue(),
+        [`${field}Id`]: id
+      });
     }
   };
 
   return (
     <Layout>
-      <div className="flex flex-col items-center pl-8 lg:items-start">
+      <div className="flex w-full flex-col items-center pl-8 lg:items-start">
         <div className="mt-4 flex flex-col w-full md:mt-4">
           <h1 className={`${raleway.className} text-3xl font-normal `}>
             FORMULÁRIO
@@ -207,7 +329,8 @@ export default function Index({
             columns={columns}
             dataSource={tableData}
             pagination={false}
-            style={{ width: "100%" }}
+            className="w-[90%]"
+            loading={isLoadingGraus && isLoadingLocais && isLoadingAreas && isLoadingTipos}
           />
         </div>
       </div>
@@ -220,7 +343,7 @@ export default function Index({
           <Button key="cancel" onClick={closeModal}>
             Cancelar
           </Button>,
-          <Button key="submit" type="primary" onClick={closeModal}>
+          <Button key="submit" type="primary" onClick={saveUpdatedData}>
             Salvar
           </Button>
         ]}
@@ -237,6 +360,19 @@ export default function Index({
           </Form.Item>
           <Form.Item label="Tipo de Aplicador" name="tipo">
             <Input />
+          </Form.Item>
+          {/* Inputs hidden para armazenar os IDs */}
+          <Form.Item name="grauId" style={{ display: 'none' }}>
+            <Input type="hidden" />
+          </Form.Item>
+          <Form.Item name="areaId" style={{ display: 'none' }}>
+            <Input type="hidden" />
+          </Form.Item>
+          <Form.Item name="localId" style={{ display: 'none' }}>
+            <Input type="hidden" />
+          </Form.Item>
+          <Form.Item name="tipoId" style={{ display: 'none' }}>
+            <Input type="hidden" />
           </Form.Item>
         </Form>
       </Modal>

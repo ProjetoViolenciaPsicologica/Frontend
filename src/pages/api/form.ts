@@ -83,10 +83,103 @@ api_form.desvio = async (params:any) => {
       }
 }
 
+api_form.updateGrau = async (id:number, values:any) => {
+    try {
+        const response =  await  api_form.put(`grau/${id}`, {
+            definicaoGrau: values
+          });
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
+
+api_form.getAllGrau = async () => {
+    try {
+        const response = await  api_form.get("grau");
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
+
+api_form.getAllArea = async () => {
+    try {
+        const response = await  api_form.get("area");
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
+api_form.getAlltipo = async () => {
+    try {
+        const response = await  api_form.get("tipo");
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
+
+api_form.getAllLocal= async () => {
+    try {
+        const response = await  api_form.get("local");
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
+api_form.updateArea = async (id:number, values:any) => {
+    try {
+        const response =  await  api_form.put(`area/${id}`, {
+            definicaoArea: values
+          });
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
+
+api_form.updateTipo = async (id:number, values:any) => {
+    try {
+        const response =  await  api_form.put(`tipo/${id}`, {
+            definicaoTipo: values
+          });
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
+
+api_form.updateLocal = async (id:number, values:any) => {
+    try {
+        const response =  await  api_form.put(`local/${id}`, {
+            definicaoLocal: values
+          });
+        return response
+      } catch (error: any) {
+          if (error?.response?.status === 401) {
+              throw error
+          }
+      }
+}
 
 api_form.dispersao = async (params:any) => {
     try {
-        const response = await   await api_form.get("dispersao", { params });
+        const response = await api_form.get("dispersao", { params });
         return response
       } catch (error: any) {
           if (error?.response?.status === 401) {
