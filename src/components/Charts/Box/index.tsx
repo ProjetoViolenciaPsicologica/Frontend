@@ -9,8 +9,7 @@ type StandardDeviationChartProps = {
 const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
   data,
 }) => {
-  const mean =
-    data?.reduce((acc, val) => acc + val, 0) / data?.length;
+  const mean = data?.reduce((acc, val) => acc + val, 0) / data?.length;
   const stdDeviation = Math.sqrt(
     data?.map((val) => (val - mean) ** 2).reduce((acc, val) => acc + val, 0) /
       data?.length
@@ -62,27 +61,23 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
       },
     },
     xaxis: {
-      title: { 
-        text: "cores de sinalização",  
+      title: {
+        text: "cores de sinalização",
         style: {
-          color: undefined,
-          fontSize: '18px',
-          fontFamily: 'Helvetica, Arial, sans-serif',
+          fontSize: "18px",
           fontWeight: 700,
-        }
+        },
       },
       categories: Object.keys(corMeans), // Categorias são as cores
     } as any,
     yaxis: [
       {
-        title: { 
+        title: {
           text: "Valores",
           style: {
-            color: undefined,
-            fontSize: '18px',
-            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontSize: "18px",
             fontWeight: 700,
-          }
+          },
         },
         labels: {
           formatter: function (val: any) {
@@ -102,11 +97,10 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
     legend: {
       show: true,
       position: "top",
-      fontSize: '18px',
-      fontFamily: 'Helvetica, Arial, sans-serif',
+      fontSize: "18px",
       fontWeight: 700,
     },
-    colors: ["#58FF94", "#0000FF", "#FFFF58","#0000FF", "#FFFF58", "#58FF94"], // Cores correspondentes a Verde, Amarelo, Vermelho e Desvio Padrão
+    colors: ["#58FF94", "#0000FF", "#FFFF58", "#0000FF", "#FFFF58", "#58FF94"], // Cores correspondentes a Verde, Amarelo, Vermelho e Desvio Padrão
   };
 
   const chartSeries = [
@@ -124,7 +118,14 @@ const StandardDeviationChart: React.FC<StandardDeviationChartProps> = ({
 
   return (
     <div className="w-full h-full">
-      <Chart options={chartOptions} series={chartSeries} type="bar" height={"100%"} />
+      {data && (
+        <Chart
+          options={chartOptions}
+          series={chartSeries}
+          type="bar"
+          height={"100%"}
+        />
+      )}
     </div>
   );
 };

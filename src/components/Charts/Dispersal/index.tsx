@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 
 type data = {
@@ -7,6 +7,19 @@ type data = {
 };
 
 const ScatterChart = ({ data }: { data: data[] }) => {
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 490);
+    };
+
+    handleResize(); // Define o tamanho inicial da tela
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Executa este efeito apenas uma vez no momento da montagem
+
   // Dados das idades e pontuações
   const idades = data.map((datas) => {
     return datas.idade;
@@ -71,11 +84,14 @@ const ScatterChart = ({ data }: { data: data[] }) => {
       size: 8, // Tamanho dos marcadores
     },
 
-    tooltip: {
-      enabled: true,
+    toolbar: {
+      show: true
     },
     legend: {
       show: true,
+      position: "bottom",
+      fontSize: '18px',
+      fontWeight: 700,
     },
   };
 
@@ -100,7 +116,13 @@ const scatterChartData = [
   return (
     <div className="h-full w-full">
       <Chart
-        options={scatterChartOptions}
+        options={{
+          ...scatterChartOptions,
+          legend: {
+            ...scatterChartOptions.legend,
+            position: isSmallScreen ? "bottom" : "top", // Specify a valid position value for the legend
+          },
+        }}
         series={scatterChartData}
         type="scatter"
         width="100%"

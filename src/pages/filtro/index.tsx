@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import Layout from "@/components/Layout";
 import { Raleway, DM_Sans } from "next/font/google";
 import dynamic from "next/dynamic";
-import  api  from "@/pages/api";
+import api from "@/pages/api";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { Router, useRouter } from "next/router";
@@ -55,23 +55,30 @@ export default function Index({ cookies }: { cookies: any }) {
   const [dataBar, setdBar] = useState<any>();
   const [dataPie, setDPie] = useState<any>();
   const [dataD, setDataD] = useState<any>();
-  const [dataDispersao, setDataDispersao] = useState<any>()
+  const [dataDispersao, setDataDispersao] = useState<any>();
   const [hiddenButton, setHiddenButton] = useState<boolean>(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
-    setHiddenButton(true);
-    const canvas = await html2canvas(contentRef.current);
+
+    // Oculta o botão de download antes de capturar a tela
+    const downloadButton = document.getElementById("download-button");
+    if (downloadButton) downloadButton.style.display = "none";
+
+    const canvas = await html2canvas(contentRef.current, {
+      scrollY: -window.scrollY,
+      windowHeight: document.documentElement.scrollHeight,
+    });
     const imgData = canvas.toDataURL("image/png");
 
-    const pdf = new jsPDF();
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+    const pdf = new jsPDF("p", "px", [canvas.width, canvas.height]);
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
     pdf.save("download.pdf");
-    setHiddenButton(false);
+
+    // Restaura a visibilidade do botão de download após capturar a tela
+    if (downloadButton) downloadButton.style.display = "block";
   };
 
   async function getData() {
@@ -85,21 +92,24 @@ export default function Index({ cookies }: { cookies: any }) {
     const params = { ...data1 }; // ou Object.assign({}, data1);
 
     try {
-      const response = await api.sinalizacao(params)
-      const response1 = await api.quantidadeRespostas(params)
-      const response4 = await api.desvio(params)
-      const response5 = await api.dispersao(params)
-      const data1 = response5.data
-      const arrayTransformado = data1.map((objeto:any) => {
+      const response = await api.sinalizacao(params);
+      const response1 = await api.quantidadeRespostas(params);
+      const response4 = await api.desvio(params);
+      const response5 = await api.dispersao(params);
+      const data1 = response5.data;
+      const arrayTransformado = data1.map((objeto: any) => {
         // Dividindo a string 'campo_questoes' em um array de números
-        const pontuacoes = objeto.campo_questoes.split(',').map(Number);
+        const pontuacoes = objeto.campo_questoes.split(",").map(Number);
         // Calculando a pontuação total
-        const pontuacaoTotal = pontuacoes.reduce((total:any, pontuacao:any) => total + pontuacao, 0);
+        const pontuacaoTotal = pontuacoes.reduce(
+          (total: any, pontuacao: any) => total + pontuacao,
+          0
+        );
         // Retornando um novo objeto com as chaves 'idade' e 'pontuacao'
         return { idade: objeto.idade, pontuacao: pontuacaoTotal };
       });
-      
-     setDataDispersao(arrayTransformado)
+
+      setDataDispersao(arrayTransformado);
       const quantidade = response4.data;
       const verde = quantidade.filter(
         (item: any) => item.sinalizacao === "Verde"
@@ -147,7 +157,7 @@ export default function Index({ cookies }: { cookies: any }) {
     <Layout>
       <div
         ref={contentRef}
-        className="flex w-full  flex-col items-center pl-4 lg:items-start lg:pl-12 "
+        className="flex  flex-col items-center pl-4 lg:items-start lg:pl-12 "
       >
         <div className="flex flex-col lg:flex-row justify-between items-center w-full mt-4 md:mt-16 ">
           <div className=" flex h-full flex-col w-full">
@@ -243,49 +253,50 @@ export default function Index({ cookies }: { cookies: any }) {
                 : "---------"}
             </span>
 
-           {qtForm ? (
-             <div
-             className={`bg-[#4339F2] w-[200px] h-[200px] rounded-[10px] gap-y-4 flex flex-col items-center`}
-           >
-             <span
-               className={`${raleway.className} mt-5 text-lg font-normal text-white`}
-             >
-               FORMULÁRIOS
-             </span>
+            {qtForm ? (
+              <div
+                className={`bg-[#4339F2] w-[200px] h-[200px] rounded-[10px] gap-y-4 flex flex-col items-center`}
+              >
+                <span
+                  className={`${raleway.className} mt-5 text-lg font-normal text-white`}
+                >
+                  FORMULÁRIOS
+                </span>
 
-            
-              <span
-              className={`${raleway.className} text-5xl font-normal text-white mt-4`}
-            >
-             {qtForm}
-            </span>
-           
-           </div>
-           ) : (
-            <Spin size="large" className="text-white"/>
-           )}
+                <span
+                  className={`${raleway.className} text-5xl font-normal text-white mt-4`}
+                >
+                  {qtForm}
+                </span>
+              </div>
+            ) : (
+              <Spin size="large" className="text-white" />
+            )}
             <Button
+              id="download-button"
               type="default"
               icon={<FaDownload />}
               onClick={handleDownloadPDF}
-              className={`${
-                hiddenButton ? "hidden" : "visible"
-              } mt-4 w-[200px] flex items-center justify-center`}
+              className={`mt-4 w-[200px] flex items-center justify-center`}
             >
               Baixar PDF
             </Button>
           </div>
         </div>
-        <div className="mt-10 gap-y-5 md:gap-x-5 w-full flex flex-col flex-wrap md:flex-row items-center">
-          <div className="w-[80vw] lg:w-[30%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+        <div className="mt-10 gap-y-5 lg:gap-x-3 w-full flex flex-col flex-wrap md:flex-row items-center">
+          <div className="w-[80vw] lg:w-[20vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
               Resultado por sinalização
             </h1>
-            {dataPie && <Pie chartData={dataPie} />}
+            {dataPie ? (
+              <Pie chartData={dataPie} />
+            ) : (
+              <Spin size="large" className="text-white" />
+            )}
           </div>
-          <div className="w-[80vw] lg:w-[65%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className=" w-[80vw] lg:w-[58.8vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
@@ -294,11 +305,15 @@ export default function Index({ cookies }: { cookies: any }) {
             {dataBar && <Bar data={dataBar} />}
           </div>
 
-          <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-            {dataD && <Box data={dataD} />}
+          <div className="w-[80vw] lg:w-[79vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+            {dataD ? (
+              <Box data={dataD} />
+            ) : (
+              <Spin size="large" className="text-white" />
+            )}
           </div>
-          <div className="w-[80vw] px-4 h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
-            {dataDispersao && <Dispersal data={dataDispersao}/>}
+          <div className="w-[80vw] lg:w-[79vw] px-4 h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
+            {dataDispersao && <Dispersal data={dataDispersao} />}
           </div>
         </div>
       </div>

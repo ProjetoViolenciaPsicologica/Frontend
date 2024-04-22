@@ -6,7 +6,7 @@ import { Form, Button, Space, Switch, Select, InputNumber } from "antd";
 import ptBR from "antd/lib/date-picker/locale/pt_BR";
 import * as XLSX from "xlsx";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import  api  from "@/pages/api";
+import api from "@/pages/api";
 import { GetServerSideProps } from "next";
 import { destroyCookie, parseCookies, setCookie } from "nookies";
 import { useRouter } from "next/router";
@@ -36,8 +36,8 @@ function Index({ users }: { users: Users[] }) {
   const [form] = Form.useForm(); // Use a instância do Form
   const router = useRouter();
   const cookies = parseCookies();
- const [loading, setLoading] = useState(false)
- const [loading1, setLoading1] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [loading1, setLoading1] = useState(false);
   const [startDate, setStartDate] = useState<any>(null);
   const [endDate, setEndDate] = useState<any>(null);
   const [disabledDate, setDisabledDate] = useState(true);
@@ -65,9 +65,9 @@ function Index({ users }: { users: Users[] }) {
     } else {
       delete params.data_inicio;
     }
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await api.filtro(params)
+      const response = await api.filtro(params);
       setCookie(undefined, "dataSearch", response.data.length);
       setCookie(undefined, "dataFilter", JSON.stringify(params));
       router.push("/filtro");
@@ -76,9 +76,8 @@ function Index({ users }: { users: Users[] }) {
       destroyCookie(null, "psi-token");
       destroyCookie(null, "psi-refreshToken");
       router.push("/login");
-    }
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -113,21 +112,18 @@ function Index({ users }: { users: Users[] }) {
       delete params.data_inicio;
     }
     console.log(params);
-    setLoading1(true)
+    setLoading1(true);
     try {
-      
-    const response = await api.filtro(params)
-    
+      const response = await api.filtro(params);
 
-    handleExportExcel(response.data);
+      handleExportExcel(response.data);
     } catch (error) {
       toast.error("Tempo expirado");
       destroyCookie(null, "psi-token");
       destroyCookie(null, "psi-refreshToken");
       router.push("/login");
-    }
-    finally {
-      setLoading1(false)
+    } finally {
+      setLoading1(false);
     }
   }
 
@@ -246,7 +242,7 @@ function Index({ users }: { users: Users[] }) {
         </div>
 
         <Form className="h-full" form={form} onFinish={onSubmit}>
-          <div className="flex flex-col-reverse lg:flex-row gap-x-44 w-full mt-10">
+          <div className="flex flex-col-reverse lg:flex-row gap-x-32 w-full mt-10">
             <div className="flex flex-col ">
               <div className="flex flex-col">
                 <label
@@ -382,7 +378,6 @@ function Index({ users }: { users: Users[] }) {
                     placeholder={["Data e hora inicial", "Data e hora final"]}
                     format="DD/MM/YYYY HH:mm"
                     onChange={handleStartDateChange}
-                    
                     locale={ptBR}
                     lang="pt-br" // Adicione o locale correto aqui
                     className={`w-72 md:w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10 pl-6 ${
@@ -478,15 +473,15 @@ function Index({ users }: { users: Users[] }) {
 
           <div className="w-full  flex flex-col md:flex-row justify-center items-center mt-10 gap-y-4 md:gap-y-0 md:gap-x-3.5 bg-[#F6FBF9]">
             <Button
-             htmlType="button"
-             loading={loading}
+              htmlType="button"
+              loading={loading}
               onClick={handleViewFilter}
               className={`${inter.className} w-[202px] h-[59px] bg-[#00FF85]  rounded-[32px] text-white font-bold `}
             >
               VISUALIZAR
             </Button>
             <Button
-             loading={loading1}
+              loading={loading1}
               htmlType="submit"
               className={`${inter.className} w-[202px] h-[59px] bg-emerald-950 rounded-[32px] text-white font-bold `}
             >
@@ -503,7 +498,7 @@ export default Index;
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
-  const token = cookies['psi-token'];
+  const token = cookies["psi-token"];
   const isAuthenticated = !!cookies["psi-token"];
 
   if (!isAuthenticated) {
@@ -517,16 +512,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   try {
     const response = await api.get("user", {
-      headers:{
-        Authorization: `Bearer ${token}`
-      }
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     const users = response.data;
-  return {
-    props: {
-      users: users,
-    },
-  };
+    return {
+      props: {
+        users: users,
+      },
+    };
   } catch (error) {
     return {
       redirect: {
@@ -535,5 +530,4 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
-  
 };

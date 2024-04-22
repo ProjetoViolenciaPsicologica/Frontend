@@ -1,13 +1,13 @@
 import React from "react";
-import { Bar } from '@ant-design/charts';
+import { Bar } from "@ant-design/charts";
 
 type ChartData = {
   [key: string]: number;
 };
 
 const HorizontalBarChart: React.FC<{ data: ChartData }> = ({ data }) => {
-  const categories = Object.keys(data);
-  const values = Object.values(data);
+  const categories = Object?.keys(data);
+  const values = Object?.values(data);
   const colors = ["#FFB200", "#4339F2", "#02A0FC", "#FF3A29"]; // Cores correspondentes às categorias
 
   // Ordena as categorias com base nos valores associados (do maior para o menor)
@@ -33,12 +33,13 @@ const HorizontalBarChart: React.FC<{ data: ChartData }> = ({ data }) => {
       position: "top",
       itemName: {
         textStyle: {
-          fontSize: "18px",
+          fontSize: 18, // Tamanho da fonte
+          fontWeight: "bold", // Estilo da fonte
         },
       },
     },
     colorField: "resposta", // Usar o campo 'resposta' para mapear as cores das barras
-    yAxis: { label: { autoRotate: false } },
+    yAxis: { label: { fontSize: 18, fontWeight: "bold" } }, // Tamanho e estilo da fonte para o eixo Y
   };
 
   return (

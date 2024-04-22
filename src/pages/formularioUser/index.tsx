@@ -16,16 +16,16 @@ const raleway = Raleway({
   subsets: ["latin"],
 });
 
-const inter = Inter({
-  style: "normal",
-  subsets: ["latin"],
-});
 export interface dataForm {
   idade: number;
   escolha_sexo: string;
   grau_de_instrucao: string;
   definicaoLocalForm: string;
 }
+const inter = Inter({
+  style: "normal",
+  subsets: ["latin"],
+});
 
 const karla = Karla({
   style: "normal",
@@ -94,8 +94,8 @@ export default function Index() {
 
   return (
     <Layout>
-      <div className="flex flex-col w-full items-center pl-4 lg:items-start lg:pl-12">
-        <div className="mt-4 flex flex-col md:mt-10 pl-4 lg:pl-0">
+      <div className="flex flex-col h-full w-full  items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
+        <div className="mt-4 flex w-full flex-col md:mt-10 pl-4 lg:pl-0">
           {isSmallScreen ? (
             <div className="absolute left-0 rigt-0">
               <svg
@@ -149,10 +149,6 @@ export default function Index() {
               current={page}
               items={[
                 {
-                  title: "Formulário",
-                  description: "",
-                },
-                {
                   title: "Categoria 1",
                   description: "",
                 },
@@ -162,6 +158,10 @@ export default function Index() {
                 },
                 {
                   title: "Categoria 3",
+                  description: "",
+                },
+                {
+                  title: "Dados",
                   description: "",
                 },
               ]}
@@ -212,12 +212,12 @@ export default function Index() {
           />
         )}
         {page === 3 && (
-          <div className="w-full mt-8 md:mt-16 flex justify-center lg:justify-start">
+          <div className="w-full mt-8 flex justify-center lg:justify-start">
             <Form
               form={form}
               onFinish={onSubmit}
               layout="vertical"
-              className="w-72 md:w-[381px]"
+              className="w-full "
             >
               <div className="flex flex-col w-full">
                 <div className="flex items-center">
@@ -239,7 +239,7 @@ export default function Index() {
                 </Form.Item>
               </div>
               <Form.Item
-                className="w-full"
+                className="w-72 md:w-[381px]"
                 label="Sexo"
                 name="escolha_sexo"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
@@ -254,7 +254,7 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-full"
+                className="w-72 md:w-[381px]"
                 label="Grau de instrução"
                 name="grau_de_instrucao"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
@@ -275,7 +275,7 @@ export default function Index() {
                 </Select>
               </Form.Item>
               <Form.Item
-                className="w-full"
+                className="w-72 md:w-[381px]"
                 label="Local da aplicação"
                 name="definicaoLocalForm"
                 rules={[{ required: true, message: "Campo é Obrigatório" }]}
@@ -289,14 +289,28 @@ export default function Index() {
                   <Select.Option value="delegacia">Delegacia</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item className="flex w-72 md:w-[470px] justify-center mt-10 lg:justify-end  items-center">
+              <div
+                className={`${
+                  page > 0 && "gap-x-5"
+                } w-full flex flex-col-reverse md:flex-row gap-y-4 justify-center items-center mb-6`}
+              >
+                <button
+                  className={`${
+                    page > 0 ? "flex" : "hidden"
+                  } items-center justify-center text-xl font-bold text-white w-[182px] h-[49px] bg-yellow-400 rounded-[32px]`}
+                  onClick={() => {
+                    setPage(page - 1);
+                  }}
+                >
+                  VOLTAR
+                </button>
                 <button
                   type="submit"
                   className={`w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
                 >
                   Avançar
                 </button>
-              </Form.Item>
+              </div>
             </Form>
           </div>
         )}

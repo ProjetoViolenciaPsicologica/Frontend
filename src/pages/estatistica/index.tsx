@@ -23,7 +23,7 @@ const Dispersal = dynamic(() => import("@/components/Charts/Dispersal"), {
 const raleway = Raleway({
   weight: "400",
   style: "normal",
-  
+
   subsets: ["latin"],
 });
 
@@ -40,9 +40,12 @@ const IndexPage: React.FC<any> = ({
   dataDispersal,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  console.log(data)
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
+
+    // Oculta o botão de download antes de capturar a tela
+    const downloadButton = document.getElementById("download-button");
+    if (downloadButton) downloadButton.style.display = "none";
 
     const canvas = await html2canvas(contentRef.current);
     const imgData = canvas.toDataURL("image/png");
@@ -52,8 +55,11 @@ const IndexPage: React.FC<any> = ({
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
     pdf.save("download.pdf");
+
+    // Restaura a visibilidade do botão de download após capturar a tela
+    if (downloadButton) downloadButton.style.display = "block";
   };
-  
+
   return (
     <Layout>
       <div
@@ -73,6 +79,7 @@ const IndexPage: React.FC<any> = ({
             </span>
           </div>
           <Button
+            id="download-button"
             type="default"
             icon={<FaDownload />}
             onClick={handleDownloadPDF}
@@ -82,17 +89,20 @@ const IndexPage: React.FC<any> = ({
           </Button>
         </div>
 
-        <div className="mt-10 gap-y-5 md:gap-x-5 w-full flex flex-col flex-wrap md:flex-row items-center">
-          <div className="w-[80vw] lg:w-[30%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+        <div className="mt-10 gap-y-5 lg:gap-x-3 w-full flex flex-col flex-wrap md:flex-row items-center">
+          <div className="w-[80vw] lg:w-[20vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
               Resultado por sinalização
             </h1>
-            {dataPie ? <Pie chartData={dataPie} /> : <Spin size="large" className="text-white"/> }
-            
+            {dataPie ? (
+              <Pie chartData={dataPie} />
+            ) : (
+              <Spin size="large" className="text-white" />
+            )}
           </div>
-          <div className="w-[80vw] lg:w-[65%] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className=" w-[80vw] lg:w-[59.8vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
@@ -102,10 +112,10 @@ const IndexPage: React.FC<any> = ({
           </div>
 
           <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-           {data && <Box data={data} /> }
+            {data && <Box data={data} />}
           </div>
           <div className="w-[80vw] px-4 h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
-            <Dispersal data={dataDispersal}/>
+            <Dispersal data={dataDispersal} />
           </div>
         </div>
       </div>
@@ -125,9 +135,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
-  const response4 = await api.get("desvio", {headers: {
-    Authorization: `Bearer ${token}`
-  }});
+  const response4 = await api.get("desvio", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   const quantidade = response4.data;
   const verde = quantidade.filter((item: any) => item.sinalizacao === "Verde");
   const amarelo = quantidade.filter(
@@ -144,32 +156,41 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     });
     return somatorio;
   };
- 
-  const response5 =  await api.get("dispersao", {headers: {
-    Authorization: `Bearer ${token}`
-  }});
-  const data1 = response5.data
+
+  const response5 = await api.get("dispersao", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data1 = response5.data;
   const d1 = calcularSomatorioCampoQuestoes(verde);
   const d2 = calcularSomatorioCampoQuestoes(amarelo);
   const d3 = calcularSomatorioCampoQuestoes(vermelho);
   const data = [d1, d2, d3];
-  const response = await api.get("formulario/sinalizacao", {headers: {
-    Authorization: `Bearer ${token}`
-  }});
-  const response1 = await api.get("formulario/quantidadeRespostas", {headers: {
-    Authorization: `Bearer ${token}`
-  }});
+  const response = await api.get("formulario/sinalizacao", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const response1 = await api.get("formulario/quantidadeRespostas", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   //const response3 = await api.get("dispersao")
-  const arrayTransformado = data1.map((objeto:any) => {
+  const arrayTransformado = data1.map((objeto: any) => {
     // Dividindo a string 'campo_questoes' em um array de números
-    const pontuacoes = objeto.campo_questoes.split(',').map(Number);
+    const pontuacoes = objeto.campo_questoes.split(",").map(Number);
     // Calculando a pontuação total
-    const pontuacaoTotal = pontuacoes.reduce((total:any, pontuacao:any) => total + pontuacao, 0);
+    const pontuacaoTotal = pontuacoes.reduce(
+      (total: any, pontuacao: any) => total + pontuacao,
+      0
+    );
     // Retornando um novo objeto com as chaves 'idade' e 'pontuacao'
     return { idade: objeto.idade, pontuacao: pontuacaoTotal };
   });
-  
-  const dataDispersal = arrayTransformado
+
+  const dataDispersal = arrayTransformado;
   const dataPie = response.data;
   const dataBar = response1.data;
   return {

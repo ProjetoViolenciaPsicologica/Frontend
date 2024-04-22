@@ -75,7 +75,7 @@ export default function Sidebar() {
         }`}
       >
         <div
-          className="flex flex-col space-y-6 h-screen"
+          className="flex flex-col space-y-6 h-screen bg-gray"
           data-dev-hint="optional div for having an extra footer navigation"
         >
           <Link
@@ -100,12 +100,15 @@ export default function Sidebar() {
             </Link>
             <Link
               href="/arquivo"
-              className="flex items-center pl-8 mt-4 md:mt-0 gap-x-2"
+              className="flex items-center pl-8 mt-4 md:mt-0 gap-x-1"
             >
               <Image src="/arquivo.svg" width={29} height={29} alt={"icon"} />
               <span className="">ARQUIVOS</span>
             </Link>
-            <Link href="/usuarios" className="flex items-center pl-7  gap-x-2">
+            <Link
+              href="/usuarios"
+              className="flex items-center pl-7 pt-4 md:pt-0  gap-x-2"
+            >
               <Image src="/user.svg" width={29} height={29} alt={"user"} />
               <span>USUÁRIOS</span>
             </Link>
@@ -123,7 +126,7 @@ export default function Sidebar() {
             </Link>
             <Link
               href="/formulario"
-              className="flex items-center pl-7 py-4 md:py-0 gap-x-2"
+              className="flex items-center pl-7 pt-4 md:pt-0 gap-x-2"
             >
               <Image src="/form.svg" width={29} height={29} alt={"form"} />
               <span>FORMULÁRIO</span>
@@ -131,7 +134,7 @@ export default function Sidebar() {
 
             <Link
               href="/editar_formulario"
-              className="flex items-center pl-7 py-4 md:py-0 gap-x-2"
+              className="flex items-center pl-7 pt-4 md:pt-0 gap-x-2"
             >
               <Image src="/edit_form.svg" width={29} height={29} alt={"form"} />
               <span>EDIT FORM</span>
@@ -148,7 +151,7 @@ export default function Sidebar() {
                   handleLogout();
                 }
               }}
-              className={`group flex w-full items-center space-x-2 px-3 py-2 ${raleway.className} transition duration-200 ml-4 text-bgGray  font-normal`}
+              className={`group flex w-full items-center space-x-2 px-3 pt-4 md:pt-0 ${raleway.className} transition duration-200 ml-4 text-bgGray  font-normal`}
             >
               <svg
                 fill="black"

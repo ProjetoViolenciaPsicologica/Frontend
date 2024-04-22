@@ -92,7 +92,7 @@ const Index = () => {
   const { data: locais, isLoading: loadingLocal } = locaisQuery;
   const { data: areas, isLoading: loadingArea } = areasQuery;
   const { data: tipos, isLoading: loadingTipo } = tiposQuery;
-  const theadClass:any = "bg-gray-800 text-white font-bold";
+  const theadClass: any = "bg-gray-800 text-white font-bold";
   const [tableData, setTableData] = useState<any>([
     {
       key: "0",
@@ -389,7 +389,7 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="flex w-full flex-col items-center pl-8 lg:items-start">
+      <div className="flex h-full w-full flex-col items-center pl-8 lg:items-start">
         <div className="mt-4 flex flex-col w-full md:mt-4">
           <h1 className={`${raleway.className} text-3xl font-normal `}>
             FORMULÁRIO
@@ -400,24 +400,24 @@ const Index = () => {
             Gerenciamento de informações de um formulário e aplicador
           </span>
         </div>
-        <div className="w-full md:w-[90%] flex justify-end mt-8 pr-4">
+        <div className="w-full flex justify-end mt-8 pr-4">
           <button
+            className={`w-[197px] h-10 bg-emerald-950 shadow text-white text-base font-normal ${dm.className}`}
             onClick={() => setModalCreateVisible(true)}
-            className={`w-[197px] h-10 bg-emerald-950 shadow text-white text-base font-normal ${dm.className} rounded-md`}
-            >
-            Criar Informações
+          >
+            ADICIONAR USUÁRIO
           </button>
         </div>
-        <div className="w-full mt-8 flex justify-center lg:justify-start">
-          <Table
-            columns={columns}
-            dataSource={tableData}
-            pagination={false}
-            className="table-auto divide-y divide-gray-200 even:bg-d9d9d9 odd:bg-aeaeae mt-2 w-full"
-            scroll={{ x: true }}
-            loading={loadingGrau || loadingLocal || loadingArea || loadingTipo}
-          />
-        </div>
+
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          pagination={false}
+          rowKey="id"
+          className="table-auto h-full z-0 mt-2 w-full"
+          scroll={{ x: true }}
+          loading={loadingGrau || loadingLocal || loadingArea || loadingTipo}
+        />
       </div>
       <Modal
         title="Criar Informações"

@@ -74,7 +74,7 @@ export default function Sidebar() {
         }`}
       >
         <div
-          className="flex flex-col space-y-6"
+          className="flex flex-col space-y-6 h-screen bg-gray"
           data-dev-hint="optional div for having an extra footer navigation"
         >
           <Link
