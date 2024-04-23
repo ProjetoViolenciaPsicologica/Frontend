@@ -308,7 +308,7 @@ export default function Index() {
                   type="submit"
                   className={`w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
                 >
-                  Avançar
+                  AVANÇAR
                 </button>
               </div>
             </Form>
