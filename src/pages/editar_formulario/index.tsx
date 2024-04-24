@@ -400,9 +400,9 @@ const Index = () => {
             Gerenciamento de informações de um formulário e aplicador
           </span>
         </div>
-        <div className="w-full flex justify-end mt-8 pr-4">
+        <div className="w-full flex md:justify-end mt-8 pr-4 ">
           <button
-            className={`w-[197px] h-10 bg-emerald-950 shadow text-white text-base font-normal ${dm.className}`}
+            className={`w-[197px] h-10 bg-emerald-950 rounded-md shadow text-white text-base font-normal ${dm.className}`}
             onClick={() => setModalCreateVisible(true)}
           >
             ADICIONAR USUÁRIO
@@ -438,7 +438,7 @@ const Index = () => {
           <Form.Item label="Tipo de Aplicador" name="tipo">
             <Input placeholder="Digite o Tipo de Aplicador" />
           </Form.Item>
-          <div className="flex w-full justify-end">
+          <div className="flex w-full md:justify-end">
             <Button
               onClick={() => setModalCreateVisible(false)}
               className="bg-red-500 shadow text-white"

@@ -229,11 +229,12 @@ export default function Index() {
                     Idade
                   </label>
                 </div>
-                <Form.Item name="idade">
+                <Form.Item name="idade" rules={[{ required: true, message: "Campo é Obrigatório" }]}>
                   <InputNumber
                     type="number"
                     min={2}
                     placeholder="Digite sua idade"
+                    
                     className="flex w-72 md:w-[381px] items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   />
                 </Form.Item>
@@ -308,7 +309,7 @@ export default function Index() {
                   type="submit"
                   className={`w-[182px] h-[49px] bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
                 >
-                  Avançar
+                  AVANÇAR
                 </button>
               </div>
             </Form>

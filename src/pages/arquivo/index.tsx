@@ -127,29 +127,52 @@ function Index({ users }: { users: Users[] }) {
     }
   }
 
+  const mapQuestaoCodigoParaTexto = (codigo: number) => {
+    switch (codigo) {
+      case 1:
+        return "Nunca";
+      case 2:
+        return "Às vezes";
+      case 3:
+        return "Frequentemente";
+      case 4:
+        return "Sempre";
+      default:
+        return "";
+    }
+  };
+  
   const handleExportExcel = (filteredData: any) => {
     // Converte os dados para o formato apropriado para o Excel
     const dataFilter = filteredData.map(
       (data: {
+        grauInstrucao: any;
         campo_questoes: any;
         idade: any;
         escolha_sexo: any;
         localAplicacao: { definicaoLocalForm: any };
       }) => {
+        // Mapeia os códigos numéricos para os textos correspondentes
+        const campoQuestoesTexto = data.campo_questoes
+          .split(",")
+          .map((codigo: string) => mapQuestaoCodigoParaTexto(parseInt(codigo)))
+          .join(", ");
+  
         return {
-          questões: data?.campo_questoes,
-          idade: data?.idade,
-          sexo: data?.escolha_sexo,
-          "local da aplicação": data?.localAplicacao?.definicaoLocalForm,
+          questões: campoQuestoesTexto,
+          idade: data.idade,
+          sexo: data.escolha_sexo,
+          "local da aplicação": data.localAplicacao?.definicaoLocalForm,
+          "Grau de instrução": data.grauInstrucao?.definicaoGrau,
         };
       }
     );
     const excelData = convertToExcelData(dataFilter);
-
+    console.log(filteredData);
     // Cria uma nova pasta de trabalho do Excel
     const worksheet = XLSX.utils.aoa_to_sheet(excelData);
 
-    // Cria um livro de trabalho e adiciona a planilha a ele
+    
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Dados Filtrados");
 
@@ -531,3 +554,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 };
+
+
+
+
+
+

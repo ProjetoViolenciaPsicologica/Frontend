@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Raleway, Karla, Inter } from "next/font/google";
@@ -229,7 +230,7 @@ export default function Index() {
                     Idade
                   </label>
                 </div>
-                <Form.Item name="idade">
+                <Form.Item name="idade" rules={[{ required: true, message: "Campo é Obrigatório" }]}>
                   <InputNumber
                     type="number"
                     min={2}
