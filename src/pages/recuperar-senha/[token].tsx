@@ -25,7 +25,6 @@ const roboto = Roboto({
 });
 
 const karla = Karla({
-  weight: "700",
   style: "normal",
   subsets: ["latin"],
 });
