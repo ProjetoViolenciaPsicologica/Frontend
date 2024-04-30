@@ -4,6 +4,8 @@ import { FaSearch } from "react-icons/fa";
 import { TbPencil } from "react-icons/tb";
 import { SlTrash } from "react-icons/sl";
 import api from "@/pages/api";
+import { api as ApiService } from "@/services";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { schema } from "@/utils/users";
@@ -22,9 +24,21 @@ import {
   Table,
   Spin,
   Pagination,
+  Switch,
+  Space,
 } from "antd";
 import ModalUserDelete from "@/components/ModalUserDelete";
 import router from "next/router";
+
+interface IArea {
+  id: number;
+  definicaoArea: string;
+}
+
+interface ITipo {
+  id: number;
+  definicaoTipo: string;
+}
 
 const raleway = Raleway({
   weight: "400",
@@ -48,7 +62,7 @@ export interface EditType {
 
 export interface Tipo {
   id: number;
-  definicaoTipo: string;
+  definicaoLocalForm: string;
 }
 
 export interface Area {
@@ -56,7 +70,13 @@ export interface Area {
   definicaoArea: string;
 }
 
-export default function Index() {
+export default function Index({
+  areas,
+  tipos,
+}: {
+  areas: IArea[];
+  tipos: ITipo[];
+}) {
   const {
     data: users,
     isLoading,
@@ -75,6 +95,7 @@ export default function Index() {
   const [form] = Form.useForm(); // Extrai a referência do form
 
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [admin, setAdmin] = useState(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -101,6 +122,9 @@ export default function Index() {
     setIsModalOpen(false);
   };
 
+  function handleAdmin(admin: boolean) {
+    setAdmin(admin);
+  }
   const toggleUserSelection = (userId: number) => {
     const isSelected = selectedUsers.includes(userId);
     if (isSelected) {
@@ -176,13 +200,30 @@ export default function Index() {
         }
       } else {
         try {
-          await api.createUser(dataUser);
-          toast.success("Usuário criado com sucesso!");
-        } catch (error) {
-          toast.error("Tempo expirado");
-          destroyCookie(null, "psi-token");
-          destroyCookie(null, "psi-refreshToken");
-          router.push("/login");
+          if (admin) {
+            const dataAdmin: any = {
+              ...dataUser,
+              parametro: admin ? "on" : "off",
+            };
+            delete dataAdmin.area;
+            delete dataAdmin.tipo;
+            await api.createUserAdmin(dataAdmin);
+            console.log(dataAdmin);
+            toast.success("Usuário criado com sucesso!");
+          } else {
+            const dataCopy = { ...dataUser, parametro: admin ? "on" : "off" };
+            await api.createUser(dataCopy);
+            toast.success("Usuário criado com sucesso!");
+          }
+        } catch (error: any) {
+          if (error?.response?.status === 401) {
+            toast.error("Tempo expirado");
+            destroyCookie(null, "psi-token");
+            destroyCookie(null, "psi-refreshToken");
+            router.push("/login");
+          } else {
+            toast.error("Erro ao criar o usuário");
+          }
         }
       }
       setIsModalOpen(false);
@@ -308,7 +349,6 @@ export default function Index() {
       setSearchTerm("");
     }
   };
-
   return (
     <Layout>
       <div className="flex bg-[#F6FBF9] h-screen w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
@@ -432,30 +472,57 @@ export default function Index() {
           >
             <Input.Password placeholder="Digite sua senha novamente" />
           </Form.Item>
-          <Form.Item
-            label="Tipo"
-            name="tipo"
-            rules={[{ required: true, message: "Por favor, selecione o tipo" }]}
-          >
-            <Select>
-              <Select.Option value="Agente de Saude">
-                Agente de Saúde
-              </Select.Option>
-              <Select.Option value="Policia">Policia</Select.Option>
-              <Select.Option value="professor">Professor</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="Área"
-            name="area"
-            rules={[{ required: true, message: "Por favor, selecione a área" }]}
-          >
-            <Select>
-              <Select.Option value="Saúde">Saúde</Select.Option>
-              <Select.Option value="Educação">Educação</Select.Option>
-              <Select.Option value="Segurança">Segurança</Select.Option>
-            </Select>
-          </Form.Item>
+          {!admin && (
+            <>
+              <Form.Item
+                label="Tipo"
+                name="tipo"
+                rules={[
+                  { required: true, message: "Por favor, selecione o tipo" },
+                ]}
+              >
+                <Select>
+                  {tipos.map((tipo) => {
+                    return (
+                      <Select.Option key={tipo.id} value={tipo.definicaoTipo}>
+                        {tipo.definicaoTipo}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Área"
+                name="area"
+                rules={[
+                  { required: true, message: "Por favor, selecione a área" },
+                ]}
+              >
+                <Select>
+                  {areas.map((area) => {
+                    return (
+                      <Select.Option key={area.id} value={area.definicaoArea}>
+                        {area.definicaoArea}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </>
+          )}
+
+          <Space direction="horizontal" className="mb-4 flex">
+            <Switch
+              checkedChildren={<CheckOutlined />}
+              unCheckedChildren={<CloseOutlined />}
+              className="bg-[#9EACAE] hover:bg-blue-600 "
+              checked={admin} // Definindo o estado atual do Switch
+              onChange={handleAdmin}
+            />
+            <span className={` text-black text-base font-normal`}>
+              Usuário Administrador
+            </span>
+          </Space>
           <Form.Item>
             <Button
               className="bg-emerald-950 shadow text-white"
@@ -506,15 +573,14 @@ export default function Index() {
             name="tipo"
             rules={[{ required: true, message: "Por favor, selecione o tipo" }]}
           >
-            <Select
-              placeholder="---------"
-              className="text-black font-bold text-lg"
-            >
-              <Select.Option value="Agente de Saude">
-                Agente de Saúde
-              </Select.Option>
-              <Select.Option value="Policia">Policia</Select.Option>
-              <Select.Option value="professor">Professor</Select.Option>
+            <Select>
+              {tipos.map((tipo) => {
+                return (
+                  <Select.Option key={tipo.id} value={tipo.definicaoTipo}>
+                    {tipo.definicaoTipo}
+                  </Select.Option>
+                );
+              })}
             </Select>
           </Form.Item>
           <Form.Item
@@ -522,13 +588,14 @@ export default function Index() {
             name="area"
             rules={[{ required: true, message: "Por favor, selecione a área" }]}
           >
-            <Select
-              placeholder="---------"
-              className="text-black font-bold text-lg"
-            >
-              <Select.Option value="Saúde">Saúde</Select.Option>
-              <Select.Option value="Educação">Educação</Select.Option>
-              <Select.Option value="Segurança">Segurança</Select.Option>
+            <Select>
+              {areas.map((area) => {
+                return (
+                  <Select.Option key={area.id} value={area.definicaoArea}>
+                    {area.definicaoArea}
+                  </Select.Option>
+                );
+              })}
             </Select>
           </Form.Item>
           <Form.Item>
@@ -555,9 +622,9 @@ export default function Index() {
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const cookies = parseCookies({ req });
-
+  const token = cookies["psi-token"];
   // Acesse o cookie ou qualquer outra informação de autenticação
-  const isAuthenticated = !!cookies["psi-token"];
+  const isAuthenticated = !!token;
 
   // Faça qualquer lógica adicional necessária
 
@@ -570,9 +637,22 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
+  const response = await ApiService.get("tipo", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const response1 = await ApiService.get("area", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const tipos = response.data;
+  const areas = response1.data;
   return {
     props: {
-      users: "users",
+      tipos,
+      areas,
     },
   };
 };

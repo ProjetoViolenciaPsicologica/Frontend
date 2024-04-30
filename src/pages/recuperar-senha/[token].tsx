@@ -4,6 +4,7 @@ import { Karla, Quicksand, Montserrat, Roboto, Inter } from "next/font/google";
 import { Form, Input, Button } from "antd";
 import { useRouter } from "next/router";
 import api from "@/pages/api";
+import Link from "next/link";
 import { toast } from "react-toastify";
 import { destroyCookie } from "nookies";
 
@@ -91,16 +92,10 @@ export default function Index() {
 
   return (
     <div className="h-screen w-full bg-[#F6FBF9] flex flex-col items-center">
-      <div
-        className={`${quicksand.className} flex flex-col items-center gap-x-2 text-white truncate whitespace-nowrap p-4 `}
-      >
-        <Image src="/icon.svg" width={100} height={100} alt={"icon"} />
-        <h1
-          className={`${montserrat.className} text-center text-neutral-700 text-4xl font-medium leading-[46.80px]`}
-        >
-          KM-QUEST
-        </h1>
-      </div>
+      <Link href="/login">
+        {" "}
+        <Image src="/icon.svg" width={150} height={150} alt={"icon"} />{" "}
+      </Link>
 
       <div className="mt-10 px-4 w-full flex  flex-col items-center">
         <h1 className={`${karla.className} text-black text-2xl font-bold`}>

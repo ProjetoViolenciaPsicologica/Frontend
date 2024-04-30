@@ -389,7 +389,7 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="flex h-full w-full flex-col items-center pl-8 lg:items-start">
+      <div className="flex h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
         <div className="mt-4 flex flex-col w-full md:mt-4">
           <h1 className={`${raleway.className} text-3xl font-normal `}>
             FORMULÁRIO
@@ -402,10 +402,10 @@ const Index = () => {
         </div>
         <div className="w-full flex md:justify-end mt-8 pr-4 ">
           <button
-            className={`w-[197px] h-10 bg-emerald-950 rounded-md shadow text-white text-base font-normal ${dm.className}`}
+            className={`w-[197px] h-14 bg-emerald-950 rounded-md shadow text-white text-base font-normal ${dm.className}`}
             onClick={() => setModalCreateVisible(true)}
           >
-            ADICIONAR USUÁRIO
+            ADICIONAR INFORMAÇÕES
           </button>
         </div>
 

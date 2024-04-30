@@ -395,6 +395,15 @@ api_form.createUser = async (dataUser: any) => {
   }
 };
 
+api_form.createUserAdmin = async (dataUser: any) => {
+  console.log(dataUser);
+  try {
+    const response = await api_form.post("user/admin/register", dataUser);
+    return response;
+  } catch (error: any) {
+    throw error;
+  }
+};
 api_form.deleteUser = async (userId: number) => {
   try {
     const response = await api_form.delete(`user/${userId}`);

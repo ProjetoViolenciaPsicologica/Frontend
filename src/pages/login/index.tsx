@@ -77,7 +77,7 @@ export default function Login() {
         <h1
           className={`text-4xl font-medium ${montserrat.className} text-[#2D3A3A]`}
         >
-          KM-QUEST
+          Questionário Kurt Mendonça
         </h1>
 
         <div className="flex items-center h-full justify-center flex-col w-full">

@@ -30,13 +30,13 @@ export default function Home() {
         <h1
           className={`text-4xl font-medium ${montserrat.className} text-[#2D3A3A]`}
         >
-          KM-QUEST
+          Questionário Kurt Mendonça
         </h1>
         <div className="flex items-center h-full justify-center flex-col w-full">
           <p
-            className={`text-4xl text-justify px-12 mb-8  text-[#2D3A3A] ${aclonica.className}`}
+            className={`text-4xl text-center px-12 mb-8  text-[#2D3A3A] ${aclonica.className}`}
           >
-            O formulário de rastreamento de violência psicológica (KM-QUEST)
+            Questionário de rastreamento de violência psicológica
           </p>
 
           <Link href="/login">

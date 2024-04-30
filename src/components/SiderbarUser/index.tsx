@@ -52,9 +52,9 @@ export default function Sidebar() {
           >
             <Image src="/icon.svg" width={44} height={44} alt={"icon"} />
             <h1
-              className={`text-neutral-700 text-2xl font-medium ${montserrat.className} leading-[46.80px]`}
+              className={`text-neutral-700 text-xl font-medium ${montserrat.className} leading-[46.80px]`}
             >
-              KM-QUEST
+              Quest. Kurt Mendonça
             </h1>
           </Link>
         </div>
@@ -79,13 +79,13 @@ export default function Sidebar() {
         >
           <Link
             href="/dashboard"
-            className="text-white flex flex-col items-center justify-center mb-24"
+            className="text-white flex flex-col items-center justify-center mb-6"
           >
             <Image src="/icon.svg" width={144} height={144} alt={"icon"} />
             <h1
-              className={`text-neutral-700 text-3xl font-medium ${montserrat.className} leading-[46.80px]`}
+              className={`text-neutral-700 text-3xl text-center font-medium ${montserrat.className} leading-[46.80px]`}
             >
-              KM-QUEST
+              Quest. Kurt Mendonça
             </h1>
           </Link>
 
@@ -163,6 +163,7 @@ export default function Sidebar() {
           </nav>
         </div>
       </aside>
+
       <Modal
         title="TEM CERTEZA QUE DESEJA SAIR?"
         open={isModalOpen}
