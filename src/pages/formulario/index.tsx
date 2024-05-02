@@ -10,7 +10,7 @@ import Modal from "@/components/ModalForm";
 import { useRouter } from "next/router";
 import { Steps, Form, InputNumber, Select } from "antd";
 import { jwtDecode } from "jwt-decode";
-
+import {api} from "@/services"
 const raleway = Raleway({
   weight: "700",
   style: "normal",
@@ -33,11 +33,20 @@ const karla = Karla({
   subsets: ["latin"],
 });
 
-export default function Index() {
+interface ILocal {
+  id: number;
+  definicaoLocalForm: string;
+}
+interface IGrau {
+  id: number;
+  definicaoGrau: string;
+}
+
+export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
   const [form] = Form.useForm(); // Extrai a referência do form
   const router = useRouter();
   const [okQuestion, setOkQuestion] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(3);
   const [allOptions, setAllOptions] = useState("");
   const [formData, setFormData] = useState<dataForm>();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -92,7 +101,6 @@ export default function Index() {
     formData?.idade,
     okQuestion,
   ]);
-
   return (
     <Layout>
       <div className="flex flex-col h-full w-full  items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
@@ -264,15 +272,14 @@ export default function Index() {
                   placeholder="---------"
                   className="text-black font-bold text-lg h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
-                  <Select.Option value="fundamental">
-                    Ensino fundamental completo
-                  </Select.Option>
-                  <Select.Option value="medio">
-                    Ensino médio completo
-                  </Select.Option>
-                  <Select.Option value="superior">
-                    Ensino superior completo
-                  </Select.Option>
+                 
+                  {graus.map((grau)=> {
+                    return (
+                      <Select.Option key={grau.id} value={grau.definicaoGrau}>
+                      {grau.definicaoGrau}
+                    </Select.Option>
+                    )
+                  })}
                 </Select>
               </Form.Item>
               <Form.Item
@@ -285,9 +292,13 @@ export default function Index() {
                   placeholder="---------"
                   className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                 >
-                  <Select.Option value="hospital">Hospital</Select.Option>
-                  <Select.Option value="escola">Escola</Select.Option>
-                  <Select.Option value="delegacia">Delegacia</Select.Option>
+                  {locais.map((local)=> {
+                    return (
+                      <Select.Option key={local.id} value={local.definicaoLocalForm}>
+                      {local.definicaoLocalForm}
+                    </Select.Option>
+                    )
+                  })}
                 </Select>
               </Form.Item>
               <div
@@ -373,10 +384,24 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
+  const response = await api.get("local", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  const response1 = await api.get("grau", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  const locais = response.data
+  const graus = response1.data
+  
   // Authentication successful, proceed with rendering the page
   return {
     props: {
-      title: "ok",
+      graus,
+      locais,
     },
   };
 };

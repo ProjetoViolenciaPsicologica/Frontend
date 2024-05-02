@@ -118,10 +118,11 @@ function Index({ users }: { users: Users[] }) {
 
       handleExportExcel(response.data);
     } catch (error) {
-      toast.error("Tempo expirado");
-      destroyCookie(null, "psi-token");
-      destroyCookie(null, "psi-refreshToken");
-      router.push("/login");
+      console.log
+      // toast.error("Tempo expirado");
+      // destroyCookie(null, "psi-token");
+      // destroyCookie(null, "psi-refreshToken");
+      // router.push("/login");
     } finally {
       setLoading1(false);
     }
@@ -143,16 +144,19 @@ function Index({ users }: { users: Users[] }) {
   };
   
   const handleExportExcel = (filteredData: any) => {
-    // Converte os dados para o formato apropriado para o Excel
     const dataFilter = filteredData.map(
       (data: {
         grauInstrucao: any;
         campo_questoes: any;
         idade: any;
         escolha_sexo: any;
-        localAplicacao: { definicaoLocalForm: any };
+        localAplicacao: { definicaoLocalForm: any } | undefined; // Adicionando | undefined
       }) => {
-        // Mapeia os códigos numéricos para os textos correspondentes
+        // Corrigindo o cálculo do somatório das questões
+        const sum = data.campo_questoes.split(",").reduce((acc: number, curr: string) => acc + parseInt(curr), 0);
+        const message = sum >= 15 && sum <= 30 ? "Sinal verde" : 
+                sum >= 31 && sum <= 38 ? "Sinal amarelo" :
+                sum >= 39 && sum <= 60 ? "Sinal vermelho" : null
         const campoQuestoesTexto = data.campo_questoes
           .split(",")
           .map((codigo: string) => mapQuestaoCodigoParaTexto(parseInt(codigo)))
@@ -162,8 +166,10 @@ function Index({ users }: { users: Users[] }) {
           questões: campoQuestoesTexto,
           idade: data.idade,
           sexo: data.escolha_sexo,
-          "local da aplicação": data.localAplicacao?.definicaoLocalForm,
-          "Grau de instrução": data.grauInstrucao?.definicaoGrau,
+          "local da aplicação": data.localAplicacao?.definicaoLocalForm || "N/A", // Adicionando verificação e valor padrão
+          "Grau de instrução": data.grauInstrucao?.definicaoGrau || "N/A", // Adicionando valor padrão
+          "Somatório questões": sum,
+          "Sinal": message
         };
       }
     );

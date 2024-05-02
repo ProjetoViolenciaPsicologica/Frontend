@@ -28,7 +28,7 @@ export default function Home() {
       <div className="h-full w-full lg:w-[50vw] flex flex-col items-center justify-between">
         <Image src="/icon.svg" alt="logo" width={150} height={150} />
         <h1
-          className={`text-4xl font-medium ${montserrat.className} text-[#2D3A3A]`}
+          className={`text-4xl text-center font-medium ${montserrat.className} text-[#2D3A3A]`}
         >
           Questionário Kurt Mendonça
         </h1>

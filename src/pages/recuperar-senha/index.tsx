@@ -88,7 +88,7 @@ export default function Index() {
               <Input
                 placeholder="Digite seu E-mail aqui"
                 name={"email"}
-                className={`text-neutral-400 text-lg font-normal  md:w-[926px] h-[60px] bg-white rounded-[10px] shadow border border-black border-opacity-10  ${roboto.className}`}
+                className={`text-neutral-400  text-lg font-normal w-96  md:w-[926px] h-[60px] bg-white rounded-[10px] shadow border border-black border-opacity-10  ${roboto.className}`}
               />
             </Form.Item>
           </div>
