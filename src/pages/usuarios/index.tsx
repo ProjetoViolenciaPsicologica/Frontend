@@ -349,6 +349,15 @@ export default function Index({
       setSearchTerm("");
     }
   };
+
+  const validateConfirmPassword = (_:any, value:any) => {
+    const { getFieldValue } = form;
+    if (value && value !== getFieldValue("senha")) {
+      return Promise.reject(new Error("As senhas não coincidem"));
+    }
+    return Promise.resolve();
+  };
+
   return (
     <Layout>
       <div className="flex bg-[#F6FBF9] h-screen w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
@@ -445,33 +454,28 @@ export default function Index({
             <Input placeholder="Digite seu email" />
           </Form.Item>
           <Form.Item
-            label="Senha"
-            name="senha"
-            rules={[
-              { required: true, message: "Por favor, insira a senha" },
-              {
-                type: "string",
-                min: 6,
-                message: "Senha deve ter no mínimo 6 caracteres",
-              },
-            ]}
-          >
-            <Input.Password placeholder="Digite sua senha" />
-          </Form.Item>
-          <Form.Item
-            label="Confirmação de Senha"
-            name="senha_confirm"
-            rules={[
-              { required: true, message: "Por favor, confirme a senha" },
-              {
-                type: "string",
-                min: 6,
-                message: "Senha deve ter no mínimo 6 caracteres",
-              },
-            ]}
-          >
-            <Input.Password placeholder="Digite sua senha novamente" />
-          </Form.Item>
+          label="Senha"
+          name="senha"
+          rules={[
+            { required: true, message: "Por favor, insira a senha" },
+            { min: 6, message: "Senha deve ter no mínimo 6 caracteres" },
+          ]}
+        >
+          <Input.Password placeholder="Digite sua senha" />
+        </Form.Item>
+        <Form.Item
+          label="Confirmação de Senha"
+          name="senha_confirm"
+          dependencies={["senha"]}
+          rules={[
+            { required: true, message: "Por favor, confirme a senha" },
+            { min: 6, message: "Senha deve ter no mínimo 6 caracteres" },
+            { validator: validateConfirmPassword }, // Adicionando validação personalizada
+          ]}
+        >
+          <Input.Password placeholder="Digite sua senha novamente" />
+        </Form.Item>
+
           {!admin && (
             <>
               <Form.Item
