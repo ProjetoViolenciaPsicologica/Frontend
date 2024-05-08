@@ -46,7 +46,7 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
   const [form] = Form.useForm(); // Extrai a referência do form
   const router = useRouter();
   const [okQuestion, setOkQuestion] = useState(false);
-  const [page, setPage] = useState(3);
+  const [page, setPage] = useState(0);
   const [allOptions, setAllOptions] = useState("");
   const [formData, setFormData] = useState<dataForm>();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
