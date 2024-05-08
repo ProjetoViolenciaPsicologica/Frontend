@@ -392,7 +392,7 @@ const Index = () => {
       <div className="flex h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
         <div className="mt-4 flex flex-col w-full md:mt-4">
           <h1 className={`${raleway.className} text-3xl font-normal `}>
-            FORMULÁRIO
+            QUESTIONÁRIO
           </h1>
           <span
             className={`${raleway.className} w-[256px] mt-4 text-black text-sm font-normal leading-tight`}

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import Layout from "@/components/Layout";
@@ -40,24 +40,40 @@ const IndexPage: React.FC<any> = ({
   dataDispersal,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(false); // Estado para controlar o carregamento
+  const cookies = parseCookies();
+  const token = cookies["psi-token"];
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
 
-    // Oculta o botão de download antes de capturar a tela
-    const downloadButton = document.getElementById("download-button");
-    if (downloadButton) downloadButton.style.display = "none";
+    setLoading(true); // Define o estado de carregamento como verdadeiro
 
-    const canvas = await html2canvas(contentRef.current);
-    const imgData = canvas.toDataURL("image/png");
+    try {
+      // Faça a solicitação para o endpoint
+      const response = await api.get("graficosPDF", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
 
-    const pdf = new jsPDF();
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-    pdf.save("download.pdf");
+      // Obtenha os dados da resposta
+      const {  Desvio, Dispersao } = response.data;
 
-    // Restaura a visibilidade do botão de download após capturar a tela
-    if (downloadButton) downloadButton.style.display = "block";
+      // Crie um novo objeto jsPDF
+      const pdf = new jsPDF();
+
+      // Adicione as imagens ao PDF
+      pdf.addImage(Desvio, "JPEG", 10, 120, 100, 100);
+      setTimeout(() => {}, 1000);
+      pdf.addImage(Dispersao, "JPEG", 10, 10, 100, 100);
+      
+      // Salve o PDF
+      pdf.save("download.pdf");
+    } catch (error) {
+      console.error("Erro ao fazer download do PDF:", error);
+    }
+
+    setLoading(false); // Define o estado de carregamento como falso após a conclusão
   };
 
   return (
@@ -79,14 +95,15 @@ const IndexPage: React.FC<any> = ({
             </span>
           </div>
           <Button
-            id="download-button"
-            type="default"
-            icon={<FaDownload />}
-            onClick={handleDownloadPDF}
-            className={`mt-4 w-[200px] flex items-center justify-center`}
-          >
-            Baixar PDF
-          </Button>
+          id="download-button"
+          type="default"
+          icon={<FaDownload />}
+          onClick={handleDownloadPDF}
+          className={`mt-4 w-[200px] flex items-center justify-center`}
+          disabled={loading} // Desabilita o botão enquanto o PDF está sendo gerado
+        >
+          {loading ? <Spin /> : "Baixar PDF"}
+        </Button>
         </div>
 
         <div className="mt-10 gap-y-5 lg:gap-x-3 w-full flex flex-col flex-wrap md:flex-row items-center">
