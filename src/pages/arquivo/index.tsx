@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import Layout from "@/components/Layout";
 import { Raleway, Karla, Inter } from "next/font/google";
-import { DatePicker } from "antd";
-import { Form, Button, Space, Switch, Select, InputNumber } from "antd";
+import { Form, Button, Space, Switch, Select, InputNumber, DatePicker, Slider } from "antd";
 import ptBR from "antd/lib/date-picker/locale/pt_BR";
 import * as XLSX from "xlsx";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
@@ -35,7 +34,8 @@ const karla = Karla({
 function Index({ users }: { users: Users[] }) {
   const [form] = Form.useForm(); // Use a instância do Form
   const router = useRouter();
-  const cookies = parseCookies();
+  const [disabledAge, setDisabledAge] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [loading1, setLoading1] = useState(false);
   const [startDate, setStartDate] = useState<any>(null);
@@ -67,15 +67,22 @@ function Index({ users }: { users: Users[] }) {
     }
     setLoading(true);
     try {
+      if(disabledAge && params.idade){
+        params.idade_min = params?.idade[0]
+        params.idade_max = params?.idade[1]
+        delete params?.idade
+      }
       const response = await api.filtro(params);
-      setCookie(undefined, "dataSearch", response.data.length);
-      setCookie(undefined, "dataFilter", JSON.stringify(params));
-      router.push("/filtro");
+      // setCookie(undefined, "dataSearch", response.data.length);
+      // setCookie(undefined, "dataFilter", JSON.stringify(params));
+      // router.push("/filtro");
+      console.log(params)
     } catch (error) {
-      toast.error("Tempo expirado");
-      destroyCookie(null, "psi-token");
-      destroyCookie(null, "psi-refreshToken");
-      router.push("/login");
+      console.log(error)
+      // toast.error("Tempo expirado");
+      // destroyCookie(null, "psi-token");
+      // destroyCookie(null, "psi-refreshToken");
+      // router.push("/login");
     } finally {
       setLoading(false);
     }
@@ -96,6 +103,10 @@ function Index({ users }: { users: Users[] }) {
     setDisabledDate(checked);
     setStartDate(null);
     setEndDate(null);
+  };
+
+  const handleChangeAge = (checked: boolean) => {
+    setDisabledAge(checked);
   };
 
   async function onSubmit(data: any) {
@@ -331,12 +342,13 @@ function Index({ users }: { users: Users[] }) {
                   </label>
                 </div>
                 <Form.Item name="idade" className="block">
-                  <InputNumber
+                  {disabledAge ? (<Slider range defaultValue={[0, 50]} className="w-72 md:w-[411px]"/>
+   ) : (<InputNumber
                     type="number"
                     min={2}
                     placeholder="Digite sua idade"
                     className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
-                  />
+                  />)}
                 </Form.Item>
               </div>
               <div className="flex flex-col">
@@ -482,6 +494,20 @@ function Index({ users }: { users: Users[] }) {
                 className={`${karla.className} text-black text-xl font-bold`}
               >
                 Desabilitar datas
+              </span>
+            </Space>
+            <Space direction="horizontal">
+              <Switch
+                checkedChildren={<CheckOutlined />}
+                unCheckedChildren={<CloseOutlined />}
+                className="bg-[#9EACAE] hover:bg-blue-600 "
+                checked={disabledAge} // Definindo o estado atual do Switch
+                onChange={handleChangeAge}
+              />
+              <span
+                className={`${karla.className} text-black text-xl font-bold`}
+              >
+                Habilitar Idade Min. e Max.
               </span>
             </Space>
             <Space direction="horizontal">

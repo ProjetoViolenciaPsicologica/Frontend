@@ -26,6 +26,7 @@ import {
   Pagination,
   Switch,
   Space,
+  Drawer,
 } from "antd";
 import ModalUserDelete from "@/components/ModalUserDelete";
 import router from "next/router";
@@ -98,29 +99,23 @@ export default function Index({
   const [admin, setAdmin] = useState(false);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<number>();
   const [currentPage, setCurrentPage] = useState(1);
+  const [open, setOpen] = useState(false);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
   const usersPerPage = 6;
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+ 
 
   function handleAdmin(admin: boolean) {
     setAdmin(admin);
@@ -226,7 +221,7 @@ export default function Index({
           }
         }
       }
-      setIsModalOpen(false);
+      setOpen(false);
       setIsModalEditOpen(false);
       setIsEditMode(false);
       setUserId(undefined);
@@ -390,8 +385,8 @@ export default function Index({
           </div>
           <button
             className={`w-[197px] h-10 bg-emerald-950 shadow text-white text-base font-normal ${dm.className}`}
-            onClick={() => showModal()}
-          >
+            onClick={showDrawer}>
+            
             ADICIONAR USUÁRIO
           </button>
         </div>
@@ -420,12 +415,8 @@ export default function Index({
           style={{ marginTop: "1rem", textAlign: "center" }}
         />
       </div>
-      <Modal
-        title="Adicionar Usuário"
-        visible={isModalOpen}
-        onCancel={handleCancel}
-        footer={null}
-      >
+      <Drawer title="Criar Usuário" onClose={onClose} open={open}>
+    
         <Form form={form} onFinish={onSubmit} layout="vertical">
           <Form.Item
             label="Nome"
@@ -537,7 +528,7 @@ export default function Index({
             </Button>
           </Form.Item>
         </Form>
-      </Modal>
+        </Drawer>
       {/* Modal de edição */}
       <Modal
         title="Editar Usuário"
