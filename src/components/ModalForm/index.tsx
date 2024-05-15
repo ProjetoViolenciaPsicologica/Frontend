@@ -125,7 +125,7 @@ export default function Index({
             <li
               className={`${montserrat.className}  text-black text-center text-2xl font-bold`}
             >
-              A pontuação do formulário foi {sum}. SINAL VERDE. Dispensando o
+              A pontuação do questionário foi {sum}. <span className="text-[#0FA44A]">SINAL VERDE.</span>  Dispensando o
               entrevistado de outros encaminhamentos
             </li>
           </ul>
@@ -134,7 +134,7 @@ export default function Index({
             <li
               className={`${montserrat.className} text-black text-center text-2xl font-bold`}
             >
-              Será registrado um formulário contendo este resultado e as
+              Será registrado um questionário contendo este resultado e as
               informações de um entrevistado.
             </li>
           </ul>
@@ -170,7 +170,7 @@ export default function Index({
             <li
               className={`${montserrat.className}  text-black text-center text-2xl font-bold`}
             >
-              A pontuação do formulário foi {sum}. SINAL AMARELO. Necessário
+              A pontuação do questionário foi {sum}. <span className="text-[#fcaf15]">SINAL AMARELO</span>. Necessário
               encaminhamento para atendimento multidisciplinar
               médico-psicológico-social.
             </li>
@@ -180,7 +180,7 @@ export default function Index({
             <li
               className={`${montserrat.className}  text-black text-center text-2xl font-bold`}
             >
-              Será registrado um formulário contendo este resultado e as
+              Será registrado um questionário contendo este resultado e as
               informações de um entrevistado.
             </li>
           </ul>
@@ -211,7 +211,7 @@ export default function Index({
             <li
               className={`${montserrat.className} text-black text-center text-2xl font-bold`}
             >
-              A pontuação do formulário foi {sum}. SINAL VERMELHO. Necessário
+              A pontuação do questionário foi {sum}. <span className="text-red-600">SINAL VERMELHO</span>. Necessário
               encaminhamento <span className="text-red-600">URGENTE</span> para
               atendimento multidisciplinar médico-psicológico-social.
             </li>
@@ -221,7 +221,7 @@ export default function Index({
             <li
               className={`${montserrat.className} text-black text-center text-2xl font-bold`}
             >
-              Será registrado um formulário contendo este resultado e as
+              Será registrado um questionário contendo este resultado e as
               informações de um entrevistado.
             </li>
           </ul>

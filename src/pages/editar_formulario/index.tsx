@@ -397,7 +397,7 @@ const Index = () => {
           <span
             className={`${raleway.className} w-[256px] mt-4 text-black text-sm font-normal leading-tight`}
           >
-            Gerenciamento de informações de um formulário e aplicador
+            Gerenciamento de informações de um questionário e aplicador
           </span>
         </div>
         <div className="w-full flex md:justify-end mt-8 pr-4 ">

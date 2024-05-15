@@ -34,7 +34,7 @@ export default function Index() {
           <span
             className={`${montserrat.className} text-black text-xl font-normal`}
           >
-            Esta é uma orientação para a aplicação do KM-Quest.{" "}
+            Esta é uma orientação para a aplicação do Questionário.{" "}
             <span className="font-bold">
               É importante enfatizar que as orientações aqui contidas não devem
               ser ditas ao respondente para não induzir as respostas.

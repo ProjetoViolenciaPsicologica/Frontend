@@ -73,10 +73,11 @@ function Index({ users }: { users: Users[] }) {
         delete params?.idade
       }
       const response = await api.filtro(params);
-      // setCookie(undefined, "dataSearch", response.data.length);
-      // setCookie(undefined, "dataFilter", JSON.stringify(params));
-      // router.push("/filtro");
-      console.log(params)
+      setCookie(undefined, "dataSearch", response.data.length);
+      setCookie(undefined, "dataFilter", JSON.stringify(params));
+      setCookie(undefined, "age", disabledAge.toString());
+      router.push("/filtro");
+      console.log(response.data)
     } catch (error) {
       console.log(error)
       // toast.error("Tempo expirado");

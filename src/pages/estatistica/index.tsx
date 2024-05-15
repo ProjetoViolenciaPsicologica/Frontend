@@ -91,7 +91,7 @@ const IndexPage: React.FC<any> = ({
               className={`${raleway.className} w-[309px] mt-4 text-black text-sm font-normal leading-tight`}
             >
               Disponibilização e visualização dos dados reunidos com base no
-              registro de formulários
+              registro de questionários
             </span>
           </div>
           <Button

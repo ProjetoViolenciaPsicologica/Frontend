@@ -129,7 +129,7 @@ export default function Sidebar() {
               className="flex items-center pl-7 pt-4 md:pt-0 gap-x-2"
             >
               <Image src="/form.svg" width={29} height={29} alt={"form"} />
-              <span>FORMULÁRIO</span>
+              <span>QUESTIONÁRIO</span>
             </Link>
 
             <Link
@@ -209,7 +209,7 @@ export default function Sidebar() {
           className={`mt-8 text-center text-black text-2xl font-semibold ${montserrat.className}`}
         >
           Ao deixar a página, todas as informações preenchidas e selecionadas
-          para formulário serão perdidas.{" "}
+          para questionário serão perdidas.{" "}
         </span>
         <Divider />
 

@@ -56,10 +56,9 @@ export default function Index({ cookies }: { cookies: any }) {
   const [dataPie, setDPie] = useState<any>();
   const [dataD, setDataD] = useState<any>();
   const [dataDispersao, setDataDispersao] = useState<any>();
-  const [hiddenButton, setHiddenButton] = useState<boolean>(false);
-
+  const [hiddenButton, setHiddenButton] = useState<boolean>(false); 
   const contentRef = useRef<HTMLDivElement>(null);
-
+  const [age, setAge] = useState()
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
 
@@ -85,7 +84,8 @@ export default function Index({ cookies }: { cookies: any }) {
     const cookies = parseCookies();
     const data1: any = JSON.parse(cookies.dataFilter);
     const data2: any = cookies.dataSearch;
-
+    const age1:any = cookies.age
+    setAge(age1)
     setData(data1);
 
     // Definindo params corretamente como um objeto
@@ -200,7 +200,7 @@ export default function Index({ cookies }: { cookies: any }) {
               className={`${raleway.className} w-[309px] mt-4 text-black text-sm font-normal leading-tight`}
             >
               Disponibilização e visualização via filtro dos dados reunidos com
-              base no registro de formulários
+              base no registro de questionários
             </span>
             <span
               className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
@@ -208,12 +208,14 @@ export default function Index({ cookies }: { cookies: any }) {
               <span className="font-bold">Local da Aplicação</span>:{" "}
               {data?.local_aplicacao ? data.local_aplicacao : "---------"}
             </span>
-            <span
-              className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
-            >
-              <span className="font-bold">Idade</span>:{" "}
-              {data?.idade ? data?.idade : "---------"}
-            </span>
+           {age === "False" && (
+             <span
+             className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
+           >
+             <span className="font-bold">Idade</span>:{" "}
+             {data?.idade ? data?.idade : "---------"}
+           </span>
+           )}
             <span
               className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
             >
@@ -260,7 +262,7 @@ export default function Index({ cookies }: { cookies: any }) {
                 <span
                   className={`${raleway.className} mt-5 text-lg font-normal text-white`}
                 >
-                  FORMULÁRIOS
+                  questionárioS
                 </span>
 
                 <span
