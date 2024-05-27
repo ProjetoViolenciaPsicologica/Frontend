@@ -137,7 +137,7 @@ export default function Sidebar() {
               className="flex items-center pl-7 pt-4 md:pt-0 gap-x-2"
             >
               <Image src="/edit_form.svg" width={29} height={29} alt={"form"} />
-              <span>EDIT FORM</span>
+              <span>EDIT QUEST</span>
             </Link>
             <button
               type="button"
