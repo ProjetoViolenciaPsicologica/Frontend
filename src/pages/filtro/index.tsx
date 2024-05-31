@@ -262,7 +262,7 @@ export default function Index({ cookies }: { cookies: any }) {
                 <span
                   className={`${raleway.className} mt-5 text-lg font-normal text-white`}
                 >
-                  questionárioS
+                  QUESTIONÁRIOS
                 </span>
 
                 <span
