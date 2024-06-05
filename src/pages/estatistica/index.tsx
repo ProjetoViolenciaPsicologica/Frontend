@@ -36,37 +36,50 @@ const dm = DM_Sans({
 const IndexPage: React.FC<any> = ({
   dataPie,
   dataBar,
-  data,
-  dataDispersal,
+  
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(false); // Estado para controlar o carregamento
+  const [loading, setLoading] = useState(false); 
+  const [loadingP, setLoadingP] = useState(false); 
+  const [loadingB, setLoadingB] = useState(false); 
   const cookies = parseCookies();
   const token = cookies["psi-token"];
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
 
-    setLoading(true); // Define o estado de carregamento como verdadeiro
+     // Define o estado de carregamento como verdadeiro
 
     try {
+      setLoading(true);
       // Faça a solicitação para o endpoint
       const response = await api.get("graficosPDF", {
         headers: {
           Authorization: `Bearer ${token}`,
-        }
+        },
       });
-
       // Obtenha os dados da resposta
-      const {  Desvio, Dispersao } = response.data;
-
+      const {  Desvio, Dispersao, Barra, Pizza } = response.data
       // Crie um novo objeto jsPDF
       const pdf = new jsPDF();
 
       // Adicione as imagens ao PDF
-      pdf.addImage(Desvio, "JPEG", 10, 120, 100, 100);
-      setTimeout(() => {}, 1000);
-      pdf.addImage(Dispersao, "JPEG", 10, 10, 100, 100);
-      
+      const imgWidth = 150; // largura da imagem no PDF
+      const imgHeight = 70; // altura da imagem no PDF
+      let yPosition = 10; // posição inicial no eixo y
+  
+      // Adicione as imagens ao PDF
+      pdf.addImage(Desvio, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
+  
+      pdf.addImage(Dispersao, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
+  
+      pdf.addImage(Barra, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight ; // Atualize a posição y para a próxima imagem
+  
+      pdf.addImage(Pizza, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
+  
       // Salve o PDF
       pdf.save("download.pdf");
     } catch (error) {
@@ -75,7 +88,36 @@ const IndexPage: React.FC<any> = ({
 
     setLoading(false); // Define o estado de carregamento como falso após a conclusão
   };
+  const handleDownloadPDFUnique = async (pdfText:string) => {   
+    try {
+      pdfText === "Pizza" ? setLoadingP(true) : setLoadingB(true);
+      const response = await api.get("graficosPDF", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Obtenha os dados da resposta
+      const pdfT  = response.data[pdfText]
+      // Crie um novo objeto jsPDF
+      const pdf = new jsPDF();
 
+      // Adicione as imagens ao PDF
+      const imgWidth = 150; // largura da imagem no PDF
+      const imgHeight = 120; // altura da imagem no PDF
+      let yPosition = 10; // posição inicial no eixo y
+  
+      // Adicione as imagens ao PDF
+      pdf.addImage(pdfT, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
+  
+      // Salve o PDF
+      pdf.save("download.pdf");
+    } catch (error) {
+      console.error("Erro ao fazer download do PDF:", error);
+    }
+
+    pdfText === "Pizza" ? setLoadingP(false) : setLoadingB(false);
+  };
   return (
     <Layout>
       <div
@@ -107,33 +149,60 @@ const IndexPage: React.FC<any> = ({
         </div>
 
         <div className="mt-10 gap-y-5 lg:gap-x-3 w-full flex flex-col flex-wrap md:flex-row items-center">
-          <div className="w-[80vw] lg:w-[20vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="w-[80vw] lg:w-[80vw] h-[400px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+            <div className="flex items-center justify-center w-full">
             <h1
-              className={`${dm.className} text-[22px] font-medium text-black`}
+              className={`${dm.className} text-center text-[22px] font-medium text-black`}
             >
               Resultado por sinalização
             </h1>
+            {dataPie && (
+             <div className="flex ml-4">
+               <Button
+              id="download-button"
+              type="default"
+              icon={<FaDownload />}
+              onClick={()=> {handleDownloadPDFUnique("Pizza")}}
+              className={`w-[200px] flex items-center justify-center`}
+              disabled={loadingP} // Desabilita o botão enquanto o PDF está sendo gerado
+            >
+              {loading && <Spin /> }
+            </Button>
+             </div>
+            )}
+        </div>
             {dataPie ? (
               <Pie chartData={dataPie} />
             ) : (
               <Spin size="large" className="text-white" />
             )}
           </div>
-          <div className=" w-[80vw] lg:w-[59.8vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className=" w-[80vw] lg:w-[80vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="flex items-center justify-center w-full">
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
               Respostas por opção
             </h1>
+            {dataPie && (
+             <div className="flex ml-4">
+               <Button
+              id="download-button"
+              type="default"
+              icon={<FaDownload />}
+              onClick={()=> {handleDownloadPDFUnique("Barra")}}
+              className={`w-[200px] flex items-center justify-center`}
+              disabled={loadingB} // Desabilita o botão enquanto o PDF está sendo gerado
+            >
+              {loading && <Spin /> }
+            </Button>
+             </div>
+            )}
+            </div>
             <Bar data={dataBar} />
           </div>
 
-          <div className="w-[80vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-            {data && <Box data={data} />}
-          </div>
-          <div className="w-[80vw] px-4 h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
-            <Dispersal data={dataDispersal} />
-          </div>
+         
         </div>
       </div>
     </Layout>
@@ -157,6 +226,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       Authorization: `Bearer ${token}`,
     },
   });
+  
+  
+
   const quantidade = response4.data;
   const verde = quantidade.filter((item: any) => item.sinalizacao === "Verde");
   const amarelo = quantidade.filter(

@@ -70,6 +70,21 @@ api_form.quantidadeRespostas = async (params: any) => {
   }
 };
 
+api_form.GraficoFiltro = async (params: any) => {
+  try {
+    const response = await api_form.get("graficosPDF", {
+      params,
+    });
+    return response;
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      throw error;
+    }
+  }
+};
+
+
+
 api_form.desvio = async (params: any) => {
   try {
     const response = await api_form.get("desvio", { params });

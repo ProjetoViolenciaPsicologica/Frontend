@@ -50,34 +50,89 @@ export interface Root {
 }
 
 export default function Index({ cookies }: { cookies: any }) {
+  const [loading, setLoading] = useState(false); 
+  const [loadingP, setLoadingP] = useState(false); 
+  const [loadingB, setLoadingB] = useState(false); 
   const [data, setData] = useState<Root>();
   const [qtForm, setQtForm] = useState<number | null>(null);
   const [dataBar, setdBar] = useState<any>();
   const [dataPie, setDPie] = useState<any>();
-  const [dataD, setDataD] = useState<any>();
-  const [dataDispersao, setDataDispersao] = useState<any>();
-  const [hiddenButton, setHiddenButton] = useState<boolean>(false); 
+  
   const contentRef = useRef<HTMLDivElement>(null);
   const [age, setAge] = useState()
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
 
-    // Oculta o botão de download antes de capturar a tela
-    const downloadButton = document.getElementById("download-button");
-    if (downloadButton) downloadButton.style.display = "none";
+     // Define o estado de carregamento como verdadeiro
+    
+     const cookies = parseCookies();
+     const data1: any = JSON.parse(cookies.dataFilter);
+     const params = { ...data1 }; // ou Object.assign({}, data1)
+    try {
+      setLoading(true);
+      const response = await api.GraficoFiltro(params);
+      
+      const {  Desvio, Dispersao, Barra, Pizza } = response.data
+      
+      const pdf = new jsPDF();
 
-    const canvas = await html2canvas(contentRef.current, {
-      scrollY: -window.scrollY,
-      windowHeight: document.documentElement.scrollHeight,
-    });
-    const imgData = canvas.toDataURL("image/png");
+      // Adicione as imagens ao PDF
+      const imgWidth = 150; // largura da imagem no PDF
+      const imgHeight = 70; // altura da imagem no PDF
+      let yPosition = 10; // posição inicial no eixo y
+  
+      // Adicione as imagens ao PDF
+      pdf.addImage(Desvio, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
+  
+      pdf.addImage(Dispersao, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
+  
+      pdf.addImage(Barra, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight ; // Atualize a posição y para a próxima imagem
+  
+      pdf.addImage(Pizza, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
+  
+      // Salve o PDF
+      pdf.save("download.pdf");
+    } catch (error) {
+      console.error("Erro ao fazer download do PDF:", error);
+    }
 
-    const pdf = new jsPDF("p", "px", [canvas.width, canvas.height]);
-    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-    pdf.save("download.pdf");
+    setLoading(false); // Define o estado de carregamento como falso após a conclusão
+  };
+  const handleDownloadPDFUnique = async (pdfText:string) => {  
+    
+    const cookies = parseCookies();
+    const data1: any = JSON.parse(cookies.dataFilter);
+    setData(data1);
 
-    // Restaura a visibilidade do botão de download após capturar a tela
-    if (downloadButton) downloadButton.style.display = "block";
+    // Definindo params corretamente como um objeto
+    const params = { ...data1 }; // ou Object.assign({}, data1) 
+    try {
+      pdfText === "Pizza" ? setLoadingP(true) : setLoadingB(true);
+      const response = await api.GraficoFiltro(params);      // Obtenha os dados da resposta
+      const pdfT  = response.data[pdfText]
+      // Crie um novo objeto jsPDF
+      const pdf = new jsPDF();
+
+      // Adicione as imagens ao PDF
+      const imgWidth = 150; // largura da imagem no PDF
+      const imgHeight = 120; // altura da imagem no PDF
+      let yPosition = 10; // posição inicial no eixo y
+  
+      // Adicione as imagens ao PDF
+      pdf.addImage(pdfT, "JPEG", 10, yPosition, imgWidth, imgHeight);
+      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
+  
+      // Salve o PDF
+      pdf.save("download.pdf");
+    } catch (error) {
+      console.error("Erro ao fazer download do PDF:", error);
+    }
+
+    pdfText === "Pizza" ? setLoadingP(false) : setLoadingB(false);
   };
 
   async function getData() {
@@ -94,46 +149,7 @@ export default function Index({ cookies }: { cookies: any }) {
     try {
       const response = await api.sinalizacao(params);
       const response1 = await api.quantidadeRespostas(params);
-      const response4 = await api.desvio(params);
-      const response5 = await api.dispersao(params);
-      const data1 = response5.data;
-      const arrayTransformado = data1.map((objeto: any) => {
-        // Dividindo a string 'campo_questoes' em um array de números
-        const pontuacoes = objeto.campo_questoes.split(",").map(Number);
-        // Calculando a pontuação total
-        const pontuacaoTotal = pontuacoes.reduce(
-          (total: any, pontuacao: any) => total + pontuacao,
-          0
-        );
-        // Retornando um novo objeto com as chaves 'idade' e 'pontuacao'
-        return { idade: objeto.idade, pontuacao: pontuacaoTotal };
-      });
-
-      setDataDispersao(arrayTransformado);
-      const quantidade = response4.data;
-      const verde = quantidade.filter(
-        (item: any) => item.sinalizacao === "Verde"
-      );
-      const amarelo = quantidade.filter(
-        (item: any) => item.sinalizacao === "Amarelo"
-      );
-      const vermelho = quantidade.filter(
-        (item: any) => item.sinalizacao === "Vermelho"
-      );
-      const calcularSomatorioCampoQuestoes = (dados: any[]) => {
-        let somatorio = 0;
-        dados.forEach((item) => {
-          const valores = item.campo_questoes.split(",").map(Number);
-          somatorio += valores.reduce((acc: any, valor: any) => acc + valor, 0);
-        });
-        return somatorio;
-      };
-
-      const d1 = calcularSomatorioCampoQuestoes(verde);
-      const d2 = calcularSomatorioCampoQuestoes(amarelo);
-      const d3 = calcularSomatorioCampoQuestoes(vermelho);
-      setDataD([d1, d2, d3]);
-      setQtForm(data2);
+     setQtForm(data2);
       setDPie(response.data);
       setdBar(response1.data);
     } catch (error) {
@@ -274,14 +290,15 @@ export default function Index({ cookies }: { cookies: any }) {
             ) : (
               <Spin size="large" className="text-white" />
             )}
-            <Button
+           <Button
               id="download-button"
               type="default"
               icon={<FaDownload />}
-              onClick={handleDownloadPDF}
-              className={`mt-4 w-[200px] flex items-center justify-center`}
+              onClick={()=> {handleDownloadPDFUnique("Pizza")}}
+              className={`w-[200px] flex items-center justify-center`}
+              disabled={loading} // Desabilita o botão enquanto o PDF está sendo gerado
             >
-              Baixar PDF
+              {loading ? <Spin/> : "Baixar PDF"  }
             </Button>
           </div>
         </div>
@@ -307,16 +324,7 @@ export default function Index({ cookies }: { cookies: any }) {
             {dataBar && <Bar data={dataBar} />}
           </div>
 
-          <div className="w-[80vw] lg:w-[79vw] h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-            {dataD ? (
-              <Box data={dataD} />
-            ) : (
-              <Spin size="large" className="text-white" />
-            )}
-          </div>
-          <div className="w-[80vw] lg:w-[79vw] px-4 h-[380px] flex flex-col justify-center items-center bg-[#D9D9D9] mb-8">
-            {dataDispersao && <Dispersal data={dataDispersao} />}
-          </div>
+         
         </div>
       </div>
     </Layout>

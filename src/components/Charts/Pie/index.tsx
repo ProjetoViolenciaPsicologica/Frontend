@@ -33,7 +33,7 @@ const PieChart: React.FC<{ chartData: ChartData }> = ({ chartData }) => {
     },
     legend: {
       color: {
-        title: false,
+        title: true,
         position: 'top',
         rowPadding: 5,
       },
@@ -43,7 +43,7 @@ const PieChart: React.FC<{ chartData: ChartData }> = ({ chartData }) => {
 
 
   return (
-    <div className="w-full h-full ml-8">
+    <div className="w-full h-full">
       {<Pie {...config} />}
     </div>
   );

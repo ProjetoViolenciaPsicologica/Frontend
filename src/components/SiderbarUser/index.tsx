@@ -103,7 +103,7 @@ export default function Sidebar() {
               className="flex items-center pl-7 py-4 md:py-0 gap-x-2"
             >
               <Image src="/form.svg" width={29} height={29} alt={"form"} />
-              <span>questionário</span>
+              <span>QUESTIONÁRIO</span>
             </Link>
 
             <button
