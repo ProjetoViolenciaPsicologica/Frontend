@@ -15,10 +15,6 @@ const Pie = dynamic(() => import("@/components/Charts/Pie"), { ssr: false });
 const Bar = dynamic(() => import("@/components/Charts/BarHorizontal"), {
   ssr: false,
 });
-const Box = dynamic(() => import("@/components/Charts/Box"), { ssr: false });
-const Dispersal = dynamic(() => import("@/components/Charts/Dispersal"), {
-  ssr: false,
-});
 
 const raleway = Raleway({
   weight: "400",
@@ -166,7 +162,7 @@ const IndexPage: React.FC<any> = ({
               className={`w-[200px] flex items-center justify-center`}
               disabled={loadingP} // Desabilita o botão enquanto o PDF está sendo gerado
             >
-              {loading && <Spin /> }
+              {loadingP && <Spin /> }
             </Button>
              </div>
             )}
@@ -194,7 +190,7 @@ const IndexPage: React.FC<any> = ({
               className={`w-[200px] flex items-center justify-center`}
               disabled={loadingB} // Desabilita o botão enquanto o PDF está sendo gerado
             >
-              {loading && <Spin /> }
+              {loadingB && <Spin /> }
             </Button>
              </div>
             )}

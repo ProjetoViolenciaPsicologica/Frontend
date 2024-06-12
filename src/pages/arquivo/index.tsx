@@ -75,15 +75,12 @@ function Index({ users }: { users: Users[] }) {
       const response = await api.filtro(params);
       setCookie(undefined, "dataSearch", response.data.length);
       setCookie(undefined, "dataFilter", JSON.stringify(params));
-      setCookie(undefined, "age", disabledAge.toString());
+      disabledAge && setCookie(undefined, "age",`${params.idade_min} - ${params.idade_max}`)
       router.push("/filtro");
-      console.log(response.data)
+      
     } catch (error) {
       console.log(error)
-      // toast.error("Tempo expirado");
-      // destroyCookie(null, "psi-token");
-      // destroyCookie(null, "psi-refreshToken");
-      // router.push("/login");
+     
     } finally {
       setLoading(false);
     }
@@ -127,14 +124,8 @@ function Index({ users }: { users: Users[] }) {
     setLoading1(true);
     try {
       const response = await api.filtro(params);
-
       handleExportExcel(response.data);
     } catch (error) {
-      console.log
-      // toast.error("Tempo expirado");
-      // destroyCookie(null, "psi-token");
-      // destroyCookie(null, "psi-refreshToken");
-      // router.push("/login");
     } finally {
       setLoading1(false);
     }

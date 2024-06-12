@@ -140,6 +140,7 @@ export default function Index({ cookies }: { cookies: any }) {
     const data1: any = JSON.parse(cookies.dataFilter);
     const data2: any = cookies.dataSearch;
     const age1:any = cookies.age
+    console.log(age1)
     setAge(age1)
     setData(data1);
 
@@ -224,8 +225,15 @@ export default function Index({ cookies }: { cookies: any }) {
               <span className="font-bold">Local da Aplicação</span>:{" "}
               {data?.local_aplicacao ? data.local_aplicacao : "---------"}
             </span>
-           {age === "False" && (
+           {age && age !== "false" ? (
              <span
+             className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
+           >
+             <span className="font-bold">Idade</span>:{" "}
+             {age}
+           </span>
+           ): (
+            <span
              className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
            >
              <span className="font-bold">Idade</span>:{" "}
@@ -290,37 +298,67 @@ export default function Index({ cookies }: { cookies: any }) {
             ) : (
               <Spin size="large" className="text-white" />
             )}
-           <Button
-              id="download-button"
-              type="default"
-              icon={<FaDownload />}
-              onClick={()=> {handleDownloadPDFUnique("Pizza")}}
-              className={`w-[200px] flex items-center justify-center`}
-              disabled={loading} // Desabilita o botão enquanto o PDF está sendo gerado
-            >
-              {loading ? <Spin/> : "Baixar PDF"  }
-            </Button>
+                     <Button
+          id="download-button"
+          type="default"
+          icon={<FaDownload />}
+          onClick={handleDownloadPDF}
+          className={`mt-4 w-[200px] flex items-center justify-center`}
+          disabled={loading} // Desabilita o botão enquanto o PDF está sendo gerado
+        >
+          {loading ? <Spin /> : "Baixar PDF"}
+        </Button>
           </div>
         </div>
         <div className="mt-10 gap-y-5 lg:gap-x-3 w-full flex flex-col flex-wrap md:flex-row items-center">
-          <div className="w-[80vw] lg:w-[20vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="w-[80vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="flex items-center justify-center w-full">
+           
             <h1
               className={`${dm.className} text-[22px] font-medium text-black`}
             >
               Resultado por sinalização
             </h1>
+            <div>
+            <Button
+              id="download-button"
+              type="default"
+              icon={<FaDownload />}
+              onClick={()=> {handleDownloadPDFUnique("Pizza")}}
+              className={`w-[200px] flex items-center justify-center`}
+              disabled={loadingP} // Desabilita o botão enquanto o PDF está sendo gerado
+            >
+              {loadingP && <Spin /> }
+            </Button>
+             </div>
+             </div>
             {dataPie ? (
               <Pie chartData={dataPie} />
             ) : (
               <Spin size="large" className="text-white" />
             )}
           </div>
-          <div className=" w-[80vw] lg:w-[58.8vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-            <h1
-              className={`${dm.className} text-[22px] font-medium text-black`}
+          <div className=" w-[80vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
+          <div className="flex items-center justify-center w-full">
+           
+           <h1
+             className={`${dm.className} text-[22px] font-medium text-black`}
+           >
+             Resposta por Opção
+           </h1>
+           <div>
+           <Button
+              id="download-button"
+              type="default"
+              icon={<FaDownload />}
+              onClick={()=> {handleDownloadPDFUnique("Barra")}}
+              className={`w-[200px] flex items-center justify-center`}
+              disabled={loadingB} // Desabilita o botão enquanto o PDF está sendo gerado
             >
-              Respostas por opção
-            </h1>
+              {loadingB && <Spin /> }
+            </Button>
+            </div>
+            </div>
             {dataBar && <Bar data={dataBar} />}
           </div>
 
