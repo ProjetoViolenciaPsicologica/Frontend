@@ -5,22 +5,14 @@ import dynamic from "next/dynamic";
 import api from "@/pages/api";
 import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
-import { Router, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Button, Spin } from "antd";
+import { Button, Dropdown, Menu, Spin } from "antd";
 import { FaDownload } from "react-icons/fa";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-
-const Box = dynamic(() => import("@/components/Charts/Box"), { ssr: false });
 
 const Pie = dynamic(() => import("@/components/Charts/Pie"), { ssr: false });
 
 const Bar = dynamic(() => import("@/components/Charts/BarHorizontal"), {
-  ssr: false,
-});
-
-const Dispersal = dynamic(() => import("@/components/Charts/Dispersal"), {
   ssr: false,
 });
 
@@ -49,99 +41,97 @@ export interface Root {
   usuario: string;
 }
 
-export default function Index({ cookies }: { cookies: any }) {
-  const [loading, setLoading] = useState(false); 
-  const [loadingP, setLoadingP] = useState(false); 
-  const [loadingB, setLoadingB] = useState(false); 
+export default function Index() {
+  const [loadingP, setLoadingP] = useState(false);
+  const [loadingB, setLoadingB] = useState(false);
+  const [loadingD, setLoadingD] = useState(false);
+  const [loadingDisp, setLoadingDisp] = useState(false);
   const [data, setData] = useState<Root>();
   const [qtForm, setQtForm] = useState<number | null>(null);
   const [dataBar, setdBar] = useState<any>();
   const [dataPie, setDPie] = useState<any>();
-  
+
   const contentRef = useRef<HTMLDivElement>(null);
-  const [age, setAge] = useState()
-  const handleDownloadPDF = async () => {
-    if (!contentRef.current) return;
+  const [age, setAge] = useState();
 
-     // Define o estado de carregamento como verdadeiro
-    
-     const cookies = parseCookies();
-     const data1: any = JSON.parse(cookies.dataFilter);
-     const params = { ...data1 }; // ou Object.assign({}, data1)
-    try {
-      setLoading(true);
-      const response = await api.GraficoFiltro(params);
-      
-      const {  Desvio, Dispersao, Barra, Pizza } = response.data
-      
-      const pdf = new jsPDF();
-
-      // Adicione as imagens ao PDF
-      const imgWidth = 150; // largura da imagem no PDF
-      const imgHeight = 70; // altura da imagem no PDF
-      let yPosition = 10; // posição inicial no eixo y
-  
-      // Adicione as imagens ao PDF
-      pdf.addImage(Desvio, "JPEG", 10, yPosition, imgWidth, imgHeight);
-      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
-  
-      pdf.addImage(Dispersao, "JPEG", 10, yPosition, imgWidth, imgHeight);
-      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
-  
-      pdf.addImage(Barra, "JPEG", 10, yPosition, imgWidth, imgHeight);
-      yPosition += imgHeight ; // Atualize a posição y para a próxima imagem
-  
-      pdf.addImage(Pizza, "JPEG", 10, yPosition, imgWidth, imgHeight);
-      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
-  
-      // Salve o PDF
-      pdf.save("download.pdf");
-    } catch (error) {
-      console.error("Erro ao fazer download do PDF:", error);
-    }
-
-    setLoading(false); // Define o estado de carregamento como falso após a conclusão
-  };
-  const handleDownloadPDFUnique = async (pdfText:string) => {  
-    
+  const handleDownloadPNG = async (chartId: string) => {
     const cookies = parseCookies();
     const data1: any = JSON.parse(cookies.dataFilter);
     setData(data1);
 
     // Definindo params corretamente como um objeto
-    const params = { ...data1 }; // ou Object.assign({}, data1) 
+    const params = { ...data1 }; // ou Object.assign({}, data1)
     try {
-      pdfText === "Pizza" ? setLoadingP(true) : setLoadingB(true);
-      const response = await api.GraficoFiltro(params);      // Obtenha os dados da resposta
-      const pdfT  = response.data[pdfText]
+      if (chartId === "Pizza") setLoadingP(true);
+      else if (chartId === "Barra") setLoadingB(true);
+      else if (chartId === "Desvio") setLoadingD(true);
+      else if (chartId === "Dispersao") setLoadingDisp(true);
+
+      const response = await api.GraficoFiltro(params); // Obtenha os dados da resposta
+      const chartData = response.data[chartId];
       // Crie um novo objeto jsPDF
-      const pdf = new jsPDF();
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
 
-      // Adicione as imagens ao PDF
-      const imgWidth = 150; // largura da imagem no PDF
-      const imgHeight = 120; // altura da imagem no PDF
-      let yPosition = 10; // posição inicial no eixo y
-  
-      // Adicione as imagens ao PDF
-      pdf.addImage(pdfT, "JPEG", 10, yPosition, imgWidth, imgHeight);
-      yPosition += imgHeight + 10; // Atualize a posição y para a próxima imagem
-  
-      // Salve o PDF
-      pdf.save("download.pdf");
+      const img = new Image();
+      img.src = `data:image/jpeg;base64,${chartData}`;
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx?.drawImage(img, 0, 0);
+
+        canvas.toBlob((blob) => {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob!);
+          link.download = `${chartId}.png`;
+          link.click();
+          if (chartId === "Pizza") setLoadingP(false);
+          else if (chartId === "Barra") setLoadingB(false);
+          else if (chartId === "Desvio") setLoadingD(false);
+          else if (chartId === "Dispersao") setLoadingDisp(false);
+        }, "image/png");
+      };
     } catch (error) {
-      console.error("Erro ao fazer download do PDF:", error);
+      console.error("Erro ao fazer download do PNG:", error);
+      if (chartId === "Pizza") setLoadingP(false);
+      else if (chartId === "Barra") setLoadingB(false);
+      else if (chartId === "Desvio") setLoadingD(false);
+      else if (chartId === "Dispersao") setLoadingDisp(false);
     }
-
-    pdfText === "Pizza" ? setLoadingP(false) : setLoadingB(false);
   };
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="1">
+        <Button
+          type="text"
+          onClick={() => handleDownloadPNG("Desvio")}
+          className="w-full flex"
+          disabled={loadingD}
+        >
+          {loadingD ? <Spin /> : "Desvio"}
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="2">
+        <Button
+          type="text"
+          className="w-full flex"
+          onClick={() => handleDownloadPNG("Dispersao")}
+          disabled={loadingDisp}
+        >
+          {loadingDisp ? <Spin /> : "Dispersão"}
+        </Button>
+      </Menu.Item>
+    </Menu>
+  );
 
   async function getData() {
     const cookies = parseCookies();
     const data1: any = JSON.parse(cookies.dataFilter);
     const data2: any = cookies.dataSearch;
-    const age1:any = cookies.age
-    console.log(age1)
-    setAge(age1)
+    const age1: any = cookies.age;
+    console.log(age1);
+    setAge(age1);
     setData(data1);
 
     // Definindo params corretamente como um objeto
@@ -150,7 +140,7 @@ export default function Index({ cookies }: { cookies: any }) {
     try {
       const response = await api.sinalizacao(params);
       const response1 = await api.quantidadeRespostas(params);
-     setQtForm(data2);
+      setQtForm(data2);
       setDPie(response.data);
       setdBar(response1.data);
     } catch (error) {
@@ -225,21 +215,20 @@ export default function Index({ cookies }: { cookies: any }) {
               <span className="font-bold">Local da Aplicação</span>:{" "}
               {data?.local_aplicacao ? data.local_aplicacao : "---------"}
             </span>
-           {age && age !== "false" ? (
-             <span
-             className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
-           >
-             <span className="font-bold">Idade</span>:{" "}
-             {age}
-           </span>
-           ): (
-            <span
-             className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
-           >
-             <span className="font-bold">Idade</span>:{" "}
-             {data?.idade ? data?.idade : "---------"}
-           </span>
-           )}
+            {age && age !== "false" ? (
+              <span
+                className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
+              >
+                <span className="font-bold">Idade</span>: {age}
+              </span>
+            ) : (
+              <span
+                className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
+              >
+                <span className="font-bold">Idade</span>:{" "}
+                {data?.idade ? data?.idade : "---------"}
+              </span>
+            )}
             <span
               className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
             >
@@ -298,40 +287,41 @@ export default function Index({ cookies }: { cookies: any }) {
             ) : (
               <Spin size="large" className="text-white" />
             )}
-                     <Button
-          id="download-button"
-          type="default"
-          icon={<FaDownload />}
-          onClick={handleDownloadPDF}
-          className={`mt-4 w-[200px] flex items-center justify-center`}
-          disabled={loading} // Desabilita o botão enquanto o PDF está sendo gerado
-        >
-          {loading ? <Spin /> : "Baixar PDF"}
-        </Button>
+
+            <Dropdown overlay={menu} trigger={["click"]}>
+              <Button
+                type="default"
+                icon={<FaDownload />}
+                className="w-[200px] flex items-center justify-center mt-2"
+              >
+                {loadingD || loadingDisp ? <Spin /> : "Baixar Gráficos"}
+              </Button>
+            </Dropdown>
           </div>
         </div>
         <div className="mt-10 gap-y-5 lg:gap-x-3 w-full flex flex-col flex-wrap md:flex-row items-center">
           <div className="w-[80vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-          <div className="flex items-center justify-center w-full">
-           
-            <h1
-              className={`${dm.className} text-[22px] font-medium text-black`}
-            >
-              Resultado por sinalização
-            </h1>
-            <div>
-            <Button
-              id="download-button"
-              type="default"
-              icon={<FaDownload />}
-              onClick={()=> {handleDownloadPDFUnique("Pizza")}}
-              className={`w-[200px] flex items-center justify-center`}
-              disabled={loadingP} // Desabilita o botão enquanto o PDF está sendo gerado
-            >
-              {loadingP && <Spin /> }
-            </Button>
-             </div>
-             </div>
+            <div className="flex items-center justify-center w-full">
+              <h1
+                className={`${dm.className} text-[22px] font-medium text-black`}
+              >
+                Resultado por sinalização
+              </h1>
+              <div>
+                <Button
+                  id="download-button"
+                  type="default"
+                  icon={<FaDownload />}
+                  onClick={() => {
+                    handleDownloadPNG("Pizza");
+                  }}
+                  className={`w-[200px] flex items-center justify-center`}
+                  disabled={loadingP} // Desabilita o botão enquanto o PDF está sendo gerado
+                >
+                  {loadingP && <Spin />}
+                </Button>
+              </div>
+            </div>
             {dataPie ? (
               <Pie chartData={dataPie} />
             ) : (
@@ -339,30 +329,29 @@ export default function Index({ cookies }: { cookies: any }) {
             )}
           </div>
           <div className=" w-[80vw] h-[360px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">
-          <div className="flex items-center justify-center w-full">
-           
-           <h1
-             className={`${dm.className} text-[22px] font-medium text-black`}
-           >
-             Resposta por Opção
-           </h1>
-           <div>
-           <Button
-              id="download-button"
-              type="default"
-              icon={<FaDownload />}
-              onClick={()=> {handleDownloadPDFUnique("Barra")}}
-              className={`w-[200px] flex items-center justify-center`}
-              disabled={loadingB} // Desabilita o botão enquanto o PDF está sendo gerado
-            >
-              {loadingB && <Spin /> }
-            </Button>
-            </div>
+            <div className="flex items-center justify-center w-full">
+              <h1
+                className={`${dm.className} text-[22px] font-medium text-black`}
+              >
+                Resposta por Opção
+              </h1>
+              <div>
+                <Button
+                  id="download-button"
+                  type="default"
+                  icon={<FaDownload />}
+                  onClick={() => {
+                    handleDownloadPNG("Barra");
+                  }}
+                  className={`w-[200px] flex items-center justify-center`}
+                  disabled={loadingB} // Desabilita o botão enquanto o PDF está sendo gerado
+                >
+                  {loadingB && <Spin />}
+                </Button>
+              </div>
             </div>
             {dataBar && <Bar data={dataBar} />}
           </div>
-
-         
         </div>
       </div>
     </Layout>
