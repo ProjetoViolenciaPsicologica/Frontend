@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Modal, Divider, Button } from "antd";
+import { Modal, Divider, Button,notification } from "antd";
 import { Montserrat, Inter } from "next/font/google";
 import Image from "next/image";
 import { useMutation } from "react-query";
-import { toast } from "react-toastify";
 import { api } from "@/services";
-import nookies from "nookies";
-import Router from "next/router";
+import { destroyCookie, parseCookies } from "nookies";
+import {useRouter} from "next/router";
+
 
 const montserrat = Montserrat({
   style: "normal",
@@ -24,6 +24,8 @@ export type ValuePropsType = {
   sum: number;
   setOkQuestion: (ok: boolean) => void;
   data: any;
+  tipo: string;
+  isSuperuser: boolean;
 };
 
 export default function Index({
@@ -32,76 +34,69 @@ export default function Index({
   sum,
   setOkQuestion,
   data,
+  tipo,
+  isSuperuser,
 }: ValuePropsType) {
   const [loading, setLoading] = useState(false);
-  const { mutate } = useMutation(
+  const router = useRouter();
+  const cookies = parseCookies();
+  const token = cookies["psi-token"];
+  const createForm = useMutation(
     async (data: any) => {
-      const token = nookies.get()["psi-token"];
-      const response = await api.post("/formulario/novo", data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const id = parseInt(cookies["id-entrevistado"], 10);
 
-      return response;
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (tipo === "saúde") {
+        return await api.patch(`/formulario/${id}`, data, { headers });
+      } else {
+        return await api.post("/formulario/novo", data, { headers });
+      }
     },
     {
-      onError: (error) => {
-        setLoading(false);
-        console.error("Sessão expirada, faça login novamente:", error);
-        toast.error("Sessão expirada, faça login novamente.", {
-          position: "top-center",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        // destroyCookie(null, "psi-token");
-        // destroyCookie(null, "psi-refreshToken");
-        // Router.push("/login");
-      },
-      onSuccess: (response) => {
-        if (response.status === 201) {
-          setLoading(false);
-          toast.success("Respostas cadastradas com sucesso!", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
+      onSuccess: (response: any) => {
+        if (response.status === 201 || response.status === 200) {
+          notification.success({
+            message: "Sucesso!",
+            description: "Respostas cadastradas com sucesso!",
           });
-
+          setLoading(false);
+          destroyCookie(null, "id-entrevistado");
           setTimeout(() => {
-            Router.push("/dashboard");
+            isSuperuser ?
+            router.push("/dashboard")
+            : router.push("/inicio");
           }, 2000);
         } else {
-          toast.error("Erro ao enviar as respostas.", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
+          notification.error({
+            message: "Erro!",
+            description: "Erro ao enviar as respostas.",
           });
+          setLoading(false);
         }
       },
-      onMutate: () => {
-        setLoading(true); // Ativa o estado de loading quando a mutação é iniciada
+      onError: (error: any) => {
+        setLoading(false);
+        console.error("Sessão expirada, faça login novamente:", error);
+        notification.error({
+          message: "Erro!",
+          description: "Sessão expirada, faça login novamente.",
+        });
+
+        // Caso queira implementar logout aqui:
+        destroyCookie(null, "psi-token");
+        destroyCookie(null, "psi-refreshToken");
+        router.push("/login");
       },
+      
     }
   );
 
   function handleOk() {
     setLoading(true); // Set loading to true when the button is clicked
-    mutate(data);
+    createForm.mutateAsync(data);
     setIsModalOpen(false);
   }
 
@@ -147,7 +142,7 @@ export default function Index({
               CANCELAR
             </button>
             <Button
-              loading={false}
+              loading={loading}
               onClick={handleOk}
               className={`w-[172px] h-[59px] hover:bg-esmerald-900 bg-emerald-950 rounded-[32px] text-white text-xl font-bold ${inter.className}`}
             >

@@ -11,9 +11,11 @@ const Question = ({
   setOkQuestion,
   selectedOptions,
   setSelectedOptions,
+  tipo,
 }: {
   question: string[];
   page: number;
+  tipo: string;
   setPage: (page: number) => void;
   allOptions: string;
   setAllOptions: (allOptions: string) => void;
@@ -31,7 +33,7 @@ const Question = ({
         [page.toString()]: Array(question.length).fill(""),
       }));
     }
-  }, [page, question.length, selectedOptions, setSelectedOptions]);
+  }, [errors, page, question.length, selectedOptions, setOkQuestion, setSelectedOptions]);
 
   const handleRadioChange = (questionIndex: number, value: string) => {
     setSelectedOptions((prevOptions: any) => ({
@@ -43,6 +45,7 @@ const Question = ({
     }));
     setErrors({});
   };
+
 
   const handleSubmit = () => {
     // Validate if any question is not answered
@@ -63,7 +66,7 @@ const Question = ({
 
     if (allQuestionsAnswered) {
       // Move to the next page if not the last page
-      setPage(page + 1);
+      page !== 3 && setPage(page + 1);
       window.scrollTo({
         top: 0,
         behavior: "smooth",
@@ -78,7 +81,6 @@ const Question = ({
       // For example, send the string to the API
       console.log("Send to API:", combinedOptions);
       setAllOptions(combinedOptions);
-
       // Scroll to top
     } else {
       // If any question is not answered, display error message
@@ -178,7 +180,7 @@ const Question = ({
           className="text-xl font-bold text-white w-[202px] h-[59px] bg-emerald-950 rounded-[32px] mt-7 mb-7"
           onClick={handleSubmit}
         >
-          {page === 3 ? "FINALIZAR" : "AVANÇAR"}
+          {page === 2 ? "FINALIZAR" : "AVANÇAR"}
         </button>
       </div>
     </div>

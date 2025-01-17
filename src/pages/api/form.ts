@@ -244,6 +244,17 @@ api_form.deleteLocal = async (ids: number[]) => {
   }
 };
 
+api_form.createDataUser = async (data:any) => {
+  try {
+    const response = await api_form.post("/formulario/novo", data);
+    return response;
+  } catch (error: any) {
+  
+      throw error;
+    
+  }
+};
+
 api_form.deleteTipo = async (ids: number[]) => {
   try {
     if (ids.length === 1) {

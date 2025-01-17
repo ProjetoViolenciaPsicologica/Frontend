@@ -42,7 +42,7 @@ interface IGrau {
   definicaoGrau: string;
 }
 
-export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
+export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], locais:ILocal[], tipo:string, isSuperuser:boolean}) {
   const [form] = Form.useForm(); // Extrai a referência do form
   const router = useRouter();
   const [okQuestion, setOkQuestion] = useState(false);
@@ -71,6 +71,9 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
   };
 
   useEffect(() => {
+    if(page === 3 && tipo === "saúde") {
+      setOkQuestion(true);
+    }
     if (okQuestion) {
       console.log(allOptions);
       const questions = allOptions.split(",");
@@ -90,8 +93,12 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
         },
       };
 
+      const data2: any = {
+        campo_questoes: allOptions
+      };
+
       setIsModalOpen(true);
-      setData(data1);
+      tipo === "saúde" ? setData(data2) : setData(data1);
     }
   }, [
     allOptions,
@@ -100,6 +107,8 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
     formData?.grau_de_instrucao,
     formData?.idade,
     okQuestion,
+    page,
+    tipo,
   ]);
 
   return (
@@ -157,7 +166,7 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
               className="w-[155px]"
               progressDot
               current={page}
-              items={[
+              items={tipo !== "saúde" ? [
                 {
                   title: "Categoria 1",
                   description: "",
@@ -174,14 +183,27 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
                   title: "Dados",
                   description: "",
                 },
+              ] : [
+                {
+                  title: "Categoria 1",
+                  description: "",
+                },
+                {
+                  title: "Categoria 2",
+                  description: "",
+                },
+                {
+                  title: "Categoria 3",
+                  description: "",
+                },
               ]}
             />
           )}
 
           <h1
-            className={`${raleway.className} flex items-center mt-9 text-2xl md:text-4xl font-bold text-black`}
+            className={`${raleway.className} flex items-center w-full h-full mt-9 text-2xl md:text-4xl font-bold text-black`}
           >
-            {page === 3 ? "Dados de Entrevistado" : `CATEGORIA ${page + 1}`}
+            {page !== 3 && tipo !== "saúde" ?  `CATEGORIA ${page + 1}` : ""}
           </h1>
         </div>
 
@@ -195,12 +217,14 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
             setAllOptions={setAllOptions}
             selectedOptions={selectedOptions}
             setSelectedOptions={setSelectedOptions}
+            tipo={tipo}
           />
         )}
         {page === 1 && (
           <Question
             question={questions.DEPENDENCIA}
             page={page}
+            tipo={tipo}
             setPage={setPage}
             allOptions={allOptions}
             setOkQuestion={setOkQuestion}
@@ -211,6 +235,7 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
         )}
         {page === 2 && (
           <Question
+            tipo={tipo}
             question={questions.CONTROLE}
             page={page}
             setPage={setPage}
@@ -221,7 +246,7 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
             setSelectedOptions={setSelectedOptions}
           />
         )}
-        {page === 3 && (
+        {page === 3 && tipo !== "saúde" &&(
           <div className="w-full mt-8 flex justify-center lg:justify-start">
             <Form
               form={form}
@@ -330,6 +355,8 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
       </div>
       <Modal
         data={data}
+        tipo={tipo}
+        isSuperuser={isSuperuser}
         setOkQuestion={setOkQuestion}
         sum={sumQuestion}
         isModalOpen={isModalOpen}
@@ -368,7 +395,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   // Check if user is superuser
   const isSuperuser = decoded?.is_superuser;
-
+  const tipo = decoded?.tipo.toLowerCase();
   // If user is not superuser, redirect to home page
   if (isSuperuser) {
     return {
@@ -398,6 +425,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     props: {
       graus,
       locais,
+      tipo,
+      isSuperuser,
     },
   };
 };
