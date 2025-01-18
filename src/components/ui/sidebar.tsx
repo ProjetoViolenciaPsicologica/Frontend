@@ -1,7 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable @typescript-eslint/no-redeclare */
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-param-reassign */
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
