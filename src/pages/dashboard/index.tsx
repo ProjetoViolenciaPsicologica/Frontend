@@ -11,6 +11,7 @@ import  api  from "@/pages/api";
 import { GetServerSideProps } from "next";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
+import Loading from "@/components/Loading";
 
 const ColumnChart = dynamic(() => import("@/components/Charts/ColumnChart"), {
   ssr: false,
@@ -77,18 +78,9 @@ export default function Index() {
   );
 
   return (
-    <Layout>
-      <div className="flex h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
-        <div className="mt-4 flex h-full flex-col w-full  md:mt-4">
-          <h1 className={`${raleway.className} text-3xl font-normal `}>
-            DASHBOARD
-          </h1>
-          <span
-            className={`${raleway.className} w-[256px] mt-4 text-black text-sm font-normal leading-tight`}
-          >
-            Gestão e visualização de informações sobre violência psicológica
-          </span>
-        </div>
+    <Layout title="DASHBOARD" description="Gestão e visualização de informações sobre violência psicológica">
+      <div className="overflow-y-hidden">
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-14 gap-x-14 mt-4 mx-auto">
           <Link href="/usuarios">
             <CardDashboard title="USUÁRIOS" svg="user1" />

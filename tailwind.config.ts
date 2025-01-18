@@ -19,6 +19,9 @@ const config: Config = {
   				bg: '#093520',
   				ligth: '#377758'
   			},
+			dropShadow: {
+				'100': '0px 4px 4px rgba(0, 0, 0, 0.25)'
+			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

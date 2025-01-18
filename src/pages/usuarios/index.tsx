@@ -354,19 +354,8 @@ export default function Index({
   };
 
   return (
-    <Layout>
-      <div className="flex bg-[#F6FBF9] h-screen w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
-        <div className="mt-4 flex flex-col w-full  md:mt-4">
-          <h1 className={`${raleway.className} text-3xl font-normal `}>
-            USUÁRIOS
-          </h1>
-          <span
-            className={`${raleway.className} w-[256px] mt-4 text-black text-sm font-normal leading-tight`}
-          >
-            Gerenciamento de usuários cadastrados no sistema
-          </span>
-        </div>
-
+    <Layout title="USUÁRIOS" description="Gerenciamento de usuários cadastrados no sistema">
+      <div className="flex bg-[#F6FBF9] w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
         <div className="flex flex-col md:flex-row w-full justify-center md:justify-between my-9 pr-5 gap-6 md:my-0 md:mt-9">
           <div className="relative">
             <button

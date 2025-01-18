@@ -388,18 +388,8 @@ const Index = () => {
   };
 
   return (
-    <Layout>
-      <div className="flex h-full w-full flex-col items-center pl-4 lg:items-start lg:pl-12">
-        <div className="mt-4 flex flex-col w-full md:mt-4">
-          <h1 className={`${raleway.className} text-3xl font-normal `}>
-            QUESTIONÁRIO
-          </h1>
-          <span
-            className={`${raleway.className} w-[256px] mt-4 text-black text-sm font-normal leading-tight`}
-          >
-            Gerenciamento de informações de um questionário e aplicador
-          </span>
-        </div>
+    <Layout title="QUESTIONÁRIO" description="Gerenciamento de informações de um questionário e aplicador">
+      <div className="flex h-full w-full flex-col items-center pl-4 lg:items-start">
         <div className="w-full flex md:justify-end mt-8 pr-4 ">
           <button
             className={`w-[197px] h-14 bg-emerald-950 rounded-md shadow text-white text-base font-normal ${dm.className}`}

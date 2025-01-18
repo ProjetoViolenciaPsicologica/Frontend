@@ -228,9 +228,9 @@ function Index({ users }: { users: Users[] }) {
   };
 
   return (
-    <Layout>
-      <div className="flex w-full  flex-col items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
-        <div className="mt-4 flex flex-col w-full md:mt-4">
+    <Layout title="ARQUIVOS" description="Manipulação e extração de informações da base de dados do sistema">
+      <div className="flex w-full  flex-col items-center pl-4 lg:items-start bg-[#F6FBF9]">
+        <div className=" flex flex-col w-full ">
           <button
             onClick={() => {
               router.back();
@@ -263,18 +263,10 @@ function Index({ users }: { users: Users[] }) {
               </defs>
             </svg>
           </button>
-          <h1 className={`${raleway.className} text-3xl font-normal `}>
-            ARQUIVOS
-          </h1>
-          <span
-            className={`${raleway.className} w-[309px] mt-4 text-black text-sm font-normal leading-tight`}
-          >
-            Manipulação e extração de informações da base de dados do sistema
-          </span>
         </div>
 
         <Form className="h-full" form={form} onFinish={onSubmit}>
-          <div className="flex flex-col-reverse lg:flex-row gap-x-32 w-full mt-10">
+          <div className="flex flex-col-reverse lg:flex-row gap-x-32 w-full mt-4">
             <div className="flex flex-col ">
               <div className="flex flex-col">
                 <label

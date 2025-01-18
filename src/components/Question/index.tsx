@@ -15,7 +15,7 @@ const Question = ({
 }: {
   question: string[];
   page: number;
-  tipo: string;
+  tipo?: string;
   setPage: (page: number) => void;
   allOptions: string;
   setAllOptions: (allOptions: string) => void;
@@ -98,7 +98,7 @@ const Question = ({
   };
 
   return (
-    <div className="mt-4 flex h-full flex-col w-[90vw] md:w-full md:pr-8 md:mt-10">
+    <div className="mt-4 flex h-full flex-col w-[90vw] md:w-full md:pr-8">
       {question.map((quest, index) => (
         <div key={index}>
           <h1 className="text-black text-justify text-2xl font-semibold">

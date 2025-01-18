@@ -8,7 +8,7 @@ export default function Document() {
         <title>Questionário Kurt Mendonça</title>
         <meta name="description" content="Questionário Kurt Mendonça" />
       </Head>
-      <body className="h-screen">
+      <body className="h-screen bg-[#F6FBF9]">
         <Main />
         <NextScript />
       </body>

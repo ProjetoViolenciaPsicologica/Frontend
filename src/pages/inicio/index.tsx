@@ -61,6 +61,10 @@ export default function Index({
         });
         setCookie(undefined, "id-entrevistado", `${response.data.id}`);
         setPage(page + 1);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
       }
     } catch (error:any) {;
       notification.error({
@@ -77,9 +81,9 @@ export default function Index({
   };
 
   return (
-    <Layout>
+    <Layout title="Formulário de Avaliação" description="Formulário de Avaliação">
       {page === 0 && (
-        <div className="flex w-full h-full flex-col flex-wrap items-center pl-4 lg:items-start lg:pl-12">
+        <div className="flex w-full h-full flex-col flex-wrap items-center pl-4 lg:items-start">
           <div className="w-full h-full px-4 py-8">
             <Card className="h-full p-6 w-full">
               <h2 className="mb-6 text-2xl font-semibold">

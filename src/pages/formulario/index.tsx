@@ -102,7 +102,7 @@ export default function Index({graus,locais}:{graus:IGrau[], locais:ILocal[]}) {
     okQuestion,
   ]);
   return (
-    <Layout>
+    <Layout title="Formulário">
       <div className="flex flex-col h-full w-full  items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
         <div className="mt-4 flex w-full flex-col md:mt-10 pl-4 lg:pl-0">
           {isSmallScreen ? (

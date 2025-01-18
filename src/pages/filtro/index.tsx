@@ -161,12 +161,13 @@ export default function Index() {
   }
 
   return (
-    <Layout>
+    <Layout title="ESTATÍSTICA" description="Disponibilização e visualização via filtro dos dados reunidos com
+              base no registro de questionários">
       <div
         ref={contentRef}
-        className="flex  flex-col items-center pl-4 lg:items-start lg:pl-12 "
+        className="flex  flex-col items-center pl-4 lg:items-start"
       >
-        <div className="flex flex-col lg:flex-row justify-between items-center w-full mt-4 md:mt-16 ">
+        <div className="flex flex-col lg:flex-row justify-between items-center w-full mt-4">
           <div className=" flex h-full flex-col w-full">
             <button
               onClick={() => {
@@ -200,15 +201,6 @@ export default function Index() {
                 </defs>
               </svg>
             </button>
-            <h1 className={`${raleway.className} text-3xl font-normal `}>
-              ESTATÍSTICA
-            </h1>
-            <span
-              className={`${raleway.className} w-[309px] mt-4 text-black text-sm font-normal leading-tight`}
-            >
-              Disponibilização e visualização via filtro dos dados reunidos com
-              base no registro de questionários
-            </span>
             <span
               className={`${raleway.className} mt-3.5 mb-3 text-black text-[15px] font-normal leading-tight`}
             >

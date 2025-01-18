@@ -104,34 +104,13 @@ const IndexPage: React.FC<any> = ({ dataPie, dataBar }) => {
   );
 
   return (
-    <Layout>
+    <Layout title="Estatística" description="Disponibilização e visualização dos dados reunidos com base no
+              registro de questionários">
       <div
         ref={contentRef}
         className="flex h-full flex-col items-center pl-4 lg:items-start"
       >
-        <div className="flex w-[92%] gap-y-4 md:items-center flex-col md:flex-row">
-          <div className="mt-4 flex h-full flex-col w-full md:mt-4">
-            <h1 className={`${raleway.className} text-3xl font-normal `}>
-              ESTATÍSTICA
-            </h1>
-            <span
-              className={`${raleway.className} w-[309px] mt-4 text-black text-sm font-normal leading-tight`}
-            >
-              Disponibilização e visualização dos dados reunidos com base no
-              registro de questionários
-            </span>
-          </div>
-
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <Button
-              type="default"
-              icon={<FaDownload />}
-              className="w-[200px] flex items-center justify-center mt-2"
-            >
-              {loadingD || loadingDisp ? <Spin /> : "Baixar Gráficos"}
-            </Button>
-          </Dropdown>
-        </div>
+ 
 
         <div className="mt-10 gap-y-5 lg:gap-x-3 w-full flex flex-col flex-wrap md:flex-row items-center">
           <div className="w-[90vw] lg:w-[80vw] h-[400px] flex flex-col justify-center items-center bg-[#D9D9D9] rounded-[10px]">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Divider, Button,notification } from "antd";
 import { Montserrat, Inter } from "next/font/google";
 import Image from "next/image";
@@ -24,8 +24,11 @@ export type ValuePropsType = {
   sum: number;
   setOkQuestion: (ok: boolean) => void;
   data: any;
-  tipo: string;
-  isSuperuser: boolean;
+  setLoadingComp?: (loading: boolean) => void;
+  tipo?: string;
+  setPage?: (page: number) => void;
+  page?: number;
+  isSuperuser?: boolean;
 };
 
 export default function Index({
@@ -35,10 +38,19 @@ export default function Index({
   setOkQuestion,
   data,
   tipo,
+  setPage,
+  page,
   isSuperuser,
+  setLoadingComp,
 }: ValuePropsType) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [mOpen, setModalOpen] = useState(false);
+  
+  useEffect(() => {
+    isModalOpen && setModalOpen(true);
+  }, [isModalOpen]);
+
   const cookies = parseCookies();
   const token = cookies["psi-token"];
   const createForm = useMutation(
@@ -64,11 +76,13 @@ export default function Index({
           });
           setLoading(false);
           destroyCookie(null, "id-entrevistado");
+          setIsModalOpen(false);
+          setLoadingComp && setLoadingComp(true)
           setTimeout(() => {
             isSuperuser ?
             router.push("/dashboard")
             : router.push("/inicio");
-          }, 2000);
+          }, 3000);
         } else {
           notification.error({
             message: "Erro!",
@@ -97,17 +111,20 @@ export default function Index({
   function handleOk() {
     setLoading(true); // Set loading to true when the button is clicked
     createForm.mutateAsync(data);
-    setIsModalOpen(false);
   }
 
   function handleCancel() {
+    if(tipo === 'saúde'){
+      setModalOpen(false);
+      setPage && page && setPage(page - 1);
+    }
     setIsModalOpen(false);
     setOkQuestion(false);
   }
   return (
     <Modal
       title="Resultado Final"
-      open={isModalOpen}
+      open={mOpen && isModalOpen}
       onCancel={handleCancel}
       className=" h-[478px]"
       footer={null}

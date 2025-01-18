@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { Steps, Form, InputNumber, Select } from "antd";
 import { jwtDecode } from "jwt-decode";
 import {api} from "@/services"
+import Loading from "@/components/Loading";
 
 const raleway = Raleway({
   weight: "700",
@@ -45,6 +46,7 @@ interface IGrau {
 export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], locais:ILocal[], tipo:string, isSuperuser:boolean}) {
   const [form] = Form.useForm(); // Extrai a referência do form
   const router = useRouter();
+  const [loadingComp, setLoadingComp] = useState(false);
   const [okQuestion, setOkQuestion] = useState(false);
   const [page, setPage] = useState(0);
   const [allOptions, setAllOptions] = useState("");
@@ -71,10 +73,7 @@ export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], 
   };
 
   useEffect(() => {
-    if(page === 3 && tipo === "saúde") {
-      setOkQuestion(true);
-    }
-    if (okQuestion) {
+    if (page === 3 && tipo === "saúde") {
       console.log(allOptions);
       const questions = allOptions.split(",");
       const sum = questions.map(Number).reduce((acc, curr) => acc + curr, 0);
@@ -112,7 +111,7 @@ export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], 
   ]);
 
   return (
-    <Layout>
+    <Layout title="Questionário" description="Questionário de rastreamento">
       <div className="flex flex-col h-full w-full  items-center pl-4 lg:items-start lg:pl-12 bg-[#F6FBF9]">
         <div className="mt-4 flex w-full flex-col md:mt-10 pl-4 lg:pl-0">
           {isSmallScreen ? (
@@ -352,10 +351,16 @@ export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], 
             </Form>
           </div>
         )}
+        {loadingComp && (
+          <Loading />
+        )}
       </div>
       <Modal
         data={data}
         tipo={tipo}
+        setPage={setPage}
+        page={page}
+        setLoadingComp={setLoadingComp}
         isSuperuser={isSuperuser}
         setOkQuestion={setOkQuestion}
         sum={sumQuestion}
