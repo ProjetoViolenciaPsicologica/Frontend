@@ -1,60 +1,80 @@
 import Layout from "@/components/LayoutUser";
-import type { RadioChangeEvent } from "antd";
 import { IGrau, ILocal } from "@/utils/inicio/types";
 import { raleway, montserrat, inter } from "@/utils/inicio/fonts";
-import {encaminhamentoData, transformedData} from "@/utils/inicio/objects";
+import { encaminhamentoData, transformedData } from "@/utils/inicio/objects";
 import apiForm from "@/pages/api";
 import {
   Form,
   Select,
   Input,
-notification,
+  notification,
   Card,
   Button,
+  Spin,
   Checkbox,
   Row,
   Col,
 } from "antd";
-import type { GetProp } from 'antd';
+import type { GetProp } from "antd";
 import Link from "next/link";
 import { parseCookies, setCookie } from "nookies";
 import { GetServerSideProps } from "next";
 import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { api } from "@/services";
-
-
+import { useQuery } from "react-query";
 
 export default function Index({
-  graus,
-  locais,
   tipo,
+  token,
 }: {
-  graus: IGrau[];
-  locais: ILocal[];
   tipo: string;
+  token: string;
 }) {
-  
+  const { data: locais, isLoading: loadingLocais } = useQuery<ILocal[]>(
+    "locais",
+    async () => {
+      const response = await api.get("local", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    }
+  );
+  const { data: graus, isLoading: loadingGrau } = useQuery<IGrau[]>(
+    "grau",
+    async () => {
+      const response1 = await api.get("grau", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response1.data;
+    }
+  );
   const [form] = Form.useForm();
   const [page, setPage] = useState(
     tipo === "saúde" || tipo === "saude" ? 0 : 1
   );
   const [check, setCheck] = useState(false);
   const [loading, setLoading] = useState(false);
-  const onChange: GetProp<typeof Checkbox.Group, 'onChange'> = (checkedValues) => {
-    const encontrado = checkedValues.find((value) => value === 'Outro');
-    encontrado === 'Outro' ? setCheck(true) : setCheck(false);
+  const onChange: GetProp<typeof Checkbox.Group, "onChange"> = (
+    checkedValues
+  ) => {
+    const encontrado = checkedValues.find((value) => value === "Outro");
+    encontrado === "Outro" ? setCheck(true) : setCheck(false);
   };
-  
+
   const onSubmit = async (data: any) => {
     setLoading(true);
     const encaminhamento = encaminhamentoData(data);
     const data1 = transformedData(data, encaminhamento);
-    
+
     try {
       const response = await apiForm.createDataUser(data1);
       console.log(response);
-      if(response.status === 201) {
+      if (response.status === 201) {
         notification.success({
           message: "Sucesso!",
           description: "Formulário enviado com sucesso!",
@@ -66,203 +86,268 @@ export default function Index({
           behavior: "smooth",
         });
       }
-    } catch (error:any) {;
+    } catch (error: any) {
       notification.error({
         message: "Erro!",
         description: "Preencha as informações corretamente!",
       });
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
-    
+
     // setFormData(data);
     // setOkQuestion(true);
   };
 
   return (
-    <Layout title="Formulário de Avaliação" description="Formulário de Avaliação">
+    <Layout
+      title="Formulário de Avaliação"
+      description="Formulário de Avaliação"
+    >
       {page === 0 && (
-        <div className="flex w-full h-full flex-col flex-wrap items-center pl-4 lg:items-start">
-          <div className="w-full h-full px-4 py-8">
-            <Card className="h-full p-6 w-full">
-              <h2 className="mb-6 text-2xl font-semibold">
-                Formulário de Avaliação
-              </h2>
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={onSubmit}
-                className="space-y-4 w-full"
-              >
-                <Form.Item
-                  label="Idade"
-                  name="idade"
-                  rules={[
-                    { required: true, message: "Por favor, insira sua idade!" },
-                  ]}
-                >
-                  <Input
-                    type="number"
-                    placeholder="Digite sua idade"
-                    className="h-10 w-full rounded-md border px-3"
-                    min={2}
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  label="Sexo"
-                  name="escolha_sexo"
-                  rules={[
-                    { required: true, message: "Por favor, selecione o sexo!" },
-                  ]}
-                >
-                  <Select placeholder="Selecione o sexo" className="w-full">
-                    <Select.Option value="masculino">Masculino</Select.Option>
-                    <Select.Option value="feminino">Feminino</Select.Option>
-                    <Select.Option value="outro" on>Outro</Select.Option>
-                  </Select>
-                </Form.Item>
-
-                <Form.Item
-                  label="Grau de Instrução"
-                  name="grau_de_instrucao"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, selecione o grau de instrução!",
-                    },
-                  ]}
-                >
-                  <Select
-                    placeholder="Selecione o grau de instrução"
-                    className="w-full"
+        <>
+          {loadingGrau && loadingLocais ? (
+            <div className="w-full h-full flex justify-center mt-10">
+              <Spin size="large" />
+            </div>
+          ) : (
+            <div className="flex w-full h-full flex-col flex-wrap items-center pl-4 lg:items-start">
+              <div className="w-full h-full px-4 py-8">
+                <Card className="h-full p-6 w-full">
+                  <h2 className="mb-6 text-2xl font-semibold">
+                    Formulário de Avaliação
+                  </h2>
+                  <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onSubmit}
+                    className="space-y-4 w-full"
                   >
-                    {graus?.map((grau) => (
-                      <Select.Option key={grau.id} value={grau.definicaoGrau}>
-                        {grau.definicaoGrau}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
+                    <Form.Item
+                      label="Idade"
+                      name="idade"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Por favor, insira sua idade!",
+                        },
+                      ]}
+                    >
+                      <Input
+                        type="number"
+                        placeholder="Digite sua idade"
+                        className="h-10 w-full rounded-md border px-3"
+                        min={2}
+                      />
+                    </Form.Item>
 
-                <Form.Item
-                  label="Local da Aplicação"
-                  name="definicaoLocalForm"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, selecione o local!",
-                    },
-                  ]}
-                >
-                  <Select placeholder="Selecione o local" className="w-full">
-                    {locais?.map((local) => (
-                      <Select.Option
-                        key={local.id}
-                        value={local.definicaoLocalForm}
+                    <Form.Item
+                      label="Sexo"
+                      name="escolha_sexo"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Por favor, selecione o sexo!",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="Selecione o sexo" className="w-full">
+                        <Select.Option value="masculino">
+                          Masculino
+                        </Select.Option>
+                        <Select.Option value="feminino">Feminino</Select.Option>
+                        <Select.Option value="outro" on>
+                          Outro
+                        </Select.Option>
+                      </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Grau de Instrução"
+                      name="grau_de_instrucao"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Por favor, selecione o grau de instrução!",
+                        },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Selecione o grau de instrução"
+                        className="w-full"
                       >
-                        {local.definicaoLocalForm}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item
-        name="encaminhamento"
-        label="Selecione as opções"
-        className="w-full  md:hidden"
-        rules={[{ required: true, message: 'Por favor, selecione pelo menos uma opção!' }]}
-      >
-        <Checkbox.Group onChange={onChange}>
-          <Row gutter={16}>
-            <Col xs={24} sm={12} lg={6}>
-              <Checkbox value="Médico" disabled={check}>Médico</Checkbox>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Checkbox value="Psicólogo" disabled={check}>Psicólogo</Checkbox>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Checkbox value="Assistente Social" disabled={check}>Assistente Social</Checkbox>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Checkbox value="Fisioterapia" disabled={check}>Fisioterapia</Checkbox>
-            </Col>
-            <Col xs={24}>
-              <Checkbox value="Outro">Outro</Checkbox>
-              {check && (
-                <Form.Item
-                  name="encaminhamentoOutro"
-                  rules={[{ required: true, message: 'Por favor, digite uma descrição.' }]}
-                >
-                  <Input placeholder="Digite a opção..." />
-                </Form.Item>
-              )}
-            </Col>
-          </Row>
-        </Checkbox.Group>
-      </Form.Item>
-      <Form.Item
-         name="encaminhamento"
-        label="Selecione as opções"
-        className="w-full hidden md:flex"
-        rules={[{ required: true, message: 'Por favor, selecione pelo menos uma opção!' }]}
-      >
-        <Checkbox.Group onChange={onChange}>
-          <Checkbox value="Médico" disabled={check}>Médico</Checkbox>
-          <Checkbox value="Psicólogo" disabled={check}>Psicólogo</Checkbox>
-          <Checkbox value="Assistente Social" disabled={check}>Assistente Social</Checkbox>
-          <Checkbox value="Fisioterapia" disabled={check}>Fisioterapia</Checkbox>
-          <Checkbox value="Outro">Outro
-         {check && (
-           <Form.Item
-           name="encaminhamentoOutro"
-           rules={[{ required: true, message: 'Por favor, digite uma descrição.' }]}
-         >
-           <Input placeholder="Digite a opção..." />
-         </Form.Item>
-         )}
+                        {graus?.map((grau) => (
+                          <Select.Option
+                            key={grau.id}
+                            value={grau.definicaoGrau}
+                          >
+                            {grau.definicaoGrau}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
 
-          </Checkbox>
-        </Checkbox.Group>
-      </Form.Item>
-                <Form.Item label="Especialidade" name="especialidade">
-                  <Input
-                    placeholder="Digite a especialidade"
-                    className="h-10 w-full rounded-md border px-3"
-                  />
-                </Form.Item>
+                    <Form.Item
+                      label="Local da Aplicação"
+                      name="definicaoLocalForm"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Por favor, selecione o local!",
+                        },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Selecione o local"
+                        className="w-full"
+                      >
+                        {locais?.map((local) => (
+                          <Select.Option
+                            key={local.id}
+                            value={local.definicaoLocalForm}
+                          >
+                            {local.definicaoLocalForm}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      name="encaminhamento"
+                      label="Selecione as opções"
+                      className="w-full  md:hidden"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Por favor, selecione pelo menos uma opção!",
+                        },
+                      ]}
+                    >
+                      <Checkbox.Group onChange={onChange}>
+                        <Row gutter={16}>
+                          <Col xs={24} sm={12} lg={6}>
+                            <Checkbox value="Médico" disabled={check}>
+                              Médico
+                            </Checkbox>
+                          </Col>
+                          <Col xs={24} sm={12} lg={6}>
+                            <Checkbox value="Psicólogo" disabled={check}>
+                              Psicólogo
+                            </Checkbox>
+                          </Col>
+                          <Col xs={24} sm={12} lg={6}>
+                            <Checkbox
+                              value="Assistente Social"
+                              disabled={check}
+                            >
+                              Assistente Social
+                            </Checkbox>
+                          </Col>
+                          <Col xs={24} sm={12} lg={6}>
+                            <Checkbox value="Fisioterapia" disabled={check}>
+                              Fisioterapia
+                            </Checkbox>
+                          </Col>
+                          <Col xs={24}>
+                            <Checkbox value="Outro">Outro</Checkbox>
+                            {check && (
+                              <Form.Item
+                                name="encaminhamentoOutro"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "Por favor, digite uma descrição.",
+                                  },
+                                ]}
+                              >
+                                <Input placeholder="Digite a opção..." />
+                              </Form.Item>
+                            )}
+                          </Col>
+                        </Row>
+                      </Checkbox.Group>
+                    </Form.Item>
+                    <Form.Item
+                      name="encaminhamento"
+                      label="Selecione as opções"
+                      className="w-full hidden md:flex"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Por favor, selecione pelo menos uma opção!",
+                        },
+                      ]}
+                    >
+                      <Checkbox.Group onChange={onChange}>
+                        <Checkbox value="Médico" disabled={check}>
+                          Médico
+                        </Checkbox>
+                        <Checkbox value="Psicólogo" disabled={check}>
+                          Psicólogo
+                        </Checkbox>
+                        <Checkbox value="Assistente Social" disabled={check}>
+                          Assistente Social
+                        </Checkbox>
+                        <Checkbox value="Fisioterapia" disabled={check}>
+                          Fisioterapia
+                        </Checkbox>
+                        <Checkbox value="Outro">
+                          Outro
+                          {check && (
+                            <Form.Item
+                              name="encaminhamentoOutro"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Por favor, digite uma descrição.",
+                                },
+                              ]}
+                            >
+                              <Input placeholder="Digite a opção..." />
+                            </Form.Item>
+                          )}
+                        </Checkbox>
+                      </Checkbox.Group>
+                    </Form.Item>
+                    <Form.Item label="Especialidade" name="especialidade">
+                      <Input
+                        placeholder="Digite a especialidade"
+                        className="h-10 w-full rounded-md border px-3"
+                      />
+                    </Form.Item>
 
-                <Form.Item
-                  label="Número do Prontuário"
-                  name="prontuario"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, insira o número do prontuário!",
-                    },
-                  ]}
-                >
-                  <Input
-                    type="number"
-                    placeholder="Digite o número do prontuário"
-                    className="h-10 w-full rounded-md border px-3"
-                  />
-                </Form.Item>
+                    <Form.Item
+                      label="Número do Prontuário"
+                      name="prontuario"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Por favor, insira o número do prontuário!",
+                        },
+                      ]}
+                    >
+                      <Input
+                        type="number"
+                        placeholder="Digite o número do prontuário"
+                        className="h-10 w-full rounded-md border px-3"
+                      />
+                    </Form.Item>
 
-                <Form.Item className="mb-0 flex justify-end md:justify-start  w-full">
-                  <Button
-                    type="primary"
-                    loading={loading}
-                    htmlType="submit"
-                    className="text-white h-10 px-16 bg-emerald-950 hover:bg-emerald-900"
-                  >
-                    {loading ? "Enviando..." : "Enviar"}
-                  </Button>
-                </Form.Item>
-              </Form>
-            </Card>
-          </div>
-        </div>
+                    <Form.Item className="mb-0 flex justify-end md:justify-start  w-full">
+                      <Button
+                        type="primary"
+                        loading={loading}
+                        htmlType="submit"
+                        className="text-white h-10 px-16 bg-emerald-950 hover:bg-emerald-900"
+                      >
+                        {loading ? "Enviando..." : "Enviar"}
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </Card>
+              </div>
+            </div>
+          )}
+        </>
       )}
       {page === 1 && (
         <div className="flex w-full flex-col flex-wrap items-center pl-4 lg:items-start lg:pl-12">
@@ -438,6 +523,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       graus,
       locais,
       tipo,
+      token,
     },
   };
 };
