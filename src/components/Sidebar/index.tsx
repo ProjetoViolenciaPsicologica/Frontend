@@ -82,52 +82,57 @@ export default function AppSidebar() {
       url: "/editar_formulario",
       icon: "edit_form",
     },
-  ]
+  ];
   return (
     <>
       <Sidebar className="bg-gray text-black">
         <SidebarHeader className="p-4">
-        <div className="flex w-full ">
-          <Link
-            href="/dashboard"
-            className={`${quicksand.className} flex  flex-col items-center justify-center text-white `}
-          >
-            <Image src="/icon.svg" width={44} height={44} alt={"icon"} className="w-36 h-36"/>
-            <h1
-              className={`text-neutral-700 text-xl font-medium ${montserrat.className} leading-[46.80px] truncate`}
+          <div className="flex w-full ">
+            <Link
+              href="/dashboard"
+              className={`${quicksand.className} flex  flex-col items-center justify-center text-white `}
             >
-              Quest. Kurt Mendonça
-            </h1>
-          </Link>
-        </div>
-
+              <Image
+                src="/icon.svg"
+                width={44}
+                height={44}
+                alt={"icon"}
+                className="w-36 h-36"
+              />
+              <h1
+                className={`text-neutral-700 text-xl font-medium ${montserrat.className} leading-[46.80px] truncate`}
+              >
+                Quest. Kurt Mendonça
+              </h1>
+            </Link>
+          </div>
         </SidebarHeader>
         <SidebarContent className="px-3 py-4 text-gray-100">
           <SidebarMenu>
             {items.map((item) => (
               <SidebarMenuItem key={item.title}>
-                
-                  <SidebarMenuButton asChild>
-                    <a
-                      href={item.url}
+                <SidebarMenuButton asChild>
+                  <a href={item.url}>
+                    <div
+                      className={`ml-1 fill-white-default text-white-default `}
                     >
-                        <div
-                          className={`ml-1 fill-white-default text-white-default `}
-                        >
-                          <Image src={`/${item.icon}.svg`} width={29} height={29} alt={item.icon} />
-                        </div>
-                    
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                
+                      <Image
+                        src={`/${item.icon}.svg`}
+                        width={29}
+                        height={29}
+                        alt={item.icon}
+                      />
+                    </div>
+
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-         
         </SidebarContent>
         <SidebarFooter className="p-4">
-        <Button
+          <Button
             variant="ghost"
             className="text-black w-full justify-start"
             onClick={() => {

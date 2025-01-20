@@ -7,11 +7,10 @@ import CardDashboard from "@/components/CardDashboard";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
-import  api  from "@/pages/api";
+import { api } from "@/services";
 import { GetServerSideProps } from "next";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
-import Loading from "@/components/Loading";
 
 const ColumnChart = dynamic(() => import("@/components/Charts/ColumnChart"), {
   ssr: false,
@@ -41,22 +40,24 @@ export interface dadosGraficoType {
   Dez: number;
 }
 
-export default function Index() {
+export default function Index({ token }: { token: string }) {
   const router = useRouter();
-  
+
   const { data: quantidade, isLoading: isLoadingQT } = useQuery(
     "quantidade",
     async () => {
       try {
-        const response = await api.formQuantidade()
-       
+        const response = await api.get("formulario/quantidade", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         return response.data;
       } catch (error: any) {
-           toast.error("Sessão expirada");
-          destroyCookie(null, "psi-token");
-          destroyCookie(null, "psi-refreshToken");
-          router.push("/login");
-       
+        toast.error("Sessão expirada");
+        destroyCookie(null, "psi-token");
+        destroyCookie(null, "psi-refreshToken");
+        router.push("/login");
       }
     }
   );
@@ -64,23 +65,27 @@ export default function Index() {
     "dadosGrafico",
     async () => {
       try {
-        const response = await api.formPorMes()
-       
+        const response = await api.get("formulario/porMes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         return response.data;
       } catch (error: any) {
-           toast.error("Sessão expirada");
-          destroyCookie(null, "psi-token");
-          destroyCookie(null, "psi-refreshToken");
-          router.push("/login");
-       
+        toast.error("Sessão expirada");
+        destroyCookie(null, "psi-token");
+        destroyCookie(null, "psi-refreshToken");
+        router.push("/login");
       }
     }
   );
 
   return (
-    <Layout title="DASHBOARD" description="Gestão e visualização de informações sobre violência psicológica">
+    <Layout
+      title="DASHBOARD"
+      description="Gestão e visualização de informações sobre violência psicológica"
+    >
       <div className="overflow-y-hidden">
-        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-14 gap-x-14 mt-4 mx-auto">
           <Link href="/usuarios">
             <CardDashboard title="USUÁRIOS" svg="user1" />
@@ -149,7 +154,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   }
 
   // Decode token
-  let decoded:any;
+  let decoded: any;
   try {
     decoded = jwtDecode(token);
   } catch (error) {
@@ -179,7 +184,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   // Authentication successful, proceed with rendering the page
   return {
     props: {
-      title: "ok",
+      token,
     },
   };
 };
