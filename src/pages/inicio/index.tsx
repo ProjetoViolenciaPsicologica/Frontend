@@ -502,26 +502,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
-  const response = await api.get("local", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const response1 = await api.get("grau", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  // Authentication successful, proceed with rendering the page
-  const locais = response.data;
-  const graus = response1.data;
 
   // Authentication successful, proceed with rendering the page
   return {
     props: {
-      graus,
-      locais,
       tipo,
       token,
     },
