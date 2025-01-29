@@ -73,8 +73,10 @@ export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], 
   };
 
   useEffect(() => {
-    if (page === 3 && tipo === "saúde") {
-      console.log(allOptions);
+    if(page === 3 && tipo === "saúde") {
+      setOkQuestion(true);
+    }
+    if (okQuestion) {
       const questions = allOptions.split(",");
       const sum = questions.map(Number).reduce((acc, curr) => acc + curr, 0);
       console.log(questions);
@@ -351,7 +353,7 @@ export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], 
             </Form>
           </div>
         )}
-        {loadingComp && (
+        {loadingComp && tipo === "saúde" &&  (
           <Loading />
         )}
       </div>
@@ -402,6 +404,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const isSuperuser = decoded?.is_superuser;
   const tipo = decoded?.tipo.toLowerCase();
   // If user is not superuser, redirect to home page
+  const id = cookies["id-entrevistado"];
+  if(!id){
+    return {
+      redirect: {
+        destination: "/inicio",
+        permanent: false,
+      },
+    };
+  }
   if (isSuperuser) {
     return {
       redirect: {

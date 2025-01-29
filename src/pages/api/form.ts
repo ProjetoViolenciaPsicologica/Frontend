@@ -410,7 +410,6 @@ api_form.updateUser = async (id: number, dataUser: any) => {
 };
 
 api_form.createUser = async (dataUser: any) => {
-  console.log(dataUser);
   try {
     const response = await api_form.post("user/register", dataUser);
     return response;
@@ -422,7 +421,6 @@ api_form.createUser = async (dataUser: any) => {
 };
 
 api_form.createUserAdmin = async (dataUser: any) => {
-  console.log(dataUser);
   try {
     const response = await api_form.post("user/admin/register", dataUser);
     return response;

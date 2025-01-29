@@ -1,25 +1,25 @@
 import React, { useState } from "react";
 import Layout from "@/components/Layout";
-import { Raleway, Karla, Inter } from "next/font/google";
-import { Form, Button, Space, Switch, Select, InputNumber, DatePicker, Slider } from "antd";
+import { Karla, Inter } from "next/font/google";
+import {
+  Form,
+  Button,
+  Space,
+  Switch,
+  Select,
+  InputNumber,
+  DatePicker,
+  Slider,
+} from "antd";
 import ptBR from "antd/lib/date-picker/locale/pt_BR";
-import * as XLSX from "xlsx";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import api from "@/pages/api";
+import { handleExportExcel, handleExportPDF } from "@/utils/files";
+import { IGrau, ILocal, IArea, ITipo, Users } from "@/utils/inicio/types";
 import { GetServerSideProps } from "next";
-import { destroyCookie, parseCookies, setCookie } from "nookies";
+import { parseCookies, setCookie } from "nookies";
 import { useRouter } from "next/router";
-import { toast } from "react-toastify";
 const { RangePicker } = DatePicker;
-type Users = {
-  id: number;
-  name: string;
-};
-
-const raleway = Raleway({
-  style: "normal",
-  subsets: ["latin"],
-});
 
 const inter = Inter({
   style: "normal",
@@ -31,11 +31,22 @@ const karla = Karla({
   subsets: ["latin"],
 });
 
-function Index({ users }: { users: Users[] }) {
+function Index({
+  users,
+  graus,
+  locais,
+  areas,
+  tipos,
+}: {
+  users: Users[];
+  locais: ILocal[];
+  graus: IGrau[];
+  areas: IArea[];
+  tipos: ITipo[];
+}) {
   const [form] = Form.useForm(); // Use a instância do Form
   const router = useRouter();
   const [disabledAge, setDisabledAge] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [loading1, setLoading1] = useState(false);
   const [startDate, setStartDate] = useState<any>(null);
@@ -67,20 +78,23 @@ function Index({ users }: { users: Users[] }) {
     }
     setLoading(true);
     try {
-      if(disabledAge && params.idade){
-        params.idade_min = params?.idade[0]
-        params.idade_max = params?.idade[1]
-        delete params?.idade
+      if (disabledAge && params.idade) {
+        params.idade_min = params?.idade[0];
+        params.idade_max = params?.idade[1];
+        delete params?.idade;
       }
       const response = await api.filtro(params);
       setCookie(undefined, "dataSearch", response.data.length);
       setCookie(undefined, "dataFilter", JSON.stringify(params));
-      disabledAge && setCookie(undefined, "age",`${params.idade_min} - ${params.idade_max}`)
+      disabledAge &&
+        setCookie(
+          undefined,
+          "age",
+          `${params.idade_min} - ${params.idade_max}`
+        );
       router.push("/filtro");
-      
     } catch (error) {
-      console.log(error)
-     
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -120,115 +134,22 @@ function Index({ users }: { users: Users[] }) {
     } else {
       delete params.data_inicio;
     }
-    console.log(params);
     setLoading1(true);
     try {
       const response = await api.filtro(params);
       handleExportExcel(response.data);
+      //handleExportPDF(response.data);
     } catch (error) {
     } finally {
       setLoading1(false);
     }
   }
 
-  const mapQuestaoCodigoParaTexto = (codigo: number) => {
-    switch (codigo) {
-      case 1:
-        return "Nunca";
-      case 2:
-        return "Às vezes";
-      case 3:
-        return "Frequentemente";
-      case 4:
-        return "Sempre";
-      default:
-        return "";
-    }
-  };
-  
-  const handleExportExcel = (filteredData: any) => {
-    const dataFilter = filteredData.map(
-      (data: {
-        grauInstrucao: any;
-        campo_questoes: any;
-        idade: any;
-        escolha_sexo: any;
-        localAplicacao: { definicaoLocalForm: any } | undefined; // Adicionando | undefined
-      }) => {
-        // Corrigindo o cálculo do somatório das questões
-        const sum = data.campo_questoes.split(",").reduce((acc: number, curr: string) => acc + parseInt(curr), 0);
-        const message = sum >= 15 && sum <= 30 ? "Sinal verde" : 
-                sum >= 31 && sum <= 38 ? "Sinal amarelo" :
-                sum >= 39 && sum <= 60 ? "Sinal vermelho" : null
-        const campoQuestoesTexto = data.campo_questoes
-          .split(",")
-          .map((codigo: string) => mapQuestaoCodigoParaTexto(parseInt(codigo)))
-          .join(", ");
-  
-        return {
-          questões: campoQuestoesTexto,
-          idade: data.idade,
-          sexo: data.escolha_sexo,
-          "local da aplicação": data.localAplicacao?.definicaoLocalForm || "N/A", // Adicionando verificação e valor padrão
-          "Grau de instrução": data.grauInstrucao?.definicaoGrau || "N/A", // Adicionando valor padrão
-          "Somatório questões": sum,
-          "Sinal": message
-        };
-      }
-    );
-    const excelData = convertToExcelData(dataFilter);
-    console.log(filteredData);
-    // Cria uma nova pasta de trabalho do Excel
-    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
-
-    
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Dados Filtrados");
-
-    // Converte o livro de trabalho em um blob
-    const excelBlob = workbook2blob(workbook);
-
-    // Cria um objeto URL a partir do blob
-    const url = window.URL.createObjectURL(excelBlob);
-
-    // Cria um link temporário e o clica para iniciar o download
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "filtered_data.xlsx";
-    link.click();
-
-    // Libera o objeto URL quando o link é removido
-    window.URL.revokeObjectURL(url);
-  };
-
-  // Função para converter os dados para o formato apropriado para o Excel
-  const convertToExcelData = (data: any[]) => {
-    const headerRow = Object.keys(data[0]);
-    const rows = data.map((row) => Object.values(row));
-    return [headerRow, ...rows];
-  };
-
-  // Função para converter o livro de trabalho em um blob
-  const workbook2blob = (workbook: XLSX.WorkBook) => {
-    const wopts: XLSX.WritingOptions = {
-      bookType: "xlsx",
-      bookSST: false,
-      type: "binary",
-    };
-    const wbout = XLSX.write(workbook, wopts);
-
-    function s2ab(s: string): ArrayBuffer {
-      const buf = new ArrayBuffer(s.length);
-      const view = new Uint8Array(buf);
-      for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
-      return buf;
-    }
-
-    return new Blob([s2ab(wbout)], { type: "application/octet-stream" });
-  };
-
   return (
-    <Layout title="ARQUIVOS" description="Manipulação e extração de informações da base de dados do sistema">
+    <Layout
+      title="ARQUIVOS"
+      description="Manipulação e extração de informações da base de dados do sistema"
+    >
       <div className="flex w-full  flex-col items-center pl-4 lg:items-start bg-[#F6FBF9]">
         <div className=" flex flex-col w-full ">
           <button
@@ -284,15 +205,11 @@ function Index({ users }: { users: Users[] }) {
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
                     <Select.Option value="">------</Select.Option>
-                    <Select.Option value="fundamental">
-                      Ensino fundamental completo
-                    </Select.Option>
-                    <Select.Option value="medio">
-                      Ensino médio completo
-                    </Select.Option>
-                    <Select.Option value="superior">
-                      Ensino superior completo
-                    </Select.Option>
+                    {graus?.map((grau) => (
+                      <Select.Option key={grau.id} value={grau.definicaoGrau}>
+                        {grau.definicaoGrau}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </div>
@@ -326,13 +243,20 @@ function Index({ users }: { users: Users[] }) {
                   </label>
                 </div>
                 <Form.Item name="idade" className="block">
-                  {disabledAge ? (<Slider range defaultValue={[0, 50]} className="w-72 md:w-[411px]"/>
-   ) : (<InputNumber
-                    type="number"
-                    min={2}
-                    placeholder="Digite sua idade"
-                    className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
-                  />)}
+                  {disabledAge ? (
+                    <Slider
+                      range
+                      defaultValue={[0, 50]}
+                      className="w-72 md:w-[411px]"
+                    />
+                  ) : (
+                    <InputNumber
+                      type="number"
+                      min={2}
+                      placeholder="Digite sua idade"
+                      className="w-72 md:w-[411px] flex items-center h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
+                    />
+                  )}
                 </Form.Item>
               </div>
               <div className="flex flex-col">
@@ -375,9 +299,14 @@ function Index({ users }: { users: Users[] }) {
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
                     <Select.Option value="">--------</Select.Option>
-                    <Select.Option value="hospital">Hospital</Select.Option>
-                    <Select.Option value="escola">Escola</Select.Option>
-                    <Select.Option value="delegacia">Delegacia</Select.Option>
+                    {locais?.map((local) => (
+                      <Select.Option
+                        key={local.id}
+                        value={local.definicaoLocalForm}
+                      >
+                        {local.definicaoLocalForm}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </div>
@@ -427,9 +356,11 @@ function Index({ users }: { users: Users[] }) {
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
                     <Select.Option value="">------</Select.Option>
-                    <Select.Option value="Saúde">Saúde</Select.Option>
-                    <Select.Option value="Educação">Educação</Select.Option>
-                    <Select.Option value="Segurança">Segurança</Select.Option>
+                    {areas?.map((area: IArea) => (
+                      <Select.Option key={area.id} value={area.definicaoArea}>
+                        {area.definicaoArea}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </div>
@@ -450,15 +381,11 @@ function Index({ users }: { users: Users[] }) {
                     className="text-black font-bold text-lg w-[411px] h-[58.67px] bg-white rounded-[10px] shadow border border-black border-opacity-10"
                   >
                     <Select.Option value="">------</Select.Option>
-                    <Select.Option value="Agente de Saúde">
-                      Agente de Saúde
-                    </Select.Option>
-                    <Select.Option value="Agente de Educação">
-                      Agente de Educação
-                    </Select.Option>
-                    <Select.Option value="Agente de Segurança">
-                      Agente de Segurança
-                    </Select.Option>
+                    {tipos?.map((tipo: ITipo) => (
+                      <Select.Option key={tipo.id} value={tipo.definicaoTipo}>
+                        {tipo.definicaoTipo}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </div>
@@ -556,9 +483,37 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     });
     const users = response.data;
+    const response1 = await api.get("local", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const locais = response1.data;
+    const response2 = await api.get("grau", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const graus = response2.data;
+    const response3 = await api.get("area", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const response4 = await api.get("tipo", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const areas = response3.data;
+    const tipos = response4.data;
     return {
       props: {
         users: users,
+        locais: locais,
+        graus: graus,
+        areas: areas,
+        tipos: tipos,
       },
     };
   } catch (error) {
@@ -570,9 +525,3 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 };
-
-
-
-
-
-
