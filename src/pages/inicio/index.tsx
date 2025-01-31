@@ -469,7 +469,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   // Get token from cookies
   const token = cookies["psi-token"];
-
+ 
   // Check if token exists and is a string
   if (!token || typeof token !== "string") {
     // Redirect to login page
@@ -489,7 +489,20 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     console.error("Error decoding token:", error);
     // Redirect to login page or handle error appropriately
   }
-
+  const response = await api.get("formulario", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const dados:{id:number, campo_questoes:string}[] = response.data.campo_questoes;
+  const apenasNull = dados?.filter(item => item.campo_questoes === null);
+  apenasNull?.forEach(async (item) => {
+    await api.delete(`formulario/${item.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  });
   // Check if user is superuser
   const isSuperuser = decoded?.is_superuser;
   const tipo = decoded?.tipo.toLowerCase();

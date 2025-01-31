@@ -15,8 +15,9 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import Router, { useRouter } from "next/router";
-import { destroyCookie } from "nookies";
+import { destroyCookie, parseCookies } from "nookies";
 import { Modal, Divider } from "antd";
+import { api } from "@/services";
 
 const montserrat = Montserrat({
   style: "normal",
@@ -44,10 +45,27 @@ export default function AppSidebar() {
   const router = useRouter();
   const [isOpen, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const cookies = parseCookies();
+  const token = cookies["psi-token"];
+  const id = parseInt(cookies["id-entrevistado"], 10);
   function handleCancel() {
     setIsModalOpen(false);
   }
-  function handleLogout() {
+  async function handleLogout() {
+    try {
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const response = await api.get(`formulario/${id}`, { headers });
+      const form: { campo_questoes: string } = response.data;
+      if (form.campo_questoes === null || form.campo_questoes === "") {
+        await api.delete(`formulario/${id}`, { headers });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    destroyCookie(null, "id-entrevistado");
     destroyCookie(null, "psi-token");
     destroyCookie(null, "psi-refreshToken");
     Router.push("/login");
@@ -58,56 +76,57 @@ export default function AppSidebar() {
       url: "/inicio",
       icon: "home",
     },
-    {
-      title: "QUESTIONÁRIO",
-      url: "/formularioUser",
-      icon: "form",
-    },
-  ]
+  ];
   return (
     <>
       <Sidebar className="bg-gray text-black">
         <SidebarHeader className="p-4">
-        <div className="flex w-full ">
-          <Link
-            href="/dashboard"
-            className={`${quicksand.className} flex  flex-col items-center justify-center text-white `}
-          >
-            <Image src="/icon.svg" width={44} height={44} alt={"icon"} className="w-36 h-36"/>
-            <h1
-              className={`text-neutral-700 text-xl font-medium ${montserrat.className} leading-[46.80px] truncate`}
+          <div className="flex w-full ">
+            <Link
+              href="/dashboard"
+              className={`${quicksand.className} flex  flex-col items-center justify-center text-white `}
             >
-              Quest. Kurt Mendonça
-            </h1>
-          </Link>
-        </div>
-
+              <Image
+                src="/icon.svg"
+                width={44}
+                height={44}
+                alt={"icon"}
+                className="w-36 h-36"
+              />
+              <h1
+                className={`text-neutral-700 text-xl font-medium ${montserrat.className} leading-[46.80px] truncate`}
+              >
+                Quest. Kurt Mendonça
+              </h1>
+            </Link>
+          </div>
         </SidebarHeader>
-        <SidebarContent className="px-3 py-4 text-gray-100">
+        <SidebarContent className="px-3 py-3 text-gray-100">
           <SidebarMenu>
             {items.map((item) => (
               <SidebarMenuItem key={item.title}>
-                
-                  <SidebarMenuButton asChild>
-                    <a
-                      href={item.url}
+                <SidebarMenuButton asChild>
+                  <a href={item.url}>
+                    <div
+                      className={`ml-1 fill-white-default text-white-default `}
                     >
-                        <div
-                          className={`ml-1 fill-white-default text-white-default `}
-                        >
-                          <Image src={`/${item.icon}.svg`} width={29} height={29} alt={item.icon} />
-                        </div>
-                    
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                
+                      <Image
+                        src={`/${item.icon}.svg`}
+                        width={29}
+                        height={29}
+                        alt={item.icon}
+                      />
+                    </div>
+
+                    <span className="font-medium">{item.title}</span>
+                  </a>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
           <Button
             variant="ghost"
-            className="text-black w-full justify-start"
+            className="text-black font-normal w-full justify-start"
             onClick={() => {
               if (
                 Router.asPath === "/formularioUser" ||
@@ -119,13 +138,10 @@ export default function AppSidebar() {
               }
             }}
           >
-            <img src="/logout.svg" alt="Logout" className="mr-2" />
-            <span className={quicksand.className}>Sair</span>
+            <img src="/logout.svg" alt="Logout" className="mr-1" />
+            <span className={quicksand.className}>SAIR</span>
           </Button>
         </SidebarContent>
-        <SidebarFooter className="p-4">
-          
-        </SidebarFooter>
       </Sidebar>
 
       <Modal
