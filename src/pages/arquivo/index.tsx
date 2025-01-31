@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useState } from "react";
 import Layout from "@/components/Layout";
 import { Karla, Inter } from "next/font/google";
@@ -10,9 +11,13 @@ import {
   InputNumber,
   DatePicker,
   Slider,
+  Dropdown,
+  Menu,
 } from "antd";
 import ptBR from "antd/lib/date-picker/locale/pt_BR";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined, DownOutlined } from "@ant-design/icons";
+import { CiExport } from "react-icons/ci";
+import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import api from "@/pages/api";
 import { handleExportExcel, handleExportPDF } from "@/utils/files";
 import { IGrau, ILocal, IArea, ITipo, Users } from "@/utils/inicio/types";
@@ -137,13 +142,49 @@ function Index({
     setLoading1(true);
     try {
       const response = await api.filtro(params);
-      handleExportExcel(response.data);
-      //handleExportPDF(response.data);
+      //handleExportExcel(response.data);
+      handleExportPDF(response.data);
     } catch (error) {
     } finally {
       setLoading1(false);
     }
   }
+
+  const handleExportOption = (type: string) => {
+    const params = form.getFieldsValue();
+    if (startDate && endDate) {
+      params.data_inicio = startDate;
+      params.data_fim = endDate;
+    } else {
+      delete params.data_inicio;
+    }
+    setLoading1(true);
+    api
+      .filtro(params)
+      .then((response: { data: any; }) => {
+        if (type === "excel") {
+          handleExportExcel(response.data); // Chama a função para exportar em Excel
+        } else if (type === "pdf") {
+          handleExportPDF(response.data); // Chama a função para exportar em PDF
+        }
+      })
+      .catch((error: any) => console.error(error))
+      .finally(() => setLoading1(false));
+  };
+
+  // Menu do Dropdown
+  const exportMenu = (
+    <Menu>
+      <Menu.Item key="1" icon={<FaFileExcel size={20} />} onClick={() => handleExportOption("excel")}>
+        
+
+        Exportar em Excel
+      </Menu.Item>
+      <Menu.Item key="2" icon={<FaFilePdf size={20} />} onClick={() => handleExportOption("pdf")}>
+        Exportar em PDF
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <Layout
@@ -158,31 +199,7 @@ function Index({
             }}
             className="mr-6 hover:cursor-pointer my-6"
           >
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 30 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect width="30" height="30" rx="5" fill="#4239F2" />
-              <g clipPath="url(#clip0_1450_3668)">
-                <path
-                  d="M13.9023 15.0004L18.543 10.3598L17.2173 9.03418L11.2511 15.0004L17.2173 20.9667L18.543 19.6411L13.9023 15.0004Z"
-                  fill="white"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_1450_3668">
-                  <rect
-                    width="22.5"
-                    height="22.5"
-                    fill="white"
-                    transform="matrix(-1 0 0 1 26.25 3.75)"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
+          <img src="/back.svg" alt="Voltar" />
           </button>
         </div>
 
@@ -446,13 +463,16 @@ function Index({
             >
               VISUALIZAR
             </Button>
-            <Button
-              loading={loading1}
-              htmlType="submit"
-              className={`${inter.className} w-[202px] h-[59px] bg-emerald-950 rounded-[32px] text-white font-bold `}
-            >
-              EXPORTAR
-            </Button>
+            <Dropdown overlay={exportMenu}>
+              <Button
+                loading={loading1}
+                icon={<CiExport size={24}/>}
+                className={`${inter.className} w-[202px] h-[59px] bg-emerald-950 rounded-[32px] text-white font-bold flex items-center justify-center`}
+              >
+               
+               EXPORTAR 
+              </Button>
+            </Dropdown>
           </div>
         </Form>
       </div>

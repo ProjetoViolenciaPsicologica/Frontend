@@ -405,7 +405,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const tipo = decoded?.tipo.toLowerCase();
   // If user is not superuser, redirect to home page
   const id = cookies["id-entrevistado"];
-  if(!id){
+  if(!id && tipo === "saúde") {
     return {
       redirect: {
         destination: "/inicio",
