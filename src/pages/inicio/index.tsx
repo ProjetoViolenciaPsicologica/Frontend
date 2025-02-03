@@ -27,9 +27,11 @@ import { useQuery } from "react-query";
 export default function Index({
   tipo,
   token,
+  id,
 }: {
   tipo: string;
   token: string;
+  id: any;
 }) {
   const { data: locais, isLoading: loadingLocais } = useQuery<ILocal[]>(
     "locais",
@@ -104,7 +106,7 @@ export default function Index({
       title="Formulário de Avaliação"
       description="Formulário de Avaliação"
     >
-      {page === 0 && (
+      {page === 0 && id === null || !id && (
         <>
           {loadingGrau && loadingLocais ? (
             <div className="w-full h-full flex justify-center mt-10">
@@ -349,7 +351,7 @@ export default function Index({
           )}
         </>
       )}
-      {page === 1 && (
+      {page === 1 && id !== null || id && (
         <div className="flex w-full flex-col flex-wrap items-center pl-4 lg:items-start lg:pl-12">
           {/* Desktop */}
 
@@ -469,7 +471,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   // Get token from cookies
   const token = cookies["psi-token"];
- 
+   const id = cookies["id-entrevistado"];
   // Check if token exists and is a string
   if (!token || typeof token !== "string") {
     // Redirect to login page
@@ -494,8 +496,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  const dados:{id:number, campo_questoes:string}[] = response.data.campo_questoes;
-  const apenasNull = dados?.filter(item => item.campo_questoes === null);
+  const dados:any = response.data
+  const apenasNull = dados?.filter(item => item.campo_questoes === null) // Filtra os elementos com campo_questoes como null
+  .map(item => item.id);
   apenasNull?.forEach(async (item) => {
     await api.delete(`formulario/${item.id}`, {
       headers: {
@@ -521,6 +524,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     props: {
       tipo,
       token,
+      id,
     },
   };
 };
