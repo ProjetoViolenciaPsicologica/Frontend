@@ -27,11 +27,9 @@ import { useQuery } from "react-query";
 export default function Index({
   tipo,
   token,
-  id,
 }: {
   tipo: string;
   token: string;
-  id: any;
 }) {
   const { data: locais, isLoading: loadingLocais } = useQuery<ILocal[]>(
     "locais",
@@ -55,6 +53,8 @@ export default function Index({
       return response1.data;
     }
   );
+  const cookies = parseCookies();
+   const id = cookies["id-entrevistado"];
   const [form] = Form.useForm();
   const [page, setPage] = useState(
     tipo === "saúde" || tipo === "saude" ? 0 : 1
