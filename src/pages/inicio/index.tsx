@@ -496,10 +496,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  const dados:{id:number, campo_questoes:string | null}[] = response.data
-  const apenasNull = dados?.filter(item => item.campo_questoes === null) // Filtra os elementos com campo_questoes como null
+  const dados:any = response.data
+  const apenasNull = dados?.filter(item:any => item.campo_questoes === null) // Filtra os elementos com campo_questoes como null
   .map(item => item.id);
-  apenasNull?.forEach(async (item) => {
+  apenasNull?.forEach(async (item:any) => {
     await api.delete(`formulario/${item.id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
