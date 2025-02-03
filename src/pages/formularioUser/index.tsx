@@ -43,7 +43,7 @@ interface IGrau {
   definicaoGrau: string;
 }
 
-export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], locais:ILocal[], tipo:string, isSuperuser:boolean}) {
+export default function Index({graus,locais, tipo, isSuperuser, id}:{graus:IGrau[], locais:ILocal[], tipo:string, isSuperuser:boolean, id:number}) {
   const [form] = Form.useForm(); // Extrai a referência do form
   const router = useRouter();
   const [loadingComp, setLoadingComp] = useState(false);
@@ -247,7 +247,7 @@ export default function Index({graus,locais, tipo, isSuperuser}:{graus:IGrau[], 
             setSelectedOptions={setSelectedOptions}
           />
         )}
-        {page === 3 && tipo !== "saúde" &&(
+        {page === 3 && tipo !== "saúde" && !id &&(
           <div className="w-full mt-8 flex justify-center lg:justify-start">
             <Form
               form={form}
@@ -443,6 +443,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       locais,
       tipo,
       isSuperuser,
+      id,
     },
   };
 };
