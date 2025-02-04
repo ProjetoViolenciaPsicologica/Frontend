@@ -19,7 +19,7 @@ import type { GetProp } from "antd";
 import Link from "next/link";
 import { parseCookies, setCookie } from "nookies";
 import { GetServerSideProps } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { api } from "@/services";
 import { useQuery } from "react-query";
@@ -31,6 +31,7 @@ export default function Index({
   tipo: string;
   token: string;
 }) {
+  
   const { data: locais, isLoading: loadingLocais } = useQuery<ILocal[]>(
     "locais",
     async () => {
@@ -54,18 +55,29 @@ export default function Index({
     }
   );
   const [form] = Form.useForm();
-  const [page, setPage] = useState(
-    tipo === "saúde" || tipo === "saude" ? 0 : 1
-  );
+  const [page, setPage] = useState<number | null>(null);
   const [check, setCheck] = useState(false);
   const [loading, setLoading] = useState(false);
+  const cookies = parseCookies();
+  const id = cookies["id-entrevistado"] ?? null;
+  useEffect(() => {
+    setPage(tipo === "saúde" || tipo === "saude" ? 0 : 1);
+    if(id !== null) {
+      setPage(1);
+    }
+    else {
+      setPage(0);
+    }
+  }, [tipo, id]);
+ 
+  if (page === null) return null; // Evita renderização inconsistente entre SSR e CSR
+
   const onChange: GetProp<typeof Checkbox.Group, "onChange"> = (
     checkedValues
   ) => {
     const encontrado = checkedValues.find((value) => value === "Outro");
     encontrado === "Outro" ? setCheck(true) : setCheck(false);
   };
-
   const onSubmit = async (data: any) => {
     setLoading(true);
     const encaminhamento = encaminhamentoData(data);
@@ -104,7 +116,7 @@ export default function Index({
       title="Formulário de Avaliação"
       description="Formulário de Avaliação"
     >
-      {page === 0 && (
+      {page === 0 && id === null && (
         <>
           {loadingGrau && loadingLocais ? (
             <div className="w-full h-full flex justify-center mt-10">
@@ -349,8 +361,8 @@ export default function Index({
           )}
         </>
       )}
-      {page === 1 && (
-        <div className="flex w-full flex-col flex-wrap items-center pl-4 lg:items-start lg:pl-12">
+      {page === 1 && id !== null && (
+        <>
           {/* Desktop */}
 
           <div className="mt-8 flex flex-col ">
@@ -457,7 +469,7 @@ export default function Index({
               </span>
             </Link>
           </div>
-        </div>
+        </>
       )}
     </Layout>
   );
@@ -469,7 +481,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   // Get token from cookies
   const token = cookies["psi-token"];
- 
+   const id = cookies["id-entrevistado"];
   // Check if token exists and is a string
   if (!token || typeof token !== "string") {
     // Redirect to login page
@@ -494,15 +506,20 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  const dados:{id:number, campo_questoes:string}[] = response.data.campo_questoes;
-  const apenasNull = dados?.filter(item => item.campo_questoes === null);
-  apenasNull?.forEach(async (item) => {
-    await api.delete(`formulario/${item.id}`, {
+  const dados: any = response.data;
+const apenasNull = dados?.filter((item: any) => item.campo_questoes === null) // Filtra os elementos com campo_questoes como null
+  .map((item: any) => item.id);
+
+if (apenasNull && apenasNull.length > 0 && id === undefined) {
+  for (const id of apenasNull) {
+    await api.delete(`formulario/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-  });
+  }
+}
+
   // Check if user is superuser
   const isSuperuser = decoded?.is_superuser;
   const tipo = decoded?.tipo.toLowerCase();
