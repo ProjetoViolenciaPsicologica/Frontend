@@ -6,6 +6,7 @@ import { useMutation } from "react-query";
 import { api } from "@/services";
 import { destroyCookie, parseCookies } from "nookies";
 import {useRouter} from "next/router";
+import { jwtDecode } from "jwt-decode";
 
 
 const montserrat = Montserrat({
@@ -40,7 +41,6 @@ export default function Index({
   tipo,
   setPage,
   page,
-  isSuperuser,
   setLoadingComp,
 }: ValuePropsType) {
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,10 @@ export default function Index({
   }, [isModalOpen]);
 
   const cookies = parseCookies();
+
   const token = cookies["psi-token"];
+  const decoded : { is_superuser: boolean} = jwtDecode(token);
+  const isSuperuser = decoded.is_superuser;
   const createForm = useMutation(
     async (data: any) => {
       const id = parseInt(cookies["id-entrevistado"], 10);

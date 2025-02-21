@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Router, { useRouter } from "next/router";
 import { destroyCookie, parseCookies } from "nookies";
-import { Modal, Divider } from "antd";
+import { Modal, Divider, notification } from "antd";
 import { api } from "@/services";
 
 const montserrat = Montserrat({
@@ -41,13 +41,18 @@ const quicksand = Quicksand({
   subsets: ["latin"],
 });
 
-export default function AppSidebar() {
+export default function AppSidebar({
+  disabledLink,
+}: {
+  disabledLink?: boolean;
+}) {
   const router = useRouter();
   const [isOpen, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const cookies = parseCookies();
   const token = cookies["psi-token"];
   const id = parseInt(cookies["id-entrevistado"], 10);
+  const id2 = cookies["id-entrevistado"];
   function handleCancel() {
     setIsModalOpen(false);
   }
@@ -104,9 +109,20 @@ export default function AppSidebar() {
         <SidebarContent className="px-3 py-3 text-gray-100">
           <SidebarMenu>
             {items.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url}>
+              <SidebarMenuItem key={item.title} className="cursor-pointer">
+                <SidebarMenuButton
+                  asChild
+                  onClick={() => {
+                    disabledLink && notification.warning({
+                      message: "Proibido",
+                      description: "Responda o questionário para voltar",
+                    });
+                  }}
+                >
+                  <a
+                    href={!disabledLink ? item.url : undefined}
+                    className="cursor-pointer"
+                  >
                     <div
                       className={`ml-1 fill-white-default text-white-default `}
                     >

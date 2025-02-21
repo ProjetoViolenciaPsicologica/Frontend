@@ -15,6 +15,7 @@ export type TitleType = {
   children?: React.ReactNode;
   rollback?: boolean;
   op?: boolean;
+  disabledLink?: boolean;
 };
 
 export default function Index({
@@ -22,12 +23,13 @@ export default function Index({
   title,
   description,
   op = false,
+  disabledLink,
 }: TitleType) {
   const [trigger, setTrigger] = useState(true);
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
-        <SidebarUser />
+        <SidebarUser disabledLink={disabledLink} />
         <div className="w-full flex-1">
           <div className="bg-white top-0 w-full border-b border-[#E0D8C5]">
             <div className="flex items-center px-4 py-1 bg-gray md:bg-white text-black">

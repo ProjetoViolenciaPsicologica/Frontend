@@ -52,7 +52,6 @@ export default function Login() {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     const response = await signIn(data);
-    console.log(response);
     if (response) {
       setError(true);
     }

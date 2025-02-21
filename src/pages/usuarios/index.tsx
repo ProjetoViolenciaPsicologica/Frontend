@@ -203,7 +203,6 @@ export default function Index({
             delete dataAdmin.area;
             delete dataAdmin.tipo;
             await api.createUserAdmin(dataAdmin);
-            console.log(dataAdmin);
             toast.success("Usuário criado com sucesso!");
           } else {
             const dataCopy = { ...dataUser, parametro: admin ? "on" : "off" };
