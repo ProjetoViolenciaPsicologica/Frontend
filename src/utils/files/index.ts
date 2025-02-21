@@ -86,7 +86,6 @@ export const handleExportExcel = (filteredData: any) => {
   );
 
   const excelData = convertToExcelData(dataFilter);
-  console.log(filteredData);
 
   // Cria uma nova pasta de trabalho do Excel
   const worksheet = XLSX.utils.aoa_to_sheet(excelData);

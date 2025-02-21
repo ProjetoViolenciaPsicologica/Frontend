@@ -25,13 +25,15 @@ import { api } from "@/services";
 import { useQuery } from "react-query";
 
 export default function Index({
-  tipo,
   token,
+  page1,
+  permission,
 }: {
-  tipo: string;
+  page1: number;
   token: string;
+  permission: boolean;
 }) {
-  
+  const [perm, setPerm] = useState(permission);
   const { data: locais, isLoading: loadingLocais } = useQuery<ILocal[]>(
     "locais",
     async () => {
@@ -55,23 +57,11 @@ export default function Index({
     }
   );
   const [form] = Form.useForm();
-  const [page, setPage] = useState<number | null>(null);
+  const [page, setPage] = useState<number>(page1);
   const [check, setCheck] = useState(false);
   const [loading, setLoading] = useState(false);
-  const cookies = parseCookies();
-  const id = cookies["id-entrevistado"] ?? null;
-  useEffect(() => {
-    setPage(tipo === "saúde" || tipo === "saude" ? 0 : 1);
-    if(id !== null) {
-      setPage(1);
-    }
-    else {
-      setPage(0);
-    }
-  }, [tipo, id]);
  
   if (page === null) return null; // Evita renderização inconsistente entre SSR e CSR
-
   const onChange: GetProp<typeof Checkbox.Group, "onChange"> = (
     checkedValues
   ) => {
@@ -85,7 +75,6 @@ export default function Index({
 
     try {
       const response = await apiForm.createDataUser(data1);
-      console.log(response);
       if (response.status === 201) {
         notification.success({
           message: "Sucesso!",
@@ -93,6 +82,7 @@ export default function Index({
         });
         setCookie(undefined, "id-entrevistado", `${response.data.id}`);
         setPage(page + 1);
+        setPerm(true);
         window.scrollTo({
           top: 0,
           behavior: "smooth",
@@ -115,8 +105,9 @@ export default function Index({
     <Layout
       title="Formulário de Avaliação"
       description="Formulário de Avaliação"
+      disabledLink={permission}
     >
-      {page === 0 && id === null && (
+      {page === 0 && (
         <>
           {loadingGrau && loadingLocais ? (
             <div className="w-full h-full flex justify-center mt-10">
@@ -361,7 +352,7 @@ export default function Index({
           )}
         </>
       )}
-      {page === 1 && id !== null && (
+      {page === 1 &&(
         <>
           {/* Desktop */}
 
@@ -481,7 +472,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   // Get token from cookies
   const token = cookies["psi-token"];
-   const id = cookies["id-entrevistado"];
+   const id = cookies["id-entrevistado"] || null;
   // Check if token exists and is a string
   if (!token || typeof token !== "string") {
     // Redirect to login page
@@ -509,7 +500,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const dados: any = response.data;
 const apenasNull = dados?.filter((item: any) => item.campo_questoes === null) // Filtra os elementos com campo_questoes como null
   .map((item: any) => item.id);
-
 if (apenasNull && apenasNull.length > 0 && id === undefined) {
   for (const id of apenasNull) {
     await api.delete(`formulario/${id}`, {
@@ -523,6 +513,8 @@ if (apenasNull && apenasNull.length > 0 && id === undefined) {
   // Check if user is superuser
   const isSuperuser = decoded?.is_superuser;
   const tipo = decoded?.tipo.toLowerCase();
+  const page1 = tipo === "saúde" && !id ? 0 : 1;
+  const permission = tipo === "saúde" && id ? true : false;
   // If user is not superuser, redirect to home page
   if (isSuperuser) {
     return {
@@ -536,8 +528,10 @@ if (apenasNull && apenasNull.length > 0 && id === undefined) {
   // Authentication successful, proceed with rendering the page
   return {
     props: {
-      tipo,
+      page1,
       token,
+      tipo,
+      permission
     },
   };
 };

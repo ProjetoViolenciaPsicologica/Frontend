@@ -130,7 +130,6 @@ export default function Index() {
     const data1: any = JSON.parse(cookies.dataFilter);
     const data2: any = cookies.dataSearch;
     const age1: any = cookies.age;
-    console.log(age1);
     setAge(age1);
     setData(data1);
 
